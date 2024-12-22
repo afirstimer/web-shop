@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  username  String    @unique
+  password  String
+  avatar    String?
+  createdAt DateTime  @default(now())
+  shops     Shop[]
+  listings  Listing[]
+}
+
+model Shop {
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  name         String          @unique
+  code         String          @unique
+  userId       String          @db.ObjectId
+  User         User            @relation(fields: [userId], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedat    DateTime        @updatedAt
+  status       String
+  priceDiff    Int
+  shopItems    Int
+  images       String[]
+  refreshToken String?
+  accessToken  String?
+  listings     ListingOnShop[]
+  products     Product[]       @relation("ShopProducts")
+}
+
+model Listing {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  images      String[]
+  code        String
+  price       Int
+  description String
+  user        User            @relation(fields: [userId], references: [id])
+  userId      String          @unique @db.ObjectId
+  shopId      String          @db.ObjectId
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  shops       ListingOnShop[]
+  products    Product[]       @relation("ListingProducts")
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       String
+  listing     Listing  @relation("ListingProducts", fields: [listingId], references: [id])
+  shop        Shop?    @relation("ShopProducts", fields: [shopId], references: [id])
+  listingId   String   @db.ObjectId
+  shopId      String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ListingOnShop {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  shopId    String  @db.ObjectId
+  listingId String  @db.ObjectId
+  shop      Shop    @relation(fields: [shopId], references: [id])
+  listing   Listing @relation(fields: [listingId], references: [id])
+  status    Status  @default(PENDING)
+}
+
+model Template {
+  id                         String                      @id @default(auto()) @map("_id") @db.ObjectId
+  name                       String?
+  description                String?
+  type                       TemplateType                @default(Dropshipping)
+  productTemplate            String
+  productTemplateDescription String
+  categoryId                 String                      @db.ObjectId
+  category                   TemplateProductCategory     @relation(fields: [categoryId], references: [id])
+  attributes                 TemplateProductAttribute[]
+  compliances                TemplateProductCompliance[]
+  sku                        TemplateProductSku[]
+  skuUpc                     String?
+  skuPrice                   String?
+  skuQty                     String?
+  skuSeller                  String?
+  logisticWeight             String?
+  logisticIsActive           Int
+  logisticIsCod              Int
+  logisticLength             String
+  logisticWidth              String
+  logisticHeight             String
+}
+
+model TemplateProductCategory {
+  id          String                      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  parentId    String?                     @db.ObjectId
+  parent      TemplateProductCategory?    @relation("CategoryParent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    TemplateProductCategory[]   @relation("CategoryParent")
+  attributes  TemplateProductAttribute[]
+  compliances TemplateProductCompliance[]
+  sku         TemplateProductSku[]
+  Template    Template[]
+}
+
+model TemplateProductAttribute {
+  id         String                           @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  categoryId String                           @db.ObjectId
+  options    TemplateProductAttributeOption[]
+  category   TemplateProductCategory          @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime                         @default(now())
+  updatedAt  DateTime                         @updatedAt
+  Template   Template?                        @relation(fields: [templateId], references: [id])
+  templateId String?                          @db.ObjectId
+}
+
+model TemplateProductAttributeOption {
+  id          String                   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  attributeId String                   @db.ObjectId
+  attribute   TemplateProductAttribute @relation(fields: [attributeId], references: [id])
+}
+
+model TemplateProductCompliance {
+  id         String                            @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  categoryId String                            @db.ObjectId
+  options    TemplateProductComplianceOption[]
+  category   TemplateProductCategory           @relation(fields: [categoryId], references: [id])
+  templateId String                            @db.ObjectId
+  template   Template?                         @relation(fields: [templateId], references: [id])
+  createdAt  DateTime                          @default(now())
+  updatedAt  DateTime                          @updatedAt
+}
+
+model TemplateProductComplianceOption {
+  id          String                    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  attributeId String                    @db.ObjectId
+  attribute   TemplateProductCompliance @relation(fields: [attributeId], references: [id])
+}
+
+model TemplateProductSku {
+  id         String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  categoryId String                  @db.ObjectId
+  category   TemplateProductCategory @relation(fields: [categoryId], references: [id])
+  field      ProductSku              @default(Color)
+  value      String
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @updatedAt
+  Template   Template?               @relation(fields: [templateId], references: [id])
+  templateId String?                 @db.ObjectId
+}
+
+enum ProductSku {
+  Color
+}
+
+enum TemplateType {
+  Dropshipping
+  POD
+}
+
+enum Status {
+  SUCCESS
+  FAILURE
+  PENDING
+}
