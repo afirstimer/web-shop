@@ -12,10 +12,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(data));
     setIsAuthenticated(true)    
   };
+  const getUser = () => JSON.parse(localStorage.getItem("user"));
   const logout = () => setIsAuthenticated(false);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, getUser }}>
       {children}
     </AuthContext.Provider>
   );

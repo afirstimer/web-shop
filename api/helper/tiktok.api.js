@@ -15,7 +15,7 @@ export const interpolateVar = (value, variables) => {
   return value.replace(/\{\{(.*?)\}\}/g, (_, name) => variables[name] || "");
 };
 
-export const calculateSign = (request, secret, timestamp) => {  
+export const calculateSign = (request, secret, timestamp, header) => {  
   request.query.timestamp = timestamp;
 
   const queryParams = request.query || {};
@@ -35,13 +35,13 @@ export const calculateSign = (request, secret, timestamp) => {
   console.log(signString);
   console.log(sortedParams);
   for (const key in sortedParams) {
-    if (key == 'path' || key == 'secret') continue;
+    if (key == 'path' || key == 'secret' || key == 'shop_id') continue;
     signString += key + sortedParams[key];
   }
 
   console.log(signString);
 
-  // if (request.body) {
+  // if (header != "multipart/form-data") {
   //   signString += JSON.stringify(request.body);
   // }
 
@@ -53,6 +53,6 @@ export const calculateSign = (request, secret, timestamp) => {
   return hmac.digest("hex");
 };
 
-export const generateSign = (request, secret, timestamp) => {
-  return calculateSign(request, secret, timestamp);
+export const generateSign = (request, secret, timestamp, header) => {
+  return calculateSign(request, secret, timestamp, header);
 };

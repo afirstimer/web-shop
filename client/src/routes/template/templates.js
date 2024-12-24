@@ -78,9 +78,9 @@ const Templates = () => {
                 name: 'Nguyen Van A',
                 avatar: avatar1,
                 email: 'afiV7@example.com',
-            }            
+            }
         },
-    ]
+    ]    
 
     const addTemplate = () => {
         navigate('/template/add')
@@ -92,7 +92,7 @@ const Templates = () => {
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
-                        Danh sách template                         
+                        Danh sách template
                     </h4>
                 </CCol>
                 <CCol sm={7} className="d-none d-md-block">
@@ -140,7 +140,7 @@ const Templates = () => {
                                                     <CAvatar size="md" src={item.user.avatar} />
                                                     {item.user.name}
                                                 </CButton>
-                                            </CTableDataCell>                                            
+                                            </CTableDataCell>
                                             <CTableDataCell className="text-center d-none d-md-table-cell">
                                                 <CButton className='me-2' color="warning" size="sm">
                                                     <CIcon icon={cilPencil} className="me-2" />

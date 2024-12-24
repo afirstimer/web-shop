@@ -12,7 +12,8 @@ export const getShops = async (req, res) => {
                 User: {
                     select: {
                         username: true,
-                        email: true
+                        email: true,
+                        avatar: true
                     }
                 }
             },
@@ -64,7 +65,9 @@ export const requestAuthorizedShops = async (request, res) => {
 
     request.query.path = "/authorization/202309/shops";
     const timestamp = Math.floor(Date.now() / 1000);
-    const sign = generateSign(request, secret, timestamp);    
+    const header = request.headers['content-type'];
+    console.log(header);
+    const sign = generateSign(request, secret, timestamp, header);    
     console.log(sign);
 
     // Define your request details
@@ -117,21 +120,45 @@ export const requestAuthorizedShops = async (request, res) => {
 
             for (const shop of response.data.data.shops) {
                 console.log(shop);
-                const newShop = await prisma.shop.create({
-                    data: {
-                        name: shop.name,
+                
+                // find shop by code
+                const existingShop = await prisma.shop.findUnique({
+                    where: {
                         code: shop.code,
-                        userId: user.id,
-                        status: "authorized",
-                        refreshToken: process.env.TIKTOK_SHOP_REFRESH_TOKEN,
-                        accessToken: access_token,
-                        priceDiff: 0,
-                        shopItems: 0,
-                        images: []                        
                     },
                 });
-
-                console.log(newShop);
+                console.log(existingShop);
+                if (existingShop) {
+                    // update
+                    await prisma.shop.update({
+                        where: {
+                            id: existingShop.id,
+                        },
+                        data: {
+                            status: "authorized",
+                            signString: sign,
+                            tiktokShopCipher: shop.cipher,
+                            tiktokTimestamp: timestamp                            
+                        },
+                    });
+                } else {
+                    const newShop = await prisma.shop.create({
+                        data: {
+                            name: shop.name,
+                            code: shop.code,
+                            userId: user.id,
+                            status: "authorized",
+                            refreshToken: process.env.TIKTOK_SHOP_REFRESH_TOKEN,
+                            accessToken: access_token,
+                            priceDiff: 0,
+                            shopItems: 0,
+                            images: [],
+                            signString: sign,
+                            tiktokShopCipher: shop.cipher,
+                            tiktokTimestamp: timestamp                           
+                        },
+                    });
+                }                                
             }
 
             res.status(200).json(response.data);

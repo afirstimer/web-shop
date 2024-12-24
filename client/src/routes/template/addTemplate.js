@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     CButton,
     CCard,
@@ -27,9 +27,65 @@ import CIcon from '@coreui/icons-react';
 import { cilArrowLeft, cilPlus, cilTrash } from '@coreui/icons';
 import { useNavigate } from 'react-router-dom';
 import { auto } from '@popperjs/core';
+import TreeSelect from '../../components/TreeSelect';
+import apiRequest from '../../lib/apiRequest';
 
 const AddTemplate = () => {
     const navigate = useNavigate();
+
+    const [categories, setCategories] = useState([]);
+
+    function transformToTree(data) {
+        // Map to store nodes by tiktokId for quick lookup
+        const nodeMap = new Map();
+
+        // Final tree structure
+        const tree = [];
+
+        // Step 1: Initialize nodes with their basic structure
+        data.forEach((item) => {
+            const node = {
+                id: item.id,
+                label: item.name,
+                level: item.tiktokParentId === "0" ? 0 : null, // Level will be adjusted later
+                children: [],
+            };
+            nodeMap.set(item.tiktokId, node);
+        });
+
+        // Step 2: Build the tree by assigning children to their parents
+        data.forEach((item) => {
+            const node = nodeMap.get(item.tiktokId);
+
+            if (item.tiktokParentId === "0") {
+                // Top-level nodes go directly to the tree
+                tree.push(node);
+            } else {
+                // Find the parent and add this node to its children
+                const parent = nodeMap.get(item.tiktokParentId);
+                if (parent) {
+                    node.level = (parent.level || 0) + 1;
+                    parent.children.push(node);
+                }
+            }
+        });
+
+        return tree;
+    }
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await apiRequest.get('/categories');
+                const treeData = transformToTree(response.data);
+                setCategories(treeData);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchCategories();
+    }, []);    
 
     const redirect = () => {
         navigate('/templates');
@@ -55,10 +111,9 @@ const AddTemplate = () => {
                                 </CCol>
                                 <CCol md={6}>
                                     <CFormSelect aria-label="Default select example" label="Loại">
-                                        <option>Danh mục</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
+                                        <option>Loại</option>
+                                        <option value="1">Dropshipping</option>
+                                        <option value="2">POD</option>
                                     </CFormSelect>
                                 </CCol>
                             </CForm>
@@ -84,12 +139,10 @@ const AddTemplate = () => {
                                     <ReactQuill theme="snow" />
                                 </CCol>
                                 <CCol xs={12}>
-                                    <CFormSelect aria-label="Default select example" label="Danh mục">
-                                        <option>Danh mục</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
+                                    <CFormLabel htmlFor="inputAddress2">Danh mục</CFormLabel>
+                                </CCol>
+                                <CCol xs={12}>
+                                    <TreeSelect treeData={categories} />
                                 </CCol>
                             </CForm>
                         </CCardBody>

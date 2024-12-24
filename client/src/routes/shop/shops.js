@@ -61,21 +61,21 @@ import WidgetsDropdown from '../../views/widgets/WidgetsDropdown'
 import MainChart from '../../views/dashboard/MainChart'
 
 import apiRequest from '../../lib/apiRequest'
+import avatarDefault from 'src/assets/images/avatars/default.png'
 
 const Shops = () => {
-    const tableExample = [
-        {
-            name: 'EssenceSNE',
-            profile: 'TTS92',
-            shopCode: 'USLC3AENU9',
-            user: {
-                name: 'Nguyen Van A',
-                avatar: avatar1,
-                email: 'afiV7@example.com',
-            },
-            status: 'CONNECTED',
-        },
-    ]
+    const [shops, setShops] = React.useState([])    
+
+    useEffect(() => {
+        apiRequest('shops')
+            .then((res) => {
+                console.log(res.data)
+                setShops(res.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [])
 
     return (
         <>
@@ -118,7 +118,7 @@ const Shops = () => {
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
-                                    {tableExample.map((item, index) => (
+                                    {shops.map((item, index) => (
                                         <CTableRow v-for="item in tableItems" key={index}>
                                             <CTableDataCell>
                                                 <div>{item.name}</div>
@@ -127,14 +127,14 @@ const Shops = () => {
                                                 <div>{item.profile}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <CButton color={item.status} size="sm">
-                                                    {item.shopCode}
+                                                <CButton color={item.status === 'authorized' ? 'success' : 'danger'} size="sm">
+                                                    {item.code}
                                                 </CButton>
                                             </CTableDataCell>
                                             <CTableDataCell>
                                                 <CButton color="info" size="sm">
-                                                    <CAvatar size="md" src={item.user.avatar} />
-                                                    {item.user.name}
+                                                    <CAvatar size="md" src={item.User.avatar || avatarDefault} />
+                                                    {item.User.username}
                                                 </CButton>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">

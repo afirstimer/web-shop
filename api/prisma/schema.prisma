@@ -25,21 +25,24 @@ model User {
 }
 
 model Shop {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  name         String          @unique
-  code         String          @unique
-  userId       String          @db.ObjectId
-  User         User            @relation(fields: [userId], references: [id])
-  createdAt    DateTime        @default(now())
-  updatedat    DateTime        @updatedAt
-  status       String
-  priceDiff    Int
-  shopItems    Int
-  images       String[]
-  refreshToken String?
-  accessToken  String?
-  listings     ListingOnShop[]
-  products     Product[]       @relation("ShopProducts")
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  name             String          @unique
+  code             String          @unique
+  userId           String          @db.ObjectId
+  User             User            @relation(fields: [userId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedat        DateTime        @updatedAt
+  status           String
+  priceDiff        Int
+  shopItems        Int
+  images           String[]
+  refreshToken     String?
+  accessToken      String?
+  signString       String?
+  tiktokShopCipher String?
+  tiktokTimestamp  Int?
+  listings         ListingOnShop[]
+  products         Product[]       @relation("ShopProducts")
 }
 
 model Listing {
@@ -105,15 +108,15 @@ model Template {
 }
 
 model TemplateProductCategory {
-  id          String                      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String?
-  parentId    String?                     @db.ObjectId
-  parent      TemplateProductCategory?    @relation("CategoryParent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children    TemplateProductCategory[]   @relation("CategoryParent")
-  attributes  TemplateProductAttribute[]
-  compliances TemplateProductCompliance[]
-  sku         TemplateProductSku[]
-  Template    Template[]
+  id             String                      @id @default(auto()) @map("_id") @db.ObjectId
+  tiktokId       String?                        @unique
+  tiktokParentId String?                        
+  name           String?
+  parentId       String?                       
+  attributes     TemplateProductAttribute[]
+  compliances    TemplateProductCompliance[]
+  sku            TemplateProductSku[]
+  template       Template[]
 }
 
 model TemplateProductAttribute {
