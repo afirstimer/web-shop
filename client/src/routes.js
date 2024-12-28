@@ -59,6 +59,8 @@ const Templates = React.lazy(() => import('./routes/template/templates'))
 const AddTemplate = React.lazy(() => import('./routes/template/addTemplate'))
 const Products = React.lazy(() => import('./routes/product/products'))
 const Tool = React.lazy(() => import('./routes/tool/tool'))
+const Settings = React.lazy(() => import('./routes/setting/settings'))
+const Setting = React.lazy(() => import('./routes/setting/setting'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -76,6 +78,8 @@ const routes = [
   { path: '/shops', name: 'Shops', element: Dashboard },  
   { path: '/users', name: 'Users', element: Users },  
   { path: '/tools', name: 'Tool', element: Tool },  
+  { path: '/settings', name: 'Settings', element: Settings },
+  { path: '/setting', name: 'Setting', element: Setting },
   /**
    * THEME ROUTES
    */

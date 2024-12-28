@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import TreeNode from "./TreeNode";
 
-const TreeSelect = ({ treeData }) => {
+const TreeSelect = ({ treeData, onCategorySelect }) => {
   const [selectedValue, setSelectedValue] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleNodeSelect = (node) => {
-    setSelectedValue(node.label);
-    setIsDropdownOpen(false);
+    // Chỉ xử lý khi node là con cuối cùng
+    if (!node.children || node.children.length === 0) {
+      setSelectedValue(node.label);
+      setIsDropdownOpen(false);
+
+      // Gọi callback với categoryId
+      if (onCategorySelect) {
+        onCategorySelect(node.tiktokId);
+      }
+    }
   };
 
   return (

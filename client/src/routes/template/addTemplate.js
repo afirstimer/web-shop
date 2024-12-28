@@ -34,6 +34,8 @@ const AddTemplate = () => {
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
+    const [attributes, setAttributes] = useState([]);
+    const [compliances, setCompliances] = useState([]);
 
     function transformToTree(data) {
         // Map to store nodes by tiktokId for quick lookup
@@ -47,6 +49,7 @@ const AddTemplate = () => {
             const node = {
                 id: item.id,
                 label: item.name,
+                tiktokId: item.tiktokId,
                 level: item.tiktokParentId === "0" ? 0 : null, // Level will be adjusted later
                 children: [],
             };
@@ -85,11 +88,31 @@ const AddTemplate = () => {
         };
 
         fetchCategories();
-    }, []);    
+    }, []);
+    
+    const fetchAttributes = async (categoryId) => {
+        try {            
+            setAttributes([]);
+            setCompliances([]);
+            const response = await apiRequest.get(`/categories/attributes?app_key=6eouk0lpquf3t&secret=09c1877519822f00aafbc33b78e9b24737d196d2&access_token=TTP_5lsWywAAAACGD35nn-1nOBdSlf-vOZILHEhx2xvOPmORipHkKr9hf_CrJk-FwaO3IAk5NNhEmYtuu0EOZGvv4SHA30u8RSt3DdT2kn2L7q0rxqhopx5h88bxbiK_vuXyMwXqotEixK3IQluS6jkf1mCcj95xISTnmmy78gdCBJRU6_4LI3D4BA&shop_id=67658ae074770469c66f6b2c&category_version=v2&category_id=${categoryId}`);
+            // loop response if item.is_required true add to attributes, otherwise add to compliances
+            response.data.forEach(item => {
+                if (item.is_required) {
+                    setAttributes(prevAttributes => [...prevAttributes, item]);
+                } else {
+                    setCompliances(prevCompliances => [...prevCompliances, item]);
+                }
+            })
+        } catch (error) {
+            console.error('Error fetching attributes:', error);
+        }
+    };
 
     const redirect = () => {
         navigate('/templates');
     }
+
+
 
     return (
         <>
@@ -132,7 +155,7 @@ const AddTemplate = () => {
                         <CCardBody>
                             <CForm className="row g-3">
                                 <CCol xs={12}>
-                                    <CFormInput id="inputAddress" label="Tên" placeholder="1234 Main St" />
+                                    <CFormInput id="inputAddress" label="Tên" placeholder="" />
                                 </CCol>
                                 <CCol xs={12}>
                                     <CFormLabel htmlFor="inputAddress2">Mô tả</CFormLabel>
@@ -142,7 +165,7 @@ const AddTemplate = () => {
                                     <CFormLabel htmlFor="inputAddress2">Danh mục</CFormLabel>
                                 </CCol>
                                 <CCol xs={12}>
-                                    <TreeSelect treeData={categories} />
+                                    <TreeSelect treeData={categories} onCategorySelect={fetchAttributes}/>
                                 </CCol>
                             </CForm>
                         </CCardBody>
@@ -159,15 +182,16 @@ const AddTemplate = () => {
                         </CCardHeader>
                         <CCardBody>
                             <CForm className="row g-3">
-                                <CCol md={4}>
-                                    <CFormInput type="email" id="inputEmail4" label="Tên" />
-                                </CCol>
-                                <CCol md={4}>
-                                    <CFormInput type="password" id="inputPassword4" label="Loại" />
-                                </CCol>
-                                <CCol md={4}>
-                                    <CFormInput type="password" id="inputPassword4" label="Loại" />
-                                </CCol>
+                                {attributes.map((attribute, index) => (
+                                    <CCol md={4} key={index}>
+                                        <CFormLabel htmlFor="validationDefault01">{attribute.name}</CFormLabel>
+                                        <CFormSelect aria-label="Default select example">
+                                            {attribute.options && attribute.options.map((value, index) => (
+                                                <option key={index}>{value.name}</option>
+                                            ))}
+                                        </CFormSelect>
+                                    </CCol>
+                                ))}                                                              
                             </CForm>
                         </CCardBody>
                     </CCard>
@@ -183,20 +207,21 @@ const AddTemplate = () => {
                         </CCardHeader>
                         <CCardBody>
                             <CForm className="row g-3">
-                                <CCol md={4}>
-                                    <CFormInput type="email" id="inputEmail4" label="Tên" />
-                                </CCol>
-                                <CCol md={4}>
-                                    <CFormInput type="password" id="inputPassword4" label="Loại" />
-                                </CCol>
-                                <CCol md={4}>
-                                    <CFormInput type="password" id="inputPassword4" label="Loại" />
-                                </CCol>
+                                {compliances.map((compliance, index) => (
+                                    <CCol md={4} key={index}>
+                                        <CFormLabel htmlFor="validationDefault01">{compliance.name}</CFormLabel>
+                                        <CFormSelect aria-label="Default select example">
+                                            {compliance.options && compliance.options.map((value, index) => (
+                                                <option key={index}>{value.name}</option>
+                                            ))}
+                                        </CFormSelect>
+                                    </CCol>
+                                ))}                                
                             </CForm>
                         </CCardBody>
                     </CCard>
                 </CCol>
-            </CRow>
+            </CRow>            
             <CRow className='mt-5'>
                 <CCol xs={12}>
                     <CCard>
@@ -208,10 +233,16 @@ const AddTemplate = () => {
                         <CCardBody>
                             <CForm className="row g-3">
                                 <CCol md={5}>
-                                    <CFormInput type="email" id="inputEmail4" label="Thuộc tính" />
+                                    <CFormLabel htmlFor="inputPassword4">Attribute</CFormLabel>
+                                    <CFormSelect aria-label="Default select example">
+                                        <option>Open this select menu</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </CFormSelect>
                                 </CCol>
                                 <CCol md={5}>
-                                    <CFormInput type="password" id="inputPassword4" label="Giá trị" />
+                                    <CFormInput type="password" id="inputPassword4" label="Value" />
                                 </CCol>
                                 <CCol md={2}>
                                     <CButton className='mt-4 ms-5 circle' color='danger'>

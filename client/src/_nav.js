@@ -12,7 +12,11 @@ import {
   cilHouse,
   cilLink,
   cilInbox,
-  cilSettings
+  cilSettings,
+  cilKeyboard,
+  cilLockLocked,
+  cilDoor,
+  cibGlassdoor
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -95,14 +99,20 @@ const _nav = [
         component: CNavItem,
         name: (
           <React.Fragment>
-            {'Tools'}
-            <CIcon icon={cilSettings} size="sm" className="ms-2" />
+            {'Token'}
+            <CIcon icon={cilLockLocked} size="sm" className="ms-2" />
           </React.Fragment>
         ),
         to: '/tools',
       },
     ],
   }, 
+  {
+    component: CNavItem,
+    name: 'Proxy',
+    to: '/settings',
+    icon: <CIcon icon={cilDoor} customClassName="nav-icon" />    
+  }
 ]
 
 export default _nav

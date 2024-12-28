@@ -175,36 +175,36 @@ export const getTiktokShopInfo = async (req, res) => {
 
 // refresh token
 export const refreshToken = async (req, res) => {
-    // const url = 'https://auth.tiktok-shops.com/api/v2/token/refresh';
+    const url = 'https://auth.tiktok-shops.com/api/v2/token/refresh';
 
     console.log('Refreshing token...');
-    // const params = {
-    //     app_key: process.env.TIKTOK_SHOP_APP_KEY,
-    //     app_secret: process.env.TIKTOK_SHOP_APP_SECRET,
-    //     refresh_token: process.env.TIKTOK_SHOP_REFRESH_TOKEN,
-    //     grant_type: 'refresh_token'
-    // };    
+    const params = {
+        app_key: process.env.TIKTOK_SHOP_APP_KEY,
+        app_secret: process.env.TIKTOK_SHOP_APP_SECRET,
+        refresh_token: process.env.TIKTOK_SHOP_REFRESH_TOKEN,
+        grant_type: 'refresh_token'
+    };    
 
-    // try {
-    //     const response = await axios.get(url, { params });
-    //     const { code, message, data } = response.data;
+    try {
+        const response = await axios.get(url, { params });
+        const { code, message, data } = response.data;
 
-    //     console.log('API Response:', response.data);
+        console.log('API Response:', response.data);
 
-    //     if (code === 0 && message === 'success') {
-    //         const accessToken = data.access_token;
-    //         const refreshToken = data.refresh_token;
+        if (code === 0 && message === 'success') {
+            const accessToken = data.access_token;
+            const refreshToken = data.refresh_token;
 
-    //         console.log('Access Token:', accessToken);
-    //         console.log('Refresh Token:', refreshToken);
+            console.log('Access Token:', accessToken);
+            console.log('Refresh Token:', refreshToken);
 
-    //         return { accessToken, refreshToken };
-    //     } else {
-    //         console.error('API Error:', response.data);
-    //         throw new Error('Failed to refresh token');
-    //     }
-    // } catch (error) {
-    //     console.error('Error refreshing token:', error.message);
-    //     throw error;
-    // }
+            return { accessToken, refreshToken };
+        } else {
+            console.error('API Error:', response.data);
+            throw new Error('Failed to refresh token');
+        }
+    } catch (error) {
+        console.error('Error refreshing token:', error.message);
+        throw error;
+    }
 }

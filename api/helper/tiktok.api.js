@@ -35,7 +35,7 @@ export const calculateSign = (request, secret, timestamp, header) => {
   console.log(signString);
   console.log(sortedParams);
   for (const key in sortedParams) {
-    if (key == 'path' || key == 'secret' || key == 'shop_id') continue;
+    if (key == 'path' || key == 'secret' || key == 'shop_id' || key == 'category_id') continue;
     signString += key + sortedParams[key];
   }
 

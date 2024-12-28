@@ -9,6 +9,7 @@ import {
     CCardBody,
     CCardFooter,
     CCardHeader,
+    CCardImage,
     CCol,
     CFormInput,
     CFormSelect,
@@ -83,6 +84,7 @@ const Listings = () => {
     const [visible, setVisible] = useState(false)
     const [visibleCrawl, setVisibleCrawl] = useState(false)
     const navigate = useNavigate();
+    const [listings, setListings] = useState([]);
 
     const tableExample = [
         {
@@ -93,6 +95,18 @@ const Listings = () => {
             shop: 'ABC Mart'
         },
     ]
+
+    useEffect(() => {
+        const fetchListings = async () => {
+            try {
+                const res = await apiRequest.get('/listings');
+                setListings(res.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchListings();
+    }, [])
 
     const viewDetail = () => {
         navigate('/listing');
@@ -180,10 +194,10 @@ const Listings = () => {
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
-                                    {tableExample.map((item, index) => (
+                                    {listings.map((item, index) => (
                                         <CTableRow v-for="item in tableItems" key={index}>
                                             <CTableDataCell>
-                                                <CAvatar src={item.image} className='rounded' />
+                                                <CCardImage src={item.images[0]} className='rounded' />
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
                                                 <div>{item.name}</div>
