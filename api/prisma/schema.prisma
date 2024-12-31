@@ -46,19 +46,25 @@ model Shop {
 }
 
 model Listing {
-  id          String          @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  images      String[]
-  code        String
-  price       String
-  description String
-  user        User            @relation(fields: [userId], references: [id])
-  userId      String          @db.ObjectId
-  shopId      String          @db.ObjectId
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  shops       ListingOnShop[]
-  products    Product[]       @relation("ListingProducts")
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  images           String[]
+  price            String
+  crawlUrl         String?
+  sku              String?
+  productDimension String?
+  packageDimension String?
+  itemModelNumber  String?
+  upc              String?
+  manufacturer     String?
+  countryOfOrigin  String?
+  description      String
+  user             User            @relation(fields: [userId], references: [id])
+  userId           String          @db.ObjectId
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  shops            ListingOnShop[]
+  products         Product[]       @relation("ListingProducts")
 }
 
 model Product {
@@ -171,24 +177,24 @@ model TemplateProductSku {
 }
 
 model Setting {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  accessToken  String?
-  expiredIn    Int  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  accessToken String?
+  expiredIn   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Proxy {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  type ProxyType @default(SOCKS5)
-  hostname String
-  port Int
-  isActive Int @default(0)
-  username String
-  password String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  type      ProxyType @default(SOCKS5)
+  hostname  String
+  port      String
+  isActive  Int       @default(0)
+  username  String
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 enum ProxyType {

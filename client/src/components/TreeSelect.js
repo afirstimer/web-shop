@@ -1,25 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TreeNode from "./TreeNode";
 
 const TreeSelect = ({ treeData, onCategorySelect }) => {
   const [selectedValue, setSelectedValue] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }       
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, []);
 
   const handleNodeSelect = (node) => {
     // Chỉ xử lý khi node là con cuối cùng
     if (!node.children || node.children.length === 0) {
-      setSelectedValue(node.label);
-      setIsDropdownOpen(false);
-
       // Gọi callback với categoryId
       if (onCategorySelect) {
         onCategorySelect(node.tiktokId);
       }
+      setSelectedValue(node.label);
+      setIsDropdownOpen(false);      
     }
   };
 
   return (
-    <div style={{ position: "relative", display: "inline-block", width: "100%" }}>
+    <div rel={dropdownRef} style={{ position: "relative", display: "inline-block", width: "100%" }}>
       <div
         style={{
           border: "1px solid #ccc",

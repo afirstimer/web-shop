@@ -1,6 +1,5 @@
 import express from "express";
-import { 
-    getSettings, 
+import {     
     getSetting,
     createSetting,
     updateSetting,
@@ -9,8 +8,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", getSettings);
-router.get("/:id", getSetting);
+router.get("/", getSetting);
 router.post("/", createSetting);
 router.put("/:id", updateSetting);
 router.delete("/:id", deleteSetting);

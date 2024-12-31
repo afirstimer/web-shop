@@ -3,24 +3,13 @@ import jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import axios from "axios";
 
-
-export const getSettings = async (req, res) => {
-    try {
-        const settings = await prisma.setting.findMany();
-        res.status(200).json(settings);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-    }
-}
-
 export const getSetting = async (req, res) => {
     try {
-        const setting = await prisma.setting.findUnique({
-            where: {
-                id: req.params.id,
-            },
-        });
+        const settings = await prisma.setting.findMany();
+        if (!settings.length) {
+            res.status(404).json({ message: "Setting not found" });
+        }
+        const setting = settings[0];
         res.status(200).json(setting);
     } catch (error) {
         console.log(error);

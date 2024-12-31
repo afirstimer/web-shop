@@ -68,10 +68,25 @@ export const updateProxy = async (req, res) => {
                 isActive
             }
         });
+
+        res.status(200).json(updatedProxy);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: error.message });
     }
 }
 
-export const deleteProxy = async (req, res) => {}
+export const deleteProxy = async (req, res) => {
+    try {
+        await prisma.proxy.delete({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        res.status(200).json({ message: "Proxy deleted" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}

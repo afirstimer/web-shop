@@ -8,7 +8,7 @@ import {
 } from "@coreui/react";
 import React from "react";
 
-const DeleteListing = ({ visible, setVisible, deleteListing }) => {
+const DeleteProxy = ({ visible, setVisible, removeProxy }) => {
     return (
         <CModal
             visible={visible}
@@ -16,7 +16,7 @@ const DeleteListing = ({ visible, setVisible, deleteListing }) => {
             aria-labelledby="LiveDemoExampleLabel"
         >
             <CModalHeader>
-                <CModalTitle id="LiveDemoExampleLabel">Xác nhận xóa sản phẩm</CModalTitle>
+                <CModalTitle id="LiveDemoExampleLabel">Xác nhận xóa Proxy</CModalTitle>
             </CModalHeader>
             <CModalBody>
                 <p>Bấm xóa để tiếp tục</p>
@@ -25,10 +25,10 @@ const DeleteListing = ({ visible, setVisible, deleteListing }) => {
                 <CButton color="secondary" onClick={() => setVisible(false)}>
                     Đóng
                 </CButton>
-                <CButton color="primary" onClick={() => deleteListing()}>Xóa</CButton>
+                <CButton color="primary" onClick={() => removeProxy()}>Xóa</CButton>
             </CModalFooter>
         </CModal>
     );
 };
 
-export default DeleteListing
+export default DeleteProxy

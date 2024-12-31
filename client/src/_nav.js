@@ -110,7 +110,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Proxy',
-    to: '/settings',
+    to: '/proxies',
     icon: <CIcon icon={cilDoor} customClassName="nav-icon" />    
   }
 ]

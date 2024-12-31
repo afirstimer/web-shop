@@ -1,14 +1,22 @@
 import express from "express";
+import { verifyToken } from "../middleware/verifyToken.js";
 import { 
     crawlAmazonProduct,
     getListings,
-    getListing
+    getListing,
+    updateListing,
+    deleteListing
 } from "../controllers/listing.controller.js";
 
 const router = express.Router();
 
+// crawl ko can verify token
 router.post("/", crawlAmazonProduct);
-router.get("/", getListings);
-router.get("/:id", getListing);
+
+// verify token
+router.get("/",  verifyToken, getListings);
+router.get("/:id", verifyToken, getListing);
+router.put("/:id", verifyToken, updateListing);
+router.delete("/:id", verifyToken, deleteListing);
 
 export default router;

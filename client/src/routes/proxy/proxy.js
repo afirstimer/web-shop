@@ -31,37 +31,60 @@ import { auto } from '@popperjs/core';
 import TreeSelect from '../../components/TreeSelect';
 import apiRequest from '../../lib/apiRequest';
 
-const Setting = () => {
+const Proxy = () => {
     const navigate = useNavigate();
 
-    const [categories, setCategories] = useState([]);        
+    const [proxy, setProxy] = useState([]);
+    const [error, setError] = useState('');
 
     const redirect = () => {
-        navigate('/settings');
+        navigate('/proxies');
     }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        try {
+            const res = await apiRequest.post('/proxy', {
+                name: formData.get('name'),
+                type: formData.get('type'),
+                hostname: formData.get('hostname'),
+                port: formData.get('port'),
+                isActive: formData.get('isActive'),
+                username: formData.get('username'),
+                password: formData.get('password')
+            });
+
+            navigate('/proxies');
+        } catch (error) {
+            console.log(error.message);
+            setError(error.message);
+        }
+    };
 
     return (
         <>
             <CButton className='mb-3' color="warning" onClick={redirect}>
                 <CIcon icon={cilArrowLeft} className="me-1" /> Quay lại
             </CButton>
-            <CRow className='mt-5'>
-                <CCol xs={12}>
-                    <CCard>
-                        <CCardHeader>
-                            <strong>
-                                Tạo Proxy
-                            </strong>
-                        </CCardHeader>
-                        <CCardBody>
-                            <CForm className="row g-3">
+            <CForm onSubmit={handleSubmit} method='post' className="row g-3">
+                <CRow className='mt-5'>
+                    <CCol xs={12}>
+                        <CCard>
+                            <CCardHeader>
+                                <strong>
+                                    Tạo Proxy
+                                </strong>
+                            </CCardHeader>
+                            <CCardBody>
                                 <CCol xs={12}>
-                                    <CFormInput id="name" label="Tên" placeholder="" aria-describedby='helpName' />
+                                    <CFormInput id="name" name="name" label="Tên" placeholder="" aria-describedby='helpName' required/>
                                     <CFormText id="helpName">Tên cho cấu hình Proxy</CFormText>
                                 </CCol>
                                 <CCol xs={12}>
                                     <CFormLabel htmlFor="inputAddress">Type</CFormLabel>
-                                    <CFormSelect id="type" name='type' aria-describedby='helpType'>
+                                    <CFormSelect id="type" name='type' aria-describedby='helpType' required>
                                         <option>-- Select --</option>
                                         <option value="HTTP">HTTP</option>
                                         <option value="HTTPS">HTTPS</option>
@@ -70,35 +93,35 @@ const Setting = () => {
                                     <CFormText id="helpType">Ví dụ: SOCKS5</CFormText>
                                 </CCol>
                                 <CCol xs={12}>
-                                    <CFormInput id="hostname" label="Hostname" placeholder="" aria-describedby='helpHostname' />
+                                    <CFormInput id="hostname" name="hostname" label="Hostname" placeholder="" aria-describedby='helpHostname' required/>
                                     <CFormText id="helpHostname">Ví dụ: 127.0.0.1</CFormText>
                                 </CCol>
                                 <CCol xs={12}>
-                                    <CFormInput id="port" label="Port" placeholder="" aria-describedby='helpPort' />
+                                    <CFormInput id="port" name="port" label="Port" placeholder="" aria-describedby='helpPort' required/>
                                     <CFormText id="helpPort">Ví dụ: 8080</CFormText>
                                 </CCol>
                                 <CCol xs={12}>
-                                    <CFormInput id="username" label="Username" placeholder="" aria-describedby='helpUsername' />
+                                    <CFormInput id="username" name="username" label="Username" placeholder="" aria-describedby='helpUsername' required/>
                                     <CFormText id="helpUsername">Ví dụ: admin</CFormText>
                                 </CCol>
                                 <CCol xs={12}>
-                                    <CFormInput type='password' id="password" label="Password" placeholder="" aria-describedby='helpPassword' />
+                                    <CFormInput type='password' id="password" name='password' label="Password" placeholder="" aria-describedby='helpPassword' required/>
                                     <CFormText id="helpPassword">Ví dụ: 123456789</CFormText>
                                 </CCol>
-                            </CForm>
-                        </CCardBody>
-                    </CCard>
-                </CCol>
-            </CRow>
-            <CRow className='mt-3'>
-                <CCol xs={12} className='justify-content-center text-center'>
-                    <CButton className='mb-5' color="primary" onClick={redirect}>
-                        Lưu cài đặt
-                    </CButton>
-                </CCol>
-            </CRow>
+                            </CCardBody>
+                        </CCard>
+                    </CCol>
+                </CRow>
+                <CRow className='mt-3'>
+                    <CCol xs={12} className='justify-content-center text-center'>
+                        <CButton type='submit' className='mb-5' color="primary">
+                            Lưu cài đặt
+                        </CButton>
+                    </CCol>
+                </CRow>
+            </CForm>
         </>
     )
 }
 
-export default Setting;
+export default Proxy;
