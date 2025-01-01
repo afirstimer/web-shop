@@ -48,6 +48,30 @@ export const getShop = async (req, res) => {
 
 }
 
+// get shops
+export const getShopsByUser = async (req, res) => {
+    try {
+        const shops = await prisma.shop.findMany({
+            where: {
+                userId: req.params.id
+            },
+            include: {
+                User: {
+                    select: {
+                        username: true,
+                        email: true,
+                        avatar: true
+                    }
+                }
+            },
+        });
+
+        res.status(200).json(shops);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // update shop
 export const updateShop = async (req, res) => {
 

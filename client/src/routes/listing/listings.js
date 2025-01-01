@@ -146,7 +146,7 @@ const Listings = () => {
 
     // upload to shop modal
     const [visibleUpload, setVisibleUpload] = useState(false);
-    const [uploadListing, setUploadListing] = useState(null);
+    const [uploadListings, setUploadListings] = useState(null);
 
     // checkbox
     const [selectAll, setSelectAll] = useState(false);
@@ -231,6 +231,19 @@ const Listings = () => {
         }
     }
 
+    // modal dang san pham
+    const callUpload = () => {
+        try {
+            const fetchListings = async () => {
+                setUploadListings(listings.filter(listing => listing.checked));
+            }
+            fetchListings();
+            setVisibleUpload(true);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     // delete modal
     const callDelete = (id) => {
         setVisible(true);
@@ -310,7 +323,7 @@ const Listings = () => {
             <CrawlListing visible={visibleCrawl} setVisible={setVisibleCrawl} />
             <ViewListing visible={visibleListing} setVisible={setVisibleListing} listing={selectedListing} />
             <EditListing visible={visibleEdit} setVisible={setVisibleEdit} listing={editListing} />
-            <UploadToShop visible={visibleUpload} setVisible={setVisibleUpload} listing={uploadListing} />
+            <UploadToShop visible={visibleUpload} setVisible={setVisibleUpload} listings={uploadListings} />
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
@@ -321,7 +334,7 @@ const Listings = () => {
                     </h4>
                 </CCol>
                 <CCol sm={7} className="d-none d-md-block">
-                    <CButton color="primary" className="float-end" disabled={!uploadStatusBtn} onClick={() => setVisibleUpload(true)}>
+                    <CButton color="primary" className="float-end" disabled={!uploadStatusBtn} onClick={() => callUpload()}>
                         <CIcon icon={cilPlus} /> Đăng sản phẩm
                     </CButton>
                 </CCol>

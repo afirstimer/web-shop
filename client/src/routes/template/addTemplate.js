@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { auto } from '@popperjs/core';
 import TreeSelect from '../../components/TreeSelect';
 import apiRequest from '../../lib/apiRequest';
+import DropdownSearch from '../../components/dropdownSearch/DropdownSearch';
 
 const AddTemplate = () => {
     const navigate = useNavigate();
@@ -36,6 +37,9 @@ const AddTemplate = () => {
     const [categories, setCategories] = useState([]);
     const [attributes, setAttributes] = useState([]);
     const [compliances, setCompliances] = useState([]);
+
+    const [translator, setTranslator] = useState('');
+    const translatorOptions = ['John Doe', 'Jane Smith', 'Alice Johnson'];
 
     function transformToTree(data) {
         // Map to store nodes by tiktokId for quick lookup
@@ -89,9 +93,9 @@ const AddTemplate = () => {
 
         fetchCategories();
     }, []);
-    
+
     const fetchAttributes = async (categoryId) => {
-        try {            
+        try {
             setAttributes([]);
             setCompliances([]);
             const response = await apiRequest.get(`/categories/attributes?app_key=6eouk0lpquf3t&secret=09c1877519822f00aafbc33b78e9b24737d196d2&access_token=TTP_5lsWywAAAACGD35nn-1nOBdSlf-vOZILHEhx2xvOPmORipHkKr9hf_CrJk-FwaO3IAk5NNhEmYtuu0EOZGvv4SHA30u8RSt3DdT2kn2L7q0rxqhopx5h88bxbiK_vuXyMwXqotEixK3IQluS6jkf1mCcj95xISTnmmy78gdCBJRU6_4LI3D4BA&shop_id=67658ae074770469c66f6b2c&category_version=v2&category_id=${categoryId}`);
@@ -112,8 +116,6 @@ const AddTemplate = () => {
         navigate('/templates');
     }
 
-
-
     return (
         <>
             <CButton className='mb-3' color="warning" onClick={redirect}>
@@ -133,11 +135,12 @@ const AddTemplate = () => {
                                     <CFormInput type="email" id="inputEmail4" label="Tên" />
                                 </CCol>
                                 <CCol md={6}>
-                                    <CFormSelect aria-label="Default select example" label="Loại">
-                                        <option>Loại</option>
-                                        <option value="1">Dropshipping</option>
-                                        <option value="2">POD</option>
-                                    </CFormSelect>
+                                    <DropdownSearch
+                                        label="Translator"
+                                        options={translatorOptions}
+                                        value={translator}
+                                        setValue={setTranslator}
+                                    />
                                 </CCol>
                             </CForm>
                         </CCardBody>
@@ -165,7 +168,7 @@ const AddTemplate = () => {
                                     <CFormLabel htmlFor="inputAddress2">Danh mục</CFormLabel>
                                 </CCol>
                                 <CCol xs={12}>
-                                    <TreeSelect treeData={categories} onCategorySelect={fetchAttributes}/>
+                                    <TreeSelect treeData={categories} onCategorySelect={fetchAttributes} />
                                 </CCol>
                             </CForm>
                         </CCardBody>
@@ -191,7 +194,7 @@ const AddTemplate = () => {
                                             ))}
                                         </CFormSelect>
                                     </CCol>
-                                ))}                                                              
+                                ))}
                             </CForm>
                         </CCardBody>
                     </CCard>
@@ -216,12 +219,12 @@ const AddTemplate = () => {
                                             ))}
                                         </CFormSelect>
                                     </CCol>
-                                ))}                                
+                                ))}
                             </CForm>
                         </CCardBody>
                     </CCard>
                 </CCol>
-            </CRow>            
+            </CRow>
             <CRow className='mt-5'>
                 <CCol xs={12}>
                     <CCard>
