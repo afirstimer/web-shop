@@ -5,12 +5,13 @@ import {
     getTikTokCategories,
     getTikTokCategoryAttributes
 } from "../controllers/category.controller.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-router.get("/", getCategories);
-router.get("/attributes", getTikTokCategoryAttributes);
-router.get("/tiktok", getTikTokCategories);
-router.delete("/:id", deleteCategory);
+router.get("/", verifyToken, getTikTokCategories);    //TODO: Replace with /tiktok
+router.get("/attributes", verifyToken, getTikTokCategoryAttributes);
+router.get("/tiktok", verifyToken, getTikTokCategories);
+router.delete("/:id", verifyToken, deleteCategory);
 
 export default router;

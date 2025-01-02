@@ -25,6 +25,7 @@ export const calculateSign = (request, secret, timestamp, header) => {
     let value = queryParams[key];
     param[key] = value;
   }
+  console.log(param);
 
   delete param.sign;
   delete param.access_token;  

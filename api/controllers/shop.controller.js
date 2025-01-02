@@ -74,7 +74,18 @@ export const getShopsByUser = async (req, res) => {
 
 // update shop
 export const updateShop = async (req, res) => {
+    try {
+        const updatedShop = await prisma.shop.update({
+            where: {
+                id: req.params.id,
+            },
+            data: req.body,
+        });
 
+        res.status(200).json(updatedShop);        
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // authorize shop

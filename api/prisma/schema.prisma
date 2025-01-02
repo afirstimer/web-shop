@@ -41,6 +41,7 @@ model Shop {
   signString       String?
   tiktokShopCipher String?
   tiktokTimestamp  Int?
+  defaultShop      Int
   listings         ListingOnShop[]
   products         Product[]       @relation("ShopProducts")
 }
@@ -90,17 +91,16 @@ model ListingOnShop {
 }
 
 model Template {
-  id                         String                      @id @default(auto()) @map("_id") @db.ObjectId
+  id                         String       @id @default(auto()) @map("_id") @db.ObjectId
   name                       String?
   description                String?
-  type                       TemplateType                @default(Dropshipping)
+  type                       TemplateType @default(Dropshipping)
   productTemplate            String
   productTemplateDescription String
-  categoryId                 String                      @db.ObjectId
-  category                   TemplateProductCategory     @relation(fields: [categoryId], references: [id])
-  attributes                 TemplateProductAttribute[]
-  compliances                TemplateProductCompliance[]
-  sku                        TemplateProductSku[]
+  categoryId                 String
+  attributes                 String?
+  compliances                String?
+  skus                       String?
   skuUpc                     String?
   skuPrice                   String?
   skuQty                     String?
@@ -113,75 +113,14 @@ model Template {
   logisticHeight             String
 }
 
-model TemplateProductCategory {
-  id             String                      @id @default(auto()) @map("_id") @db.ObjectId
-  tiktokId       String?                     @unique
-  tiktokParentId String?
-  name           String?
-  parentId       String?
-  attributes     TemplateProductAttribute[]
-  compliances    TemplateProductCompliance[]
-  sku            TemplateProductSku[]
-  template       Template[]
-}
-
-model TemplateProductAttribute {
-  id         String                           @id @default(auto()) @map("_id") @db.ObjectId
-  name       String?
-  categoryId String                           @db.ObjectId
-  options    TemplateProductAttributeOption[]
-  category   TemplateProductCategory          @relation(fields: [categoryId], references: [id])
-  createdAt  DateTime                         @default(now())
-  updatedAt  DateTime                         @updatedAt
-  Template   Template?                        @relation(fields: [templateId], references: [id])
-  templateId String?                          @db.ObjectId
-}
-
-model TemplateProductAttributeOption {
-  id          String                   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  attributeId String                   @db.ObjectId
-  attribute   TemplateProductAttribute @relation(fields: [attributeId], references: [id])
-}
-
-model TemplateProductCompliance {
-  id         String                            @id @default(auto()) @map("_id") @db.ObjectId
-  name       String?
-  categoryId String                            @db.ObjectId
-  options    TemplateProductComplianceOption[]
-  category   TemplateProductCategory           @relation(fields: [categoryId], references: [id])
-  templateId String                            @db.ObjectId
-  template   Template?                         @relation(fields: [templateId], references: [id])
-  createdAt  DateTime                          @default(now())
-  updatedAt  DateTime                          @updatedAt
-}
-
-model TemplateProductComplianceOption {
-  id          String                    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  attributeId String                    @db.ObjectId
-  attribute   TemplateProductCompliance @relation(fields: [attributeId], references: [id])
-}
-
-model TemplateProductSku {
-  id         String                  @id @default(auto()) @map("_id") @db.ObjectId
-  name       String?
-  categoryId String                  @db.ObjectId
-  category   TemplateProductCategory @relation(fields: [categoryId], references: [id])
-  field      ProductSku              @default(Color)
-  value      String
-  createdAt  DateTime                @default(now())
-  updatedAt  DateTime                @updatedAt
-  Template   Template?               @relation(fields: [templateId], references: [id])
-  templateId String?                 @db.ObjectId
-}
-
 model Setting {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  accessToken String?
-  expiredIn   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  accessToken      String?
+  shopAccessToken  String?
+  shopRefreshToken String?
+  expiredIn        Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Proxy {

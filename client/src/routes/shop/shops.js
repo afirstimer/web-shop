@@ -46,7 +46,12 @@ import {
     cilHouse,
     cilReload,
     cilTrash,
-    cilLinkAlt
+    cilLinkAlt,
+    cilThumbUp,
+    cilThumbDown,
+    cibGoogleCloud,
+    cilArrowCircleTop,
+    cilArrowCircleBottom
 } from '@coreui/icons'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
@@ -105,7 +110,7 @@ const Shops = () => {
                                             <CIcon icon={cilHouse} /> Shop
                                         </CTableHeaderCell>
                                         <CTableHeaderCell className="bg-body-tertiary text-center">
-                                            Profile
+                                            Tình trạng
                                         </CTableHeaderCell>
                                         <CTableHeaderCell className="bg-body-tertiary text-center">
                                             Shop Code
@@ -124,7 +129,15 @@ const Shops = () => {
                                                 <div>{item.name}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.profile}</div>
+                                                <div>{item.defaultShop ? (
+                                                    <div className='text-success'>
+                                                        <CIcon icon={cilArrowCircleTop} className="text-success" /> Mặc định                                                        
+                                                    </div>                                                                                                        
+                                                ) : (
+                                                    <div className='text-danger'>
+                                                        <CIcon icon={cilArrowCircleBottom} className="text-danger" />                                                        
+                                                    </div>
+                                                )}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
                                                 <CButton color={item.status === 'authorized' ? 'success' : 'danger'} size="sm">
@@ -132,22 +145,25 @@ const Shops = () => {
                                                 </CButton>
                                             </CTableDataCell>
                                             <CTableDataCell>
-                                                <CButton color="info" size="sm">
+                                                <CButton size="sm">
                                                     <CAvatar size="md" src={item.User.avatar || avatarDefault} />
-                                                    {item.User.username}
+                                                    &nbsp;{item.User.username}
                                                 </CButton>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.status}</div>
+                                                <div className='text-success'>
+                                                    <CIcon icon={cilThumbUp} className="text-success" />
+                                                    &nbsp;{item.status}
+                                                </div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center d-none d-md-table-cell">
-                                                <CButton className='me-2' color="danger" size="sm">
+                                                <CButton className='me-2 text-white' color="danger" size="sm">
                                                     <CIcon icon={cilTrash} className="me-2" />
-                                                    Delete
+                                                    Xóa
                                                 </CButton>
                                                 <CButton color="info" size="sm">
-                                                    <CIcon icon={cilLinkAlt} className="me-2" />
-                                                    View
+                                                    <CIcon icon={cilLinkAlt} className="me-2 text-white" />
+                                                    Xem
                                                 </CButton>
                                             </CTableDataCell>
                                         </CTableRow>

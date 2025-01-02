@@ -1,57 +1,109 @@
 import React, { useState } from 'react';
-import './DropdownSearch.css';
-import { CFormLabel } from '@coreui/react';
 
-const DropdownSearch = ({ label, options, value, setValue }) => {
-    const [filteredOptions, setFilteredOptions] = useState(options);
-    const [showDropdown, setShowDropdown] = useState(false);
+const DropdownSearch = ({ fieldData, value, onChange, style }) => {
+    const [options, setOptions] = useState(fieldData?.options || []);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-    const handleInputChange = (e) => {
-        const inputValue = e.target.value;
-        setValue(inputValue);
-
-        const filtered = options.filter(option =>
-            option.toLowerCase().includes(inputValue.toLowerCase())
-        );
-
-        if (!filtered.includes(inputValue)) {
-            setFilteredOptions([...filtered, inputValue]);
-        } else {
-            setFilteredOptions(filtered);
+    const handleSearchChange = (e) => {
+        const term = e.target.value.trim();
+        if (term === '') {
+            return;
         }
+        setSearchTerm(term);
 
-        setShowDropdown(true);
+        // Hiển thị dropdown khi gõ
+        setDropdownOpen(true);
+
+        // Gửi giá trị đã nhập về form
+        console.log("term", term);
+        onChange(term);
     };
 
     const handleOptionSelect = (option) => {
-        setValue(option);
-        setShowDropdown(false);
+        if (!option) {
+            return;
+        }
+        console.log("option", option);
+        onChange({id: option.id, value: option.name}); // Gửi giá trị đã chọn về form
+        setSearchTerm(option.name);
+        setDropdownOpen(false); // Đóng dropdown
     };
 
+    const handleAddOption = () => {
+        if (!options.some(option => option.name.toLowerCase() === searchTerm.toLowerCase()) && searchTerm.trim() !== '') {
+            const newOption = { id: Date.now().toString(), name: searchTerm };
+            const updatedOptions = [newOption, ...options];
+            setOptions(updatedOptions); // Thêm vào đầu danh sách
+            handleOptionSelect(newOption);
+        }
+    };
+
+    const handleBlur = () => {
+        // Đóng dropdown sau khi mất focus
+        setTimeout(() => setDropdownOpen(false), 200);
+    };
+
+    // Lọc các tùy chọn dựa trên giá trị tìm kiếm
+    const filteredOptions = options.filter(option =>
+        option?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const showAddNewOption = !filteredOptions.length && searchTerm.trim() !== '';
+
     return (
-        <div className="dropdown-search">
-            <CFormLabel>{label}:</CFormLabel>
+        <div style={{ marginTop: '10px', position: 'relative' }} className={style}>
+            <label>{fieldData?.name}:</label>
             <input
+                className='form-control'
                 type="text"
-                value={value}
-                onChange={handleInputChange}
-                onFocus={() => setShowDropdown(true)}
-                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                placeholder={`Tìm hoặc thêm ${label}`}
-                className="form-control"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onFocus={() => setDropdownOpen(true)} // Hiển thị dropdown khi focus
+                onBlur={handleBlur}
+                placeholder='Select..'               
             />
-            {showDropdown && (
-                <ul className="form-control dropdown-list">
-                    {filteredOptions.map((option, index) => (
-                        <li
-                            key={index}
+            {isDropdownOpen && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        maxHeight: '150px',
+                        overflowY: 'auto',
+                        border: '1px solid #ccc',
+                        backgroundColor: '#fff',
+                        zIndex: 10,
+                    }}
+                >
+                    {filteredOptions.map((option) => (
+                        <div
+                            key={option.id}
                             onClick={() => handleOptionSelect(option)}
-                            className={option === value ? 'selected' : ''}
+                            style={{
+                                padding: '10px',
+                                cursor: 'pointer',
+                                backgroundColor: value === option.name ? '#f0f0f0' : '#fff',
+                            }}
                         >
-                            {option}
-                        </li>
+                            {option.name}
+                        </div>
                     ))}
-                </ul>
+                    {showAddNewOption && (
+                        <div
+                            onClick={handleAddOption}
+                            style={{
+                                padding: '10px',
+                                cursor: 'pointer',
+                                backgroundColor: '#e7f7ff',
+                                color: '#007bff',
+                            }}
+                        >
+                            Add "{searchTerm}"
+                        </div>
+                    )}
+                </div>
             )}
         </div>
     );

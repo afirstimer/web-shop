@@ -7,8 +7,7 @@ import axios from "axios";
 // get all shops
 export const getCategories = async (req, res) => {
     try {
-        const categories = await prisma.templateProductCategory.findMany();
-        res.status(200).json(categories);
+        console.log("getCategories");
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Failed to get categories!" });
@@ -17,28 +16,38 @@ export const getCategories = async (req, res) => {
 
 // Get categories from TikTok
 export const getTikTokCategories = async (request, res) => {
-    const { shop_id, app_key, access_token, secret, category_version } = request.query;
+    const app_key = process.env.TIKTOK_SHOP_APP_KEY;
+    const secret = process.env.TIKTOK_SHOP_APP_SECRET;
+    const category_version = process.env.TIKTOK_CATEGORY_VERSION;    
 
-    if (!app_key || !secret || !access_token) {
-        console.log(app_key, secret, access_token);
-        console.error("Missing required parameters: app_key, secret, or access_token");
-        throw new Error("Missing required parameters: app_key, secret, or access_token");
+    // TODO: lấy token
+    const setting = await prisma.setting.findFirst();
+    if (!setting) {
+        console.error("Setting not found");
+        return res.status(404).json({ message: "Setting not found" });
     }
+    const access_token = setting.shopAccessToken;
 
-    const shop = await prisma.shop.findUnique({
+    // TODO: lấy shop mặc định
+    const shop = await prisma.shop.findFirst({
         where: {
-            id: shop_id
+            defaultShop: 1
         }
-    });
-
-    console.log(shop);
-
+    });    
+    console.log(shop);    
     if (!shop) {
         console.error("Shop not found");
         return res.status(404).json({ message: "Shop not found" });
-    }
+    }    
+    const shop_cipher = shop.tiktokShopCipher;
 
-    request.query.shop_cipher = shop.tiktokShopCipher;
+    // Param
+    request.query.category_version = category_version;
+    request.query.shop_id = shop.id;
+    request.query.access_token = access_token;
+    request.query.app_key = app_key;
+    request.query.secret = secret;
+    request.query.shop_cipher = shop_cipher;
     request.query.path = "/product/202309/categories";
     const timestamp = Math.floor(Date.now() / 1000);
     const header = request.headers['content-type'];
@@ -50,11 +59,11 @@ export const getTikTokCategories = async (request, res) => {
         method: "GET",
         url: "https://open-api.tiktokglobalshop.com/product/202309/categories",
         query: {
-            app_key: process.env.TIKTOK_SHOP_APP_KEY,
+            app_key: app_key,
             sign: "{{sign}}",
             timestamp: "{{timestamp}}",
             shop_cipher: shop.tiktokShopCipher,
-            category_version: 'v2'
+            category_version: category_version
         },
         headers: {
             "x-tts-access-token": process.env.TIKTOK_SHOP_ACCESS_TOKEN
@@ -87,18 +96,19 @@ export const getTikTokCategories = async (request, res) => {
             url: options.url,
             headers: options.headers
         });
+        
+        
         const categories = response.data.data.categories;
-
+        const categoryRes = [];
         for (const category of categories) {
-            await prisma.templateProductCategory.create({
-                data: {
-                    name: category.local_name,
-                    tiktokId: category.id,
-                    tiktokParentId: category.parent_id,
-                },
-            });
+            categoryRes.push({
+                id: category.id,
+                name: category.local_name,
+                tiktokId: category.id,
+                tiktokParentId: category.parent_id,
+            });            
         }
-        res.status(200).json(response.data);
+        res.status(200).json(categoryRes);
     } catch (error) {
         console.error("Error:", error.response ? error.response.data : error.message);
         res.status(500).json({ error });
@@ -106,27 +116,39 @@ export const getTikTokCategories = async (request, res) => {
 }
 
 export const getTikTokCategoryAttributes = async (request, res) => {
-    const { shop_id, category_id, app_key, access_token, secret, category_version } = request.query;
+    const { category_id } = request.query;    
+    
+    const app_key = process.env.TIKTOK_SHOP_APP_KEY;
+    const secret = process.env.TIKTOK_SHOP_APP_SECRET;
+    const category_version = process.env.TIKTOK_CATEGORY_VERSION;    
 
-    if (!app_key || !secret || !access_token || !category_id) {
-        console.log(app_key, secret, access_token, category_id);
-        console.error("Missing required parameters: app_key, secret, or access_token");
-        throw new Error("Missing required parameters: app_key, secret, or access_token");
-    }
-
-    const shop = await prisma.shop.findUnique({
+    //TODO: nên lấy shop mặc định (lưu ý chỉ 1 shop mặc định)
+    const shop = await prisma.shop.findFirst({
         where: {
-            id: shop_id
+            defaultShop: 1
         }
     });
-
     console.log(shop);
-
     if (!shop) {
         console.error("Shop not found");
         return res.status(404).json({ message: "Shop not found" });
     }
 
+    // TODO: lấy token
+    const setting = await prisma.setting.findFirst();
+    if (!setting) {
+        console.error("Setting not found");
+        return res.status(404).json({ message: "Setting not found" });
+    }
+    const access_token = setting.shopAccessToken;
+
+    // Param
+    request.query.category_version = category_version;
+    request.query.shop_id = shop.id;
+    request.query.category_id = category_id;
+    request.query.access_token = access_token;
+    request.query.app_key = app_key;
+    request.query.secret = secret;
     request.query.shop_cipher = shop.tiktokShopCipher;
     request.query.path = "/product/202309/categories/" + category_id + "/attributes";
     const timestamp = Math.floor(Date.now() / 1000);
@@ -178,20 +200,9 @@ export const getTikTokCategoryAttributes = async (request, res) => {
             headers: options.headers
         });
         console.log(response.data);
-        const attributes = response.data.data.attributes;
+        const attributes = response.data.data.attributes;        
 
-        const result = [];
-        for (const attribute of attributes) {
-            result.push({
-                id: attribute.id,
-                name: attribute.name,
-                type: attribute.type,
-                is_required: attribute.is_requried,
-                options: attribute.values,
-            });
-        }
-
-        res.status(200).json(result);        
+        res.status(200).json(attributes);        
     } catch (error) {
         console.error("Error:", error.response ? error.response.data : error.message);
         res.status(500).json({ error });

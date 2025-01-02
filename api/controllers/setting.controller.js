@@ -44,13 +44,16 @@ export const updateSetting = async (req, res) => {
             id: Math.random().toString(36).substring(2, 10) + (new Date()).getTime().toString(36),
         }, process.env.JWT_SECRET_KEY);
         const expiredIn = Date.now() + 3600000;
+
         const updatedSetting = await prisma.setting.update({
             where: {
                 id: req.params.id,
             },
             data: {
                 accessToken,
-                expiredIn
+                expiredIn,
+                shopAccessToken: req.body.shopAccessToken ? req.body.shopAccessToken : null,
+                shopRefreshToken: req.body.shopRefreshToken ? req.body.shopRefreshToken : null
             },
         });
         res.status(200).json(updatedSetting);
