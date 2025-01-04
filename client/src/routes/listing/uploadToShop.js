@@ -20,7 +20,19 @@ const UploadToShop = ({ visible, setVisible, listings }) => {
         fetchShops();
     }, [listings]);
 
-    
+    useEffect(() => {
+        const fetchTemplates = async () => {
+            try {
+                const templates = await apiRequest.get(`/templates`);
+                setTemplates(templates.data);
+                console.log(templates.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchTemplates();
+    }, [shops]);
 
     return (
         <CModal
@@ -42,6 +54,10 @@ const UploadToShop = ({ visible, setVisible, listings }) => {
                     </CRow>
                     <CRow className="mb-3" controlId="exampleForm.ControlInput1">
                         <CFormLabel>Chọn mẫu</CFormLabel>
+                        <MultiSelect
+                            displayValue='name'
+                            options={templates}
+                        />
                     </CRow>
                 </CForm>
                 <CRow className="mt-5 d-flex justify-content-center" >

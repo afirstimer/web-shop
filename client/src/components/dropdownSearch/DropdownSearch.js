@@ -7,27 +7,23 @@ const DropdownSearch = ({ fieldData, value, onChange, style }) => {
 
     const handleSearchChange = (e) => {
         const term = e.target.value.trim();
-        if (term === '') {
-            return;
-        }
-        setSearchTerm(term);
-
+        
         // Hiển thị dropdown khi gõ
         setDropdownOpen(true);
 
         // Gửi giá trị đã nhập về form
-        console.log("term", term);
-        onChange(term);
+        if (term) {
+            console.log("term", term);
+            setSearchTerm(term);
+            onChange({ id: fieldData.id, value: term, label: term });
+        }
     };
 
     const handleOptionSelect = (option) => {
-        if (!option) {
-            return;
-        }
         console.log("option", option);
-        onChange({id: option.id, value: option.name}); // Gửi giá trị đã chọn về form
+        onChange({ id: fieldData.id, value: option.id, label: option.name }); // Gửi giá trị đã chọn về form
         setSearchTerm(option.name);
-        setDropdownOpen(false); // Đóng dropdown
+        setDropdownOpen(true); // Đóng dropdown
     };
 
     const handleAddOption = () => {
@@ -45,9 +41,7 @@ const DropdownSearch = ({ fieldData, value, onChange, style }) => {
     };
 
     // Lọc các tùy chọn dựa trên giá trị tìm kiếm
-    const filteredOptions = options.filter(option =>
-        option?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredOptions = options;
 
     const showAddNewOption = !filteredOptions.length && searchTerm.trim() !== '';
 
@@ -61,7 +55,7 @@ const DropdownSearch = ({ fieldData, value, onChange, style }) => {
                 onChange={handleSearchChange}
                 onFocus={() => setDropdownOpen(true)} // Hiển thị dropdown khi focus
                 onBlur={handleBlur}
-                placeholder='Select..'               
+                placeholder='Select..'
             />
             {isDropdownOpen && (
                 <div

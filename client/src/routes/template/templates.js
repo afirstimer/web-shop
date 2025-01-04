@@ -68,22 +68,23 @@ import { useNavigate } from 'react-router-dom'
 
 const Templates = () => {
     const [visible, setVisible] = useState(false)
+    const [templates, setTemplates] = useState([])
     const navigate = useNavigate()
-    const tableExample = [
-        {
-            name: 'BABY BOOK',
-            type: 'DROPSHIPPING',
-            category: 'Picture Books',
-            user: {
-                name: 'Nguyen Van A',
-                avatar: avatar1,
-                email: 'afiV7@example.com',
-            }
-        },
-    ]    
+
+    useEffect(() => {
+        const fetchTemplates = async () => {
+            const response = await apiRequest.get('/templates')
+            setTemplates(response.data)
+        }
+        fetchTemplates();
+    }, []);
 
     const addTemplate = () => {
         navigate('/template/add')
+    }
+
+    const editTemplate = (id) => {
+        navigate(`/template/edit/${id}`)
     }
 
     return (
@@ -117,32 +118,23 @@ const Templates = () => {
                                         <CTableHeaderCell className="bg-body-tertiary text-center">
                                             Danh mục
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell className="bg-body-tertiary">Người Tạo</CTableHeaderCell>
                                         <CTableHeaderCell className="bg-body-tertiary text-center">Chức năng</CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
-                                    {tableExample.map((item, index) => (
+                                    {templates.map((template, index) => (
                                         <CTableRow v-for="item in tableItems" key={index}>
                                             <CTableDataCell>
-                                                <div>{item.name}</div>
+                                                <div>{template.name}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.type}</div>
+                                                <div>{template.type}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <CButton color={item.status} size="sm">
-                                                    {item.category}
-                                                </CButton>
-                                            </CTableDataCell>
-                                            <CTableDataCell>
-                                                <CButton color="info" size="sm">
-                                                    <CAvatar size="md" src={item.user.avatar} />
-                                                    {item.user.name}
-                                                </CButton>
+                                                {template.categoryId}
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center d-none d-md-table-cell">
-                                                <CButton className='me-2' color="warning" size="sm">
+                                                <CButton className='me-2' color="warning" size="sm" onClick={() => editTemplate(template.id)}>
                                                     <CIcon icon={cilPencil} className="me-2" />
                                                     Update
                                                 </CButton>

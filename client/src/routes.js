@@ -57,6 +57,7 @@ const Listings = React.lazy(() => import('./routes/listing/listings'))
 const Listing = React.lazy(() => import('./routes/listing/listing'))
 const Templates = React.lazy(() => import('./routes/template/templates'))
 const AddTemplate = React.lazy(() => import('./routes/template/addTemplate'))
+const EditTemplate = React.lazy(() => import('./routes/template/editTemplate'))
 const Products = React.lazy(() => import('./routes/product/products'))
 const Tool = React.lazy(() => import('./routes/tool/tool'))
 const Proxy = React.lazy(() => import('./routes/proxy/proxy'))
@@ -74,6 +75,7 @@ const routes = [
   { path: '/listing', name: 'Listing', element: Listing },
   { path: '/templates', name: 'Templates', element: Templates },
   { path: '/template/add', name: 'AddTemplate', element: AddTemplate },
+  { path: '/template/edit/:id', name: 'EditTemplate', element: EditTemplate },
   { path: '/products', name: 'Products', element: Products },  
   { path: '/shops', name: 'Shops', element: Dashboard },  
   { path: '/users', name: 'Users', element: Users },  

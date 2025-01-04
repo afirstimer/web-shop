@@ -213,10 +213,13 @@ export const refreshToken = async (req, res) => {
     const url = 'https://auth.tiktok-shops.com/api/v2/token/refresh';
 
     console.log('Refreshing token...');
+    // Get first setting
+    const setting = await prisma.setting.findFirst();    
+
     const params = {
         app_key: process.env.TIKTOK_SHOP_APP_KEY,
         app_secret: process.env.TIKTOK_SHOP_APP_SECRET,
-        refresh_token: process.env.TIKTOK_SHOP_REFRESH_TOKEN,
+        refresh_token: setting.shopRefreshToken,
         grant_type: 'refresh_token'
     };    
 
@@ -231,9 +234,21 @@ export const refreshToken = async (req, res) => {
             const refreshToken = data.refresh_token;
 
             console.log('Access Token:', accessToken);
-            console.log('Refresh Token:', refreshToken);
+            console.log('Refresh Token:', refreshToken);        
 
-            return { accessToken, refreshToken };
+            setting.shopAccessToken = accessToken;
+            setting.shopRefreshToken = refreshToken;
+            const updatedSetting = await prisma.setting.update({
+                where: {
+                    id: setting.id,
+                },
+                data: {
+                    shopAccessToken: accessToken,
+                    shopRefreshToken: refreshToken
+                },
+            });
+
+            res.status(200).json({ accessToken, refreshToken });
         } else {
             console.error('API Error:', response.data);
             throw new Error('Failed to refresh token');

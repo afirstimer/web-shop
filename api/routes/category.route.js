@@ -9,7 +9,7 @@ import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-router.get("/", verifyToken, getTikTokCategories);    //TODO: Replace with /tiktok
+router.get("/", verifyToken, getCategories);    //TODO: Replace with /tiktok
 router.get("/attributes", verifyToken, getTikTokCategoryAttributes);
 router.get("/tiktok", verifyToken, getTikTokCategories);
 router.delete("/:id", verifyToken, deleteCategory);

@@ -101,16 +101,16 @@ model Template {
   attributes                 String?
   compliances                String?
   skus                       String?
-  skuUpc                     String?
+  identifierCode             String?
   skuPrice                   String?
   skuQty                     String?
   skuSeller                  String?
-  logisticWeight             String?
-  logisticIsActive           Int
-  logisticIsCod              Int
-  logisticLength             String
-  logisticWidth              String
-  logisticHeight             String
+  isSale                     Int
+  isCOD                      Int
+  packageWeight              String?
+  packageLength              String
+  packageWidth               String
+  packageHeight              String
 }
 
 model Setting {

@@ -20,21 +20,29 @@ import {
     CInputGroupText,
     CRow,
 } from '@coreui/react'
+import { DocsComponents, DocsExample } from 'src/components'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import CIcon from '@coreui/icons-react';
-import { cilArrowLeft, cilPlus, cilReload } from '@coreui/icons';
-import { useNavigate } from 'react-router-dom';
+import { cilArrowLeft, cilPlus, cilReload, cilTrash } from '@coreui/icons';
+import { useNavigate, useParams } from 'react-router-dom';
+import { auto } from '@popperjs/core';
 import TreeSelect from '../../components/TreeSelect';
 import apiRequest from '../../lib/apiRequest';
 import DropdownSearch from '../../components/dropdownSearch/DropdownSearch';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css";
+import ImageUpload from 'react-image-easy-upload';
 import Sku from '../../components/template/SKU';
 import { IdentifierCode } from '../../utils/enums/product';
 
-const AddTemplate = () => {
+const EditTemplate = () => {
     const navigate = useNavigate();
+
+    // 
+    const params = useParams();
+    const { id } = params;
+    const [template, setTemplate] = useState(null);
 
     // Form fields
     const [templateDescription, setTemplateDescription] = useState('{{description}}');
@@ -49,6 +57,26 @@ const AddTemplate = () => {
     ]);
     const [identifierCode, setIdentifierCode] = useState(IdentifierCode.GTIN);
     const [errorMessage, setErrorMessage] = useState('');
+
+    /** LOAD TEMPLATE */
+    useEffect(() => {
+        const fetchTemplate = async () => {
+            try {
+                const response = await apiRequest.get('/templates/' + id);
+                console.log('Template:', response.data);
+                setTemplate(response.data);
+                setCategoryId(response.data.categoryId);
+            } catch (error) {
+                console.error('Error fetching templates:', error);
+            }
+        };
+
+        fetchTemplate();
+    }, []);
+
+    useEffect(() => {
+        fetchAttributes(template?.categoryId);
+    }, [categoryId]);
 
     /**
      * RENDER FROM TITKOK
@@ -394,11 +422,11 @@ const AddTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     <CCol md={6}>
-                                        <CFormInput type="text" id="name" name="name" label="Tên" required />
+                                        <CFormInput type="text" id="name" name="name" label="Tên" value={template && template.name} required />
                                     </CCol>
                                     <CCol md={6}>
                                         <CFormLabel>Loại</CFormLabel>
-                                        <CFormSelect id='type' name='type' aria-label='Loại' defaultValue={'Dropshipping'}>
+                                        <CFormSelect id='type' name='type' aria-label='Loại' defaultValue={ template && template.type ? template.type : 'Dropshipping'}>
                                             <option value='Dropshipping'>Dropshipping</option>
                                             <option value='POD'>POD</option>
                                         </CFormSelect>
@@ -419,13 +447,13 @@ const AddTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     <CCol xs={12}>
-                                        <CFormInput id="productTemplate" name='productTemplate' label="Tên" placeholder="" value='{{name}}' />
+                                        <CFormInput id="productTemplate" name='productTemplate' label="Tên" placeholder="" value={template && template.productTemplate} />
                                     </CCol>
                                     <CCol xs={12}>
                                         <CFormLabel>Mô tả</CFormLabel>
                                         <ReactQuill
                                             theme="snow"
-                                            value={templateDescription}
+                                            value={template && template.templateDescription}
                                             onChange={setTemplateDescription}
                                         />
                                     </CCol>
@@ -629,4 +657,4 @@ const AddTemplate = () => {
     )
 }
 
-export default AddTemplate;
+export default EditTemplate;

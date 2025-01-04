@@ -3,11 +3,15 @@ import jwt from "jsonwebtoken";
 import { generateSign } from "../helper/tiktok.api.js";
 import fetch from "node-fetch";
 import axios from "axios";
+import { readJSONFile, writeJSONFile } from "../helper/helper.js";
+
+const CATEGORY_FILE = "./dummy/tiktok/categories.json";
 
 // get all shops
 export const getCategories = async (req, res) => {
     try {
-        console.log("getCategories");
+        const categories = await readJSONFile(CATEGORY_FILE);
+        res.status(200).json(categories);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Failed to get categories!" });
@@ -27,6 +31,7 @@ export const getTikTokCategories = async (request, res) => {
         return res.status(404).json({ message: "Setting not found" });
     }
     const access_token = setting.shopAccessToken;
+    console.log(access_token);
 
     // TODO: lấy shop mặc định
     const shop = await prisma.shop.findFirst({
@@ -66,7 +71,7 @@ export const getTikTokCategories = async (request, res) => {
             category_version: category_version
         },
         headers: {
-            "x-tts-access-token": process.env.TIKTOK_SHOP_ACCESS_TOKEN
+            "x-tts-access-token": setting.shopAccessToken,
         }
     };
 
@@ -108,6 +113,9 @@ export const getTikTokCategories = async (request, res) => {
                 tiktokParentId: category.parent_id,
             });            
         }
+
+        await writeJSONFile(CATEGORY_FILE, categoryRes);
+
         res.status(200).json(categoryRes);
     } catch (error) {
         console.error("Error:", error.response ? error.response.data : error.message);
@@ -168,7 +176,7 @@ export const getTikTokCategoryAttributes = async (request, res) => {
             category_version: 'v2'
         },
         headers: {
-            "x-tts-access-token": process.env.TIKTOK_SHOP_ACCESS_TOKEN,
+            "x-tts-access-token": setting.shopAccessToken,
             "Content-Type": "application/json"
         }
     };
