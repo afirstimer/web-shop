@@ -52,16 +52,6 @@ export const crawlAmazonProduct = async (req, res) => {
 
 export const getListings = async (req, res) => {
     try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
         const { page = 1, limit = process.env.DEFAULT_LIMIT, name, sku, sort } = req.query;
 
         const pageNum = parseInt(page, 10);
@@ -122,17 +112,7 @@ export const getListings = async (req, res) => {
 }
 
 export const updateListing = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         const listing = await prisma.listing.update({
             where: {
                 id: req.params.id,
@@ -146,17 +126,7 @@ export const updateListing = async (req, res) => {
 }
 
 export const getListing = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         const listing = await prisma.listing.findUnique({
             where: {
                 id: req.params.id,
@@ -170,17 +140,7 @@ export const getListing = async (req, res) => {
 }
 
 export const deleteListing = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         await prisma.listing.delete({
             where: {
                 id: req.params.id,

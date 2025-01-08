@@ -52,6 +52,7 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 // Shop
 const Users = React.lazy(() => import('./routes/user/users'))
+const Teams = React.lazy(() => import('./routes/team/teams'))
 const Shops = React.lazy(() => import('./routes/shop/shops'))
 const Listings = React.lazy(() => import('./routes/listing/listings'))
 const Listing = React.lazy(() => import('./routes/listing/listing'))
@@ -70,6 +71,7 @@ const routes = [
    * SHOP ROUTES
    */  
   { path: '/users', name: 'Users', element: Users },
+  { path: '/teams', name: 'Teams', element: Teams },
   { path: '/shops', name: 'Shop', element: Shops },
   { path: '/listings', name: 'Listings', element: Listings },
   { path: '/listing', name: 'Listing', element: Listing },

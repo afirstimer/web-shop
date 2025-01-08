@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { 
+import {
   cilExternalLink,
   cilPuzzle,
   cilSpeedometer,
@@ -16,7 +16,14 @@ import {
   cilKeyboard,
   cilLockLocked,
   cilDoor,
-  cibGlassdoor
+  cibGlassdoor,
+  cilFactory,
+  cilLibraryBuilding,
+  cilMediaRecord,
+  cilColumns,
+  cilSitemap,
+  cilGlobeAlt,
+  cilUser
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -25,8 +32,8 @@ const _nav = [
     component: CNavItem,
     name: 'Dashboard',
     to: '/dashboard',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,    
-  },  
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
   {
     component: CNavTitle,
     name: 'Shop',
@@ -35,83 +42,72 @@ const _nav = [
     component: CNavGroup,
     name: 'Products',
     to: '/products',
-    icon: <CIcon icon={cilInbox} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilSitemap} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: (
-          <React.Fragment>
-            {'Products Listing'}
-            <CIcon icon={cilCart} size="sm" className="ms-2" />
-          </React.Fragment>
-        ),        
+        name: 'Products Listing',
+        icon: <CIcon icon={cilGlobeAlt} customClassName="nav-icon" />,
         to: '/listings',
       },
       {
         component: CNavItem,
-        name: (
-          <React.Fragment>
-            {'Templates'}
-            <CIcon icon={cilCloud} size="sm" className="ms-2" />
-          </React.Fragment>
-        ),
+        name: 'Templates',
+        icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
         to: '/templates',
       },
       {
         component: CNavItem,
-        name: (
-          <React.Fragment>
-            {'Products'}
-            <CIcon icon={cilExternalLink} size="sm" className="ms-2" />
-          </React.Fragment>
-        ),
+        name: 'Products',
+        icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
         to: '/products',
-      }      
+      }
     ],
-  },  
+  },
   {
     component: CNavGroup,
     name: 'Systems',
     to: '/systems',
-    icon: <CIcon icon={cilLink} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: (
-          <React.Fragment>
-            {'Shops'}
-            <CIcon icon={cilHouse} size="sm" className="ms-2" />
-          </React.Fragment>
-        ),        
+        name: 'Shops',
+        icon: <CIcon icon={cilLibraryBuilding} customClassName="nav-icon" />,
         to: '/shops',
       },
       {
         component: CNavItem,
-        name: (
-          <React.Fragment>
-            {'Users'}
-            <CIcon icon={cilGroup} size="sm" className="ms-2" />
-          </React.Fragment>
-        ),
-        to: '/users',
-      },      
+        name: 'Teams',
+        icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+        to: '/teams',
+      },
       {
         component: CNavItem,
-        name: (
-          <React.Fragment>
-            {'Token'}
-            <CIcon icon={cilLockLocked} size="sm" className="ms-2" />
-          </React.Fragment>
-        ),
+        name: 'Users',
+        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+        to: '/users',
+      },     
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Tools',    
+    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Proxy',
+        to: '/proxies',
+        icon: <CIcon icon={cilDoor} customClassName="nav-icon" />
+      },
+      {
+        component: CNavItem,
+        name: 'Token',
+        icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
         to: '/tools',
       },
-    ],
-  }, 
-  {
-    component: CNavItem,
-    name: 'Proxy',
-    to: '/proxies',
-    icon: <CIcon icon={cilDoor} customClassName="nav-icon" />    
+    ]
   }
 ]
 

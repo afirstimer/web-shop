@@ -2,6 +2,7 @@ import express from "express";
 import { verifyToken } from "../middleware/verifyToken.js";
 import {
     getShops,
+    getActiveShops,
     getShop, 
     getShopsByUser,
     createShop, 
@@ -14,6 +15,7 @@ import {
 const router = express.Router();
 
 router.get("/", verifyToken, getShops);
+router.get("/active", verifyToken, getActiveShops);
 router.get("/token/refresh", verifyToken, refreshToken);
 router.get("/authorize", verifyToken, requestAuthorizedShops);
 router.get("/shop/:id", verifyToken, getShop);

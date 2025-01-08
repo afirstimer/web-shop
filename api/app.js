@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import teamRoute from "./routes/team.route.js";
 import shopRoute from "./routes/shop.route.js";
 import categoryRoute from "./routes/category.route.js";
 import listingRoute from "./routes/listing.route.js";
@@ -13,13 +14,17 @@ import templateRoute from "./routes/template.route.js";
 const app = express();
 
 app.use(cors({
-    origin: [process.env.CLIENT_URL, "https://www.amazon.com"],
+    origin: [
+        process.env.CLIENT_URL, 
+        process.env.WHITELIST_URL1
+    ],
     credentials: true,    
 }));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
+app.use("/api/teams", teamRoute);
 app.use("/api/users", userRoute);
 app.use("/api/shops", shopRoute);
 app.use("/api/categories", categoryRoute);

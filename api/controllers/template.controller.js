@@ -6,17 +6,7 @@ import axios from "axios";
 import { readJSONFile } from "../helper/helper.js";
 
 export const getTemplates = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         const templates = await prisma.template.findMany({});
 
         const categories = await readJSONFile("./dummy/tiktok/categories.json");
@@ -31,17 +21,7 @@ export const getTemplates = async (req, res) => {
 }
 
 export const getTemplate = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         const { id } = req.params;
         const template = await prisma.template.findUnique({
             where: {
@@ -57,17 +37,7 @@ export const getTemplate = async (req, res) => {
 export const getTemplatesByShop = async (req, res) => { }
 
 export const createTemplate = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         const newTemplate = await prisma.template.create({
             data: {
                 name: req.body.name,
@@ -99,17 +69,7 @@ export const createTemplate = async (req, res) => {
 }
 
 export const updateTemplate = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) {
-            return res.status(401).json({ message: "Not Authenticated!" });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-            if (err) return res.status(403).json({ message: "Token is not Valid!" });
-            req.userId = payload.id;
-        });
-
+    try {        
         const { id } = req.params;
         const updatedTemplate = await prisma.template.update({
             where: {

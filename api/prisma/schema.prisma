@@ -21,13 +21,14 @@ model User {
   avatar    String?
   createdAt DateTime  @default(now())
   shops     Shop[]
-  listings  Listing[]
+  listings  Listing[]  
 }
 
 model Shop {
   id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  name             String          @unique
+  name             String
   code             String          @unique
+  profile          String?
   userId           String          @db.ObjectId
   User             User            @relation(fields: [userId], references: [id])
   createdAt        DateTime        @default(now())
@@ -39,11 +40,23 @@ model Shop {
   refreshToken     String?
   accessToken      String?
   signString       String?
+  tiktokShopId     String?
   tiktokShopCipher String?
   tiktokTimestamp  Int?
   defaultShop      Int
+  managers         String[]
+  teamId           String?
   listings         ListingOnShop[]
   products         Product[]       @relation("ShopProducts")
+}
+
+model Team {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  members   String[]
+  isActive  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Listing {
