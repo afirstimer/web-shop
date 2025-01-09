@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import classNames from 'classnames'
+import React, { useEffect, useState } from 'react'
 
 import {
     CAvatar,
@@ -41,7 +40,9 @@ import {
     cilPeople,
     cilUser,
     cilUserFemale,
-    cilPlus
+    cilPlus,
+    cilPencil,
+    cilTrash
 } from '@coreui/icons'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
@@ -54,34 +55,49 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 import WidgetsBrand from '../../views/widgets/WidgetsBrand'
 import WidgetsDropdown from '../../views/widgets/WidgetsDropdown'
 import MainChart from '../../views/dashboard/MainChart'
+import EditUser from './editUser'
 
 import apiRequest from '../../lib/apiRequest'
+import {format} from 'timeago.js'
 
 const Users = () => {
-    const [users, setUsers] = React.useState([])
+    const [users, setUsers] = useState([])
+    const [teams, setTeams] = useState([])
 
-    const tableExample = [
-        {
-            avatar: avatar1,
-            status: 'success',
-            username: 'vincent',
-            email: 'afiV7@example.com',
-            registered: 'Jan 1, 2023',
-        },
-    ]
+    const [visibleEdit, setVisibleEdit] = useState(false)
+    const [selectUser, setSelectUser] = useState({})
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await apiRequest.get('/users');                    
+                setUsers(response.data)
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchUsers();
+    }, []);
+
+    const handleEditUser = (user) => {
+        setVisibleEdit(true)
+        setSelectUser(user)
+    }
 
     return (
         <>
+            <EditUser visible={visibleEdit} setVisible={setVisibleEdit} user={selectUser} />
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
-                        Danh sách người dùng
-                    </h4>                    
+                        Danh sách user
+                    </h4>
                 </CCol>
                 <CCol sm={7} className="d-none d-md-block">
-                    <CButton color="primary" className="float-end">
-                        <CIcon icon={cilPlus} /> Tạo mới tài khoản                        
-                    </CButton>                    
+                    <CButton color="primary" className="float-end mb-2">
+                        <CIcon icon={cilPlus} /> Tạo mới tài khoản
+                    </CButton>
                 </CCol>
             </CRow>
             <CRow>
@@ -91,40 +107,46 @@ const Users = () => {
                             <CTable align="middle" className="mb-0 border" hover responsive>
                                 <CTableHead className="text-nowrap">
                                     <CTableRow>
-                                        <CTableHeaderCell className="bg-body-tertiary text-center">
-                                            <CIcon icon={cilPeople} />
+                                        <CTableHeaderCell className="bg-body-tertiary">
+                                            Account
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell className="bg-body-tertiary">User</CTableHeaderCell>
-                                        <CTableHeaderCell className="bg-body-tertiary text-center">
+                                        <CTableHeaderCell className='bg-body-tertiary'>
                                             Email
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell className="bg-body-tertiary text-center">
-                                            Status
+                                        <CTableHeaderCell className="bg-body-tertiary">
+                                            Ngày tạo
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell className="bg-body-tertiary">Activity</CTableHeaderCell>
+                                        <CTableHeaderCell className="bg-body-tertiary">
+                                            Nhóm
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell className="bg-body-tertiary text-center">
+                                            #
+                                        </CTableHeaderCell>                                        
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
-                                    {tableExample.map((item, index) => (
+                                    {users.map((user, index) => (
                                         <CTableRow v-for="item in tableItems" key={index}>
-                                            <CTableDataCell className="text-center">
-                                                <CAvatar size="md" src={item.avatar} />
+                                            <CTableDataCell>
+                                                <div>{user.username}</div>
                                             </CTableDataCell>
                                             <CTableDataCell>
-                                                <div>{item.username}</div>
+                                                <div>{user.email}</div>
+                                            </CTableDataCell>
+                                            <CTableDataCell>
+                                                <div>{format(user.createdAt)}</div>
+                                            </CTableDataCell>
+                                            <CTableDataCell className="">
+                                                {user.Team && user.Team.name ? user.Team.name : "Chưa có nhóm"}
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.email}</div>
-                                            </CTableDataCell>
-                                            <CTableDataCell className="text-center">
-                                                <CButton color={item.status} size="sm">
-                                                    {item.status}
+                                                <CButton color="info" size="sm" className='text-white' onClick={() => handleEditUser(user)}>
+                                                    <CIcon icon={cilPencil} className="me-2" />
+                                                    Sửa tài khoản
                                                 </CButton>
-                                            </CTableDataCell>
-                                            <CTableDataCell>
-                                                <CButton color="info" size="sm">
-                                                    <CIcon icon={cilUser} className="me-2" />
-                                                    View
+                                                <CButton color="danger" size="sm" className="ms-2 text-white">
+                                                    <CIcon icon={cilTrash} className="me-2" />
+                                                    Xóa
                                                 </CButton>
                                             </CTableDataCell>
                                         </CTableRow>

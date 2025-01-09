@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import classNames from 'classnames'
 
 import {
     CAvatar,
@@ -42,47 +41,63 @@ import {
     cilUser,
     cilUserFemale,
     cilPlus,
-    cilPencil
+    cilPencil,
+    cilGroup
 } from '@coreui/icons'
-
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
-
-import WidgetsBrand from '../../views/widgets/WidgetsBrand'
-import WidgetsDropdown from '../../views/widgets/WidgetsDropdown'
-import MainChart from '../../views/dashboard/MainChart'
 
 import apiRequest from '../../lib/apiRequest'
 import AddTeam from './addTeam'
+import AddMember from './addMember'
+import Toggle from 'react-toggle'
+import "react-toggle/style.css";
 
 const Teams = () => {
-    const [visibleAddTeam, setVisibleAddTeam] = useState(false)
+    const [visibleAddTeam, setVisibleAddTeam] = useState(false)    
+    const [selectedTeam, setSelectedTeam] = useState(null)
+    const [visibleMember, setVisibleMember] = useState(false)
     const [teams, setTeams] = useState([])
+    const [flagAddTeam, setFlagAddTeam] = useState(null)
 
     useEffect(() => {
         const getTeams = async () => {
-            const res = await apiRequest.get('/team')
+            const res = await apiRequest.get('/teams')
             setTeams(res.data)
         }
         getTeams()
-    }, [])
+        setFlagAddTeam(null)
+    }, [flagAddTeam]);
+
+    const handleSelectTeam = (team) => {
+        setSelectedTeam(team)
+        setVisibleMember(true)
+    }    
+
+    const toggleTeamStatus = async (team) => {
+        try {
+            await apiRequest.put(`/teams/${team.id}`, { isActive: team.isActive ? 0 : 1 });
+            setFlagAddTeam(1)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const onChange = () => {
+        setFlagAddTeam(1)
+    }
 
     return (
         <>
-            <AddTeam visible={visibleAddTeam} setVisible={setVisibleAddTeam} />
+            <AddTeam visible={visibleAddTeam} setVisible={setVisibleAddTeam} onChange={onChange}/>
+            <AddMember visible={visibleMember} setVisible={setVisibleMember} onChange={onChange} team={selectedTeam}/>
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
                         Danh sách nhóm
                     </h4>
                 </CCol>
-                <CCol sm={7} className="d-none d-md-block">
+                <CCol sm={7} className="d-none d-md-block mb-3">
                     <CButton color="primary" className="float-end" onClick={() => setVisibleAddTeam(true)}>
-                        <CIcon icon={cilPlus}/> Tạo nhóm
+                        <CIcon icon={cilPlus} /> Tạo nhóm
                     </CButton>
                 </CCol>
             </CRow>
@@ -90,7 +105,7 @@ const Teams = () => {
                 <CCol xs>
                     <CCard className="mb-4">
                         <CCardBody>
-                            <CTable align="middle" className="mb-0 border" hover responsive>
+                            <CTable align="middle" className="mb-0" responsive>
                                 <CTableHead className="text-nowrap">
                                     <CTableRow>
                                         <CTableHeaderCell className="bg-body-tertiary">Nhóm</CTableHeaderCell>
@@ -104,23 +119,28 @@ const Teams = () => {
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
-                                    {teams.map((item, index) => (
+                                    {teams.map((team, index) => (
                                         <CTableRow v-for="item in tableItems" key={index}>
                                             <CTableDataCell>
-                                                <div>{item.name}</div>
+                                                {team.name}
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.members.length}</div>
+                                                <div>{team.members.length}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <CButton color={item.isActive ? 'success' : 'danger'} size="sm">
-                                                    {item.isActive ? 'Active' : 'Inactive'}
-                                                </CButton>
+                                                <Toggle
+                                                    className='mt-2 me-2'
+                                                    defaultChecked={team.isActive}
+                                                    id="isActive"
+                                                    name='isActive'
+                                                    value={team.isActive ? "yes" : "no"}   
+                                                    onChange={() => toggleTeamStatus(team)}                                                 
+                                                />
                                             </CTableDataCell>
                                             <CTableDataCell>
-                                                <CButton color="info" size="sm">
-                                                    <CIcon icon={cilPencil} className="me-2" />
-                                                    Sửa nhóm
+                                                <CButton color='warning' size="sm" className='ms-2' onClick={() => handleSelectTeam(team)}>
+                                                    <CIcon icon={cilGroup} className="me-2 " />
+                                                    Thành viên
                                                 </CButton>
                                             </CTableDataCell>
                                         </CTableRow>

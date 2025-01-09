@@ -19,9 +19,11 @@ model User {
   username  String    @unique
   password  String
   avatar    String?
+  Team      Team?     @relation(fields: [teamId], references: [id])
+  teamId    String?   @db.ObjectId
   createdAt DateTime  @default(now())
   shops     Shop[]
-  listings  Listing[]  
+  listings  Listing[]
 }
 
 model Shop {
@@ -57,6 +59,7 @@ model Team {
   isActive  Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User[]
 }
 
 model Listing {

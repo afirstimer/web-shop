@@ -2,8 +2,27 @@ import prisma from "../lib/prisma.js";
 import bcrypt from "bcrypt";
 
 export const getUsers = async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
+  try {    
+    const users = await prisma.user.findMany(
+      {
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          Team: {
+            select: {
+              name: true,
+            },
+          },
+          shops: {
+            select: {
+              id: true,
+              name: true,
+            },
+          }
+        }
+      }
+    );
     res.status(200).json(users);
   } catch (err) {
     console.log(err);
