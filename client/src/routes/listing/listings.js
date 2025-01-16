@@ -93,6 +93,7 @@ import EditListing from './editListing'
 import UploadToShop from './uploadToShop'
 import { useNavigate } from 'react-router-dom'
 import MultiSelect from 'multiselect-react-dropdown'
+import { format } from 'timeago.js'
 
 const Listings = () => {
     const navigate = useNavigate();
@@ -444,7 +445,7 @@ const Listings = () => {
                                                 <div>{item.price}</div>
                                             </CTableDataCell>
                                             <CTableDataCell>
-                                                <div>{item.createdAt}</div>
+                                                <div>{format(item.createdAt)}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
                                                 <div>{item.shop}</div>

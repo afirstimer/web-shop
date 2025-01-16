@@ -8,7 +8,7 @@ const AppFooter = () => {
         <a href="https://phapsuit.com" target="_blank" rel="noopener noreferrer">
           WebShop
         </a>
-        <span className="ms-1">&copy; 2024</span>
+        <span className="ms-1">&copy; 2025</span>
       </div>
       <div className="ms-auto">
         

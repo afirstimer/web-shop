@@ -3,8 +3,51 @@ import bcrypt from "bcrypt";
 
 export const getTeams = async (req, res) => {
     try {
-        const teams = await prisma.team.findMany();
-        res.status(200).json(teams);
+        const { page = 1, limit = process.env.DEFAULT_LIMIT, name, sort } = req.query;
+
+        const pageNum = parseInt(page, 10);
+        const pageSize = parseInt(limit, 10);
+
+        const where = {
+            ...(name && {
+                name: {
+                    contains: name,
+                    mode: "insensitive",
+                },
+            })
+        };
+
+        const orderBy = (() => {
+            switch (sort) {
+                case "newest":
+                    return { createdAt: "desc" };
+                case "oldest":
+                    return { createdAt: "asc" };
+                case "updated_newest":
+                    return { updatedAt: "desc" };
+                case "updated_oldest":
+                    return { updatedAt: "asc" };
+                default:
+                    return { createdAt: "desc" };
+            }
+        })();
+        
+        const total = await prisma.listing.count({
+            where
+        });
+
+        const teams = await prisma.team.findMany({
+            where,
+            skip: (pageNum - 1) * pageSize,
+            take: pageSize,
+            orderBy
+        });
+        res.status(200).json({
+            total,
+            page: pageNum,
+            limit: pageSize,
+            teams
+        });
     } catch (error) {
         console.log(error);
     }

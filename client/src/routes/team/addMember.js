@@ -68,7 +68,7 @@ const ModalContent = ({ onClose, team }) => {
         const fetchMembers = async () => {
             try {
                 const response = await apiRequest.get("/users");
-                setMembers(response.data.filter(item => item.teamId === team.id || item.teamId === null));
+                setMembers(response.data.users.filter(item => item.teamId === team.id || item.teamId === null));
             } catch (error) {
                 console.log(error);
             }

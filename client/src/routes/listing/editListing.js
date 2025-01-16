@@ -66,7 +66,7 @@ const EditListing = ({ visible, setVisible, listing }) => {
                 <CModalTitle id="LiveDemoExampleLabel">Sản phẩm #{listing && listing.sku}</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                <CRow className="clearfix">
+                <CRow className="mb-2 mt-2">
                     {listing && images && images.map((image, index) => (
                         <CCol xs={3} key={index} className="position-relative">
                             <CImage
@@ -95,6 +95,7 @@ const EditListing = ({ visible, setVisible, listing }) => {
                         />
                     </div>
                 </CRow>
+                <div className="clearfix"></div>
                 <CForm method='post' onSubmit={handleSubmit}>
                     <CRow className="mt-3">
                         <CCol md={6}>

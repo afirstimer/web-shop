@@ -4,6 +4,7 @@ import {
     getShops,
     getActiveShops,
     getShop, 
+    getShopOrders,
     getShopsByUser,
     createShop, 
     updateShop, 
@@ -16,6 +17,7 @@ const router = express.Router();
 
 router.get("/", verifyToken, getShops);
 router.get("/active", verifyToken, getActiveShops);
+router.get("/orders/:id", verifyToken, getShopOrders);
 router.get("/token/refresh", verifyToken, refreshToken);
 router.get("/authorize", verifyToken, requestAuthorizedShops);
 router.get("/shop/:id", verifyToken, getShop);

@@ -27,7 +27,10 @@ import {
     CDropdownMenu,
     CDropdownItem,
     CDropdownDivider,
-    CFormSelect
+    CFormSelect,
+    CPagination,
+    CPaginationItem,
+    CBadge
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -89,6 +92,7 @@ import MultiSelect from 'multiselect-react-dropdown';
 import AddShop from './addShop'
 import Toggle from 'react-toggle'
 import "react-toggle/style.css";
+import EditShop from './editShop'
 
 
 const Shops = () => {
@@ -99,6 +103,10 @@ const Shops = () => {
 
     // authorized shop
     const [visibleAuthShop, setVisibleAuthShop] = useState(false);
+
+    // edit shop
+    const [visibleEdit, setVisibleEdit] = useState(false);
+    const [shop2Edit, setShop2Edit] = useState({});
 
     // paging
     const [page, setPage] = useState(1);
@@ -112,40 +120,48 @@ const Shops = () => {
         SHOP_STATUS: [
             { id: 'CONNECTED', name: 'CONNECTED' },
             { id: 'DISCONNECTED', name: 'DISCONNECTED' },
-            { id: 'ACCOUNT_DEACTIVATED', name: 'ACCOUNT DEACTIVATED' }
+            { id: 'DEACTIVATED', name: 'DEACTIVATED' }
         ]
     };
 
     useEffect(() => {
         const fetchShops = async () => {
-            apiRequest('shops')
-            .then((res) => {                
+            apiRequest('shops', {
+                params: {
+                    search: searchTerm,
+                    page,
+                    limit,
+                    sort
+                }
+            }).then((res) => {
                 apiRequest('shops/active')
-                .then((res2) => {
-                    const activeIds = [...res2.data.map(shop => shop.id)]
-                    setActiveShops(activeIds);
-                    res.data.map(shop => {
-                        shop.checked = false;
-                        if (activeIds.includes(shop.tiktokShopId)) {
-                            shop.checked = true;
-                        }
-                    });
-                    setShops(res.data);
+                    .then((res2) => {
+                        const activeIds = [...res2.data.map(shop => shop.id)]
+                        setActiveShops(activeIds);
+                        res.data.shops.map(shop => {
+                            shop.checked = false;
+                            if (activeIds.includes(shop.tiktokShopId)) {
+                                shop.checked = true;
+                            }
+                        });
+                        setShops(res.data.shops);
+                        setTotal(res.data.total);
+                        setTotalPages(Math.ceil(res.data.total / limit));
+                    })
+            })
+                .catch((err) => {
+                    console.log(err)
                 })
-            })
-            .catch((err) => {
-                console.log(err)
-            })
         };
 
         fetchShops();
-    }, []);    
+    }, [searchTerm, page, limit, sort]);
 
     const handleChangeShopStatus = (shopId, status) => {
         try {
             console.log(shopId, status);
         } catch (error) {
-            console.log(error);            
+            console.log(error);
         }
     };
 
@@ -178,9 +194,6 @@ const Shops = () => {
 
     const handleSearchChange = (e) => {
         e.preventDefault();
-        if (!e.target.value) {
-            window.location.reload();
-        }
         setSearchTerm(e.target.value);
     }
 
@@ -189,9 +202,31 @@ const Shops = () => {
         console.log(selectedList);
     }
 
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage);
+        }
+    }
+
+    const renderPagination = () => {
+        const pageNumbers = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pageNumbers.push(
+                <CPaginationItem key={i} active={i === page} onClick={() => handlePageChange(i)}>{i}</CPaginationItem>
+            );
+        }
+        return pageNumbers;
+    }
+
+    const editShop = (shop) => {
+        setVisibleEdit(true);
+        setShop2Edit(shop);
+    }
+
     return (
         <>
             <AddShop visible={visibleAuthShop} setVisible={setVisibleAuthShop} />
+            <EditShop visible={visibleEdit} setVisible={setVisibleEdit} shop={shop2Edit} />
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
@@ -222,8 +257,8 @@ const Shops = () => {
                 <CCol>
                     <CInputGroup className="mb-3">
                         <CFormInput
-                            placeholder="Tìm theo mã hoặc tên"
-                            aria-label="Tìm theo mã hoặc tên"
+                            placeholder="Tìm theo tên"
+                            aria-label="Tìm theo tên"
                             aria-describedby="basic-addon2"
                             onChange={handleSearchChange}
                         />
@@ -306,18 +341,18 @@ const Shops = () => {
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
-                                    {shops.map((item, index) => (
+                                    {shops.map((shop, index) => (
                                         <CTableRow v-for="item in tableItems" key={index}>
                                             <CTableDataCell>
                                                 <CFormCheck
                                                     className="form-check-input"
-                                                    checked={item.checked}
-                                                    onChange={(e) => handleProductCheckboxChange(e, item.id)}
+                                                    checked={shop.checked}
+                                                    onChange={(e) => handleProductCheckboxChange(e, shop.id)}
                                                 />
                                             </CTableDataCell>
                                             <CTableDataCell>
-                                                <div>{item.name}</div>
-                                                <div>{item.defaultShop ? (
+                                                <div>{shop.name}</div>
+                                                <div>{shop.defaultShop ? (
                                                     <div className='text-danger small'>
                                                         (Shop mặc định)
                                                     </div>
@@ -328,31 +363,26 @@ const Shops = () => {
                                                 )}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.profile}</div>
+                                                <div>{shop.profile}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <code>{item.code}</code>
+                                                <code>{shop.code}</code>
                                             </CTableDataCell>
                                             <CTableDataCell>
                                                 <CButton size="sm">
-                                                    <CAvatar size="md" src={item.User.avatar || avatarDefault} />
-                                                    &nbsp;{item.User.username}
+                                                    <CAvatar size="md" src={shop.User.avatar || avatarDefault} />
+                                                    &nbsp;{shop.User.username}
                                                 </CButton>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div className='text-success'>
-                                                    <Toggle
-                                                        className='mt-2 me-2'
-                                                        defaultChecked={item.checked}
-                                                        id="isActive"
-                                                        name='isActive'
-                                                        value={item.checked ? "yes" : "no"} 
-                                                        onChange={() => handleChangeShopStatus(item.id, item.checked ? "no" : "yes")}                                                       
-                                                    />                                                    
-                                                </div>
+                                                {shop.status === "authorized" || shop.status === "CONNECTED" ? (
+                                                    <CBadge color="success">CONNECTED</CBadge>
+                                                ) : (
+                                                    <CBadge color="danger">{shop.status}</CBadge>
+                                                )}
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center d-none d-md-table-cell">
-                                                <CButton color='warning' size="sm" className='me-2 mb-2'>
+                                                <CButton color='warning' size="sm" className='me-2 mb-2' onClick={() => editShop(shop)}>
                                                     <CIcon icon={cilPencil} className='me-2' />
                                                     Sửa
                                                 </CButton>
@@ -362,13 +392,30 @@ const Shops = () => {
                                                 </CButton>
                                                 <CButton color="primary" size="sm" className='me-2 mb-2'>
                                                     <CIcon icon={cilSync} className='me-2' />
-                                                    Sync
+                                                    Sync đơn hàng
                                                 </CButton>
                                             </CTableDataCell>
                                         </CTableRow>
                                     ))}
                                 </CTableBody>
                             </CTable>
+                            <CPagination className='d-flex justify-content-center mt-3' aria-label="Page navigation example">
+                                <CPaginationItem
+                                    aria-label="Previous"
+                                    onClick={() => handlePageChange(page - 1)}
+                                    disabled={page === 1}
+                                >
+                                    <span aria-hidden="true">&laquo;</span>
+                                </CPaginationItem>
+                                {renderPagination()}
+                                <CPaginationItem
+                                    aria-label="Next"
+                                    onClick={() => handlePageChange(page + 1)}
+                                    disabled={page === totalPages}
+                                >
+                                    <span aria-hidden="true">&raquo;</span>
+                                </CPaginationItem>
+                            </CPagination>
                         </CCardBody>
                     </CCard>
                 </CCol>

@@ -31,13 +31,20 @@ const EditUser = ({ visible, setVisible, user }) => {
     const [data, setData] = useState([]);
     const [teams, setTeams] = useState(null);
     const [shops, setShops] = useState([]);
+    const [selectedShops, setSelectedShops] = useState([]);
     const [avatar, setAvatar] = useState([]);
 
     useEffect(() => {
         const fetchTeams = async () => {
             try {
-                const teams = await apiRequest.get('/teams');
-                setTeams(teams.data);
+                const teams = await apiRequest.get('/teams')
+                    .then(res => {
+                        setTeams(res.data.teams);
+                        const shops = apiRequest.get(`/shops`)
+                            .then(res2 => {
+                                setShops(res2.data.shops);
+                            })
+                    });
             } catch (error) {
                 console.log(error);
             }
@@ -45,21 +52,32 @@ const EditUser = ({ visible, setVisible, user }) => {
         if (user) {
             fetchTeams();
             setData(user);
-            setShops(user.shops);
+            setSelectedShops(user.shops);
         }
     }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const formData = new FormData(e.target);
+            const payload = {
+                username: formData.get('username'),
+                password: formData.get('password'),
+                email: formData.get('email'),
+                avatar: avatar[0],
+                teamId: formData.get('team'),
+                shops: JSON.stringify(selectedShops),
+            }
 
+            const res = await apiRequest.put(`/users/${user.id}`, payload);
+            setVisible(false);
         } catch (error) {
-
+            console.log(error);
         }
     }
-    
+
     const searchBy = (selectedList, selectedItem) => {
-        console.log(selectedList);
+        setSelectedShops(selectedList.map(item => item.id));
     }
 
     return (
@@ -74,7 +92,25 @@ const EditUser = ({ visible, setVisible, user }) => {
                 <CModalTitle id="LiveDemoExampleLabel">User {user && user.username}</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                <CForm method='post' onSubmit={handleSubmit}>
+                <CRow className="mt-3 col-3">
+                    <CRow className="d-flex justify-content-center">
+                        <CImage src={avatar[0] || user && user.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} className="col-12 img-fluid mb-2"/>
+                        <div style={{ height: "15%" }} className="d-flex justify-content-center">
+                            <UploadWidget
+                                className="col-3"
+                                uwConfig={{
+                                    multiple: true,
+                                    cloudName: "dg5multm4",
+                                    uploadPreset: "estate_3979",
+                                    folder: "users",
+                                }}
+                                multiple={false}
+                                setState={setAvatar}
+                            />
+                        </div>
+                    </CRow>                    
+                </CRow>
+                <CForm className="row g-3" method='post' onSubmit={handleSubmit}>
                     <CRow className="mt-3">
                         <CCol md={12}>
                             <CFormInput type="text" id="username" name="username" label="Tài khoản" value={user && user.username} />
@@ -82,32 +118,13 @@ const EditUser = ({ visible, setVisible, user }) => {
                     </CRow>
                     <CRow className="mt-3">
                         <CCol md={12}>
-                            <CFormInput type="password" id="password" name="password" label="Mật khẩu" value="" />
+                            <CFormInput type="password" id="password" name="password" label="Mật khẩu" />
                         </CCol>
                     </CRow>
                     <CRow className="mt-3">
                         <CCol md={12}>
                             <CFormInput type="text" id="email" name="email" label="Email" value={user && user.email} />
                         </CCol>
-                    </CRow>
-                    <CRow className="mt-3">
-                        <CRow className="d-flex justify-content-center">
-                            <CImage src={avatar[0] || user && user.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} className="col-12 img-fluid" style={{ width: "100px", height: "100px" }} />
-                        </CRow>
-                        <CRow className="col-12 d-flex justify-content-center text-center mt-3">
-                            <div className="row col-3">
-                                <UploadWidget
-                                    className="col-3"
-                                    uwConfig={{
-                                        multiple: true,
-                                        cloudName: "dg5multm4",
-                                        uploadPreset: "estate_3979",
-                                        folder: "users",
-                                    }}
-                                    setState={setAvatar}
-                                />
-                            </div>
-                        </CRow>
                     </CRow>
                     <CRow className="mt-2">
                         <CCol md={12}>
@@ -124,13 +141,14 @@ const EditUser = ({ visible, setVisible, user }) => {
                     <CRow className="mt-3">
                         <CCol md={12}>
                             <CFormLabel>
-                                Nhóm
+                                Shop quản lý
                             </CFormLabel>
                             <MultiSelect
                                 displayValue='name'
                                 options={shops}
                                 onSelect={searchBy}
-                                placeholder='Chọn nhóm'
+                                placeholder='Chọn shop'
+                                selectedValues={selectedShops}
                             />
                         </CCol>
                     </CRow>

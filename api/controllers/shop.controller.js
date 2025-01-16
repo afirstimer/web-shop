@@ -3,11 +3,51 @@ import jwt from "jsonwebtoken";
 import { generateSign } from "../helper/tiktok.api.js";
 import fetch from "node-fetch";
 import axios from "axios";
+import { readJSONFile, writeJSONFile } from "../helper/helper.js";
+
+const ORDER_FILE = "./dummy/tiktok/orders.json";
 
 // get all shops
 export const getShops = async (req, res) => {
-    try {        
+    try {
+        const { page = 1, limit = process.env.DEFAULT_LIMIT, search, sort } = req.query;
+
+        const pageNum = parseInt(page, 10);
+        const pageSize = parseInt(limit, 10);
+
+        const where = {
+            ...(search && {
+                name: {
+                    contains: search,
+                    mode: "insensitive",
+                },
+            })
+        };
+
+        const orderBy = (() => {
+            switch (sort) {
+                case "newest":
+                    return { createdAt: "desc" };
+                case "oldest":
+                    return { createdAt: "asc" };
+                case "updated_newest":
+                    return { updatedAt: "desc" };
+                case "updated_oldest":
+                    return { updatedAt: "asc" };
+                default:
+                    return { createdAt: "desc" };
+            }
+        })();
+
+        const total = await prisma.shop.count({
+            where
+        });
+
         const shops = await prisma.shop.findMany({
+            where,
+            skip: (pageNum - 1) * pageSize,
+            take: pageSize,
+            orderBy: orderBy,
             include: {
                 User: {
                     select: {
@@ -18,7 +58,12 @@ export const getShops = async (req, res) => {
                 }
             },
         });
-        res.status(200).json(shops);
+        res.status(200).json({
+            total,
+            page: pageNum,
+            limit: pageSize,
+            shops
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Failed to get shops!" });
@@ -27,7 +72,7 @@ export const getShops = async (req, res) => {
 
 // create shop
 export const createShop = async (req, res) => {
-    try {        
+    try {
         const { name, manager, team } = req.body;
         const newShop = await prisma.shop.create({
             data: {
@@ -45,7 +90,7 @@ export const createShop = async (req, res) => {
 
 // get shop
 export const getShop = async (req, res) => {
-    try {        
+    try {
         const shop = await prisma.shop.findUnique({
             where: {
                 id: req.params.id
@@ -63,6 +108,100 @@ export const getShop = async (req, res) => {
         res.status(200).json(shop);
     } catch (error) {
         console.log(error);
+    }
+}
+
+export const getShopOrders = async (request, res) => {
+    try {        
+        const app_key = process.env.TIKTOK_SHOP_APP_KEY;
+        const secret = process.env.TIKTOK_SHOP_APP_SECRET;
+        const setting = await prisma.setting.findFirst();
+        if (!setting) {
+            console.error("Setting not found");
+            return res.status(404).json({ message: "Setting not found" });
+        }
+        const access_token = setting.shopAccessToken;
+
+        if (!app_key || !secret || !access_token) {
+            console.log(app_key, secret, access_token);
+            console.error("Missing required parameters: app_key, secret, or access_token");
+            throw new Error("Missing required parameters: app_key, secret, or access_token");
+        }
+
+        const shopId = request.params.id
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: shopId
+            }
+        })        
+
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }
+
+        request.query.path = "/order/202309/orders/search";
+        request.query.access_token = access_token;
+        request.query.app_key = app_key;
+        request.query.secret = secret;  
+        request.query.shop_cipher = shop.tiktokShopCipher;
+        request.query.page_size = 20;
+        request.query.sort_order = 'ASC';
+        request.query.sort_field = 'create_time';      
+        request.query.page_token = '';
+        const timestamp = Math.floor(Date.now() / 1000);
+        const header = request.headers['content-type'];
+        const sign = generateSign(request, secret, timestamp, header);
+
+        console.log(sign);
+
+        // Define your request details
+        const options = {
+            method: "POST",
+            url: "https://open-api.tiktokglobalshop.com/order/202309/orders/search",
+            query: {
+                app_key: app_key,
+                sign: "{{sign}}",
+                timestamp: "{{timestamp}}",
+                shop_cipher: shop.tiktokShopCipher,
+                page_size: 20,
+                sort_order: 'ASC',
+                sort_field: 'create_time',
+                page_token: ''
+            },
+            headers: {
+                "x-tts-access-token": setting.shopAccessToken,
+                "content-type": "application/json"
+            }
+        };
+
+        console.log(options);
+
+        // Update the query parameters with calculated values
+        options.query.sign = sign;
+        options.query.timestamp = timestamp;
+
+        // Interpolate URL
+        const queryString = new URLSearchParams(options.query).toString();
+        options.url = `${options.url}?${queryString}`;
+
+        // Make the GET request    
+        const response = await axios({
+            method: options.method,
+            url: options.url,
+            headers: options.headers
+        });
+        console.log(response);
+
+        if (response.data.message == 'Success') {            
+            await writeJSONFile(ORDER_FILE, response.data.data);
+
+            res.status(200).json(response.data.data);
+        } else {
+            console.error("Error:", response.data);
+            throw new Error("Failed to get active shops");
+        }
+    } catch (error) {
+        console.error("Error:", error.response ? error.response.data : error.message);
     }
 }
 
@@ -144,7 +283,7 @@ export const getActiveShops = async (request, res) => {
 
 // get shops
 export const getShopsByUser = async (req, res) => {
-    try {        
+    try {
         const shops = await prisma.shop.findMany({
             where: {
                 userId: req.params.id
@@ -168,12 +307,39 @@ export const getShopsByUser = async (req, res) => {
 
 // update shop
 export const updateShop = async (req, res) => {
-    try {        
+    const { images, managers, priceDiff, shopItems, ...inputs } = req.body;
+
+    try {
+        let shopImages = [];
+        if (images) {
+            shopImages = JSON.parse(images);
+        }
+
+        let shopManagers = [];
+        if (managers) {
+            shopManagers = JSON.parse(managers);
+        }
+
+        let shopPriceDiff = null;
+        if (priceDiff) {
+            shopPriceDiff = parseInt(priceDiff, 10);
+        }
+
+        let shopQtyItems = null;
+        if (shopItems) {
+            shopQtyItems = parseInt(shopItems, 10);
+        }
         const updatedShop = await prisma.shop.update({
             where: {
                 id: req.params.id,
             },
-            data: req.body,
+            data: {
+                ...inputs,
+                priceDiff: shopPriceDiff,
+                shopItems: shopQtyItems,
+                images: shopImages,
+                managers: shopManagers
+            },
         });
 
         res.status(200).json(updatedShop);
@@ -184,7 +350,7 @@ export const updateShop = async (req, res) => {
 
 // authorize shop
 export const requestAuthorizedShops = async (request, res) => {
-    try {                
+    try {
         const app_key = process.env.TIKTOK_SHOP_APP_KEY;
         const secret = process.env.TIKTOK_SHOP_APP_SECRET;
         const setting = await prisma.setting.findFirst();
@@ -245,7 +411,7 @@ export const requestAuthorizedShops = async (request, res) => {
             method: options.method,
             url: options.url,
             headers: options.headers
-        });        
+        });
 
         // create shop
         console.log(response.data);
@@ -255,16 +421,16 @@ export const requestAuthorizedShops = async (request, res) => {
                 where: {
                     id: request.userId,
                 },
-            });            
+            });
 
-            for (const shop of response.data.data.shops) {                
+            for (const shop of response.data.data.shops) {
                 // find shop by code
                 const existingShop = await prisma.shop.findUnique({
                     where: {
                         code: shop.code,
                     },
                 });
-                
+
                 if (existingShop) {
                     // update
                     await prisma.shop.update({
@@ -313,7 +479,7 @@ export const getTiktokShopInfo = async (req, res) => {
 }
 
 // refresh token
-export const refreshToken = async (req, res) => {    
+export const refreshToken = async (req, res) => {
     const url = 'https://auth.tiktok-shops.com/api/v2/token/refresh';
 
     console.log('Refreshing token...');

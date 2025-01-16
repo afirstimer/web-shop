@@ -1,7 +1,7 @@
 import express from "express";
 import {
     getTeams, 
-    getTeam,
+    getTeam,    
     createTeam, 
     updateTeam,
     addMemberToTeam, 

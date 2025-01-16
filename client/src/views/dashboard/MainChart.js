@@ -1,10 +1,37 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { CChartLine } from '@coreui/react-chartjs'
 import { getStyle } from '@coreui/utils'
+import apiRequest from '../../lib/apiRequest'
 
 const MainChart = () => {
   const chartRef = useRef(null)
+  const [months, setMonths] = useState([]);
+  const [totalOrders, setTotalOrders] = useState([]);
+  const [revenue, setRevenue] = useState([]);
+
+  useEffect(() => {
+    const fetchTotalOrders = async () => {
+      try {
+        const orders = await apiRequest.get('/orders');        
+        const tmpMonths = [];
+        const tmpOrders = [];
+        const tmpRevenues = [];
+        orders.data.forEach(order => {
+          tmpMonths.push(order.month);          
+          tmpOrders.push(order.total);
+          tmpRevenues.push(order.revenue);
+        });        
+        setMonths(tmpMonths);        
+        setTotalOrders(tmpOrders);
+        setRevenue(tmpRevenues);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchTotalOrders();
+  }, []);
 
   useEffect(() => {
     document.documentElement.addEventListener('ColorSchemeChange', () => {
@@ -34,50 +61,34 @@ const MainChart = () => {
         ref={chartRef}
         style={{ height: '300px', marginTop: '40px' }}
         data={{
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+          labels: months,
           datasets: [
             {
-              label: 'My First dataset',
+              label: 'Đơn hàng',
               backgroundColor: `rgba(${getStyle('--cui-info-rgb')}, .1)`,
               borderColor: getStyle('--cui-info'),
               pointHoverBackgroundColor: getStyle('--cui-info'),
               borderWidth: 2,
-              data: [
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-              ],
+              data: totalOrders,
               fill: true,
             },
             {
-              label: 'My Second dataset',
+              label: 'Doanh thu',
               backgroundColor: 'transparent',
               borderColor: getStyle('--cui-success'),
               pointHoverBackgroundColor: getStyle('--cui-success'),
               borderWidth: 2,
-              data: [
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-              ],
+              data: revenue,
             },
-            {
-              label: 'My Third dataset',
-              backgroundColor: 'transparent',
-              borderColor: getStyle('--cui-danger'),
-              pointHoverBackgroundColor: getStyle('--cui-danger'),
-              borderWidth: 1,
-              borderDash: [8, 5],
-              data: [65, 65, 65, 65, 65, 65, 65],
-            },
+            // {
+            //   label: 'My Third dataset',
+            //   backgroundColor: 'transparent',
+            //   borderColor: getStyle('--cui-danger'),
+            //   pointHoverBackgroundColor: getStyle('--cui-danger'),
+            //   borderWidth: 1,
+            //   borderDash: [8, 5],
+            //   data: [65, 65, 65, 65, 65, 65, 65],
+            // },
           ],
         }}
         options={{

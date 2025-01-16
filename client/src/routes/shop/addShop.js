@@ -12,7 +12,8 @@ import {
     CButtonGroup,
     CButton,
     CFormInput,
-    CForm
+    CForm,
+    CFormTextarea
 } from "@coreui/react";
 import DOMPurify from "dompurify";
 
@@ -24,7 +25,7 @@ const AddShop = ({ visible, setVisible }) => {
             aria-labelledby="LiveDemoExampleLabel"
             alignment="center"
             scrollable
-            size="lg"
+            size="sm"
         >
             <CModalHeader>
                 <CModalTitle id="LiveDemoExampleLabel">Tạo shop</CModalTitle>
@@ -33,7 +34,8 @@ const AddShop = ({ visible, setVisible }) => {
                 <CForm>
                     <CRow className="mt-3 d-flex justify-content-center">
                         <div className="col-12">
-                            <CFormInput type="text" className="text-center" placeholder="Nhập authorization link" />
+                            <CFormTextarea placeholder="Nhập link của shop">
+                            </CFormTextarea>
                         </div>
                     </CRow>
                     <CRow className="mt-3 d-flex justify-content-center" >

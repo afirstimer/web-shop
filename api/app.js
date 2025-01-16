@@ -10,6 +10,7 @@ import listingRoute from "./routes/listing.route.js";
 import settingRoute from "./routes/setting.route.js";
 import proxyRoute from "./routes/proxy.route.js";
 import templateRoute from "./routes/template.route.js";
+import orderRoute from "./routes/order.route.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/listings", listingRoute);
 app.use("/api/templates", templateRoute);
 app.use("/api/settings", settingRoute);
 app.use("/api/proxy", proxyRoute);
+app.use("/api/orders", orderRoute);
 
 app.listen(8800, () => {
     console.log("Listening on port 8800");

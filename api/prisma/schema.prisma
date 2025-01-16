@@ -22,6 +22,7 @@ model User {
   Team      Team?     @relation(fields: [teamId], references: [id])
   teamId    String?   @db.ObjectId
   createdAt DateTime  @default(now())
+  isActive  Int?      @default(1)
   shops     Shop[]
   listings  Listing[]
 }
@@ -150,6 +151,84 @@ model Proxy {
   password  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model Order {
+  id                         String      @id @default(auto()) @map("_id") @db.ObjectId
+  buyerEmail                 String
+  buyerMessage               String?
+  cancelOrderSlaTime         Int
+  collectionTime             Int
+  createTime                 Int
+  deliveryOptionId           String
+  deliveryOptionName         String
+  deliveryOptionTime         Int
+  deliverySlaTime            Int
+  deliveryTime               Int
+  deliveryType               String
+  fulfillmentType            String
+  hasUpdatedRecipientAddress Boolean
+  isCod                      Boolean
+  isOnHoldOrder              Boolean
+  isReplacementOrder         Boolean
+  isSampleOrder              Boolean
+  paidTime                   Int
+  paymentMethodName          String
+  recipientAddress           Json
+  rtsSlaTime                 Int
+  shippingDueTime            Int
+  shippingProvider           String
+  shippingProviderId         String
+  shippingType               String
+  status                     String
+  trackingNumber             String
+  updateTime                 Int
+  userId                     String
+  warehouseId                String
+  items                      OrderItem[]
+}
+
+model OrderItem {
+  id                   String             @id @default(auto()) @map("_id") @db.ObjectId
+  orderId              String             @db.ObjectId
+  currency             String
+  displayStatus        String
+  itemTax              Json
+  originalPrice        Float
+  packageId            String
+  packageStatus        String
+  platformDiscount     Float
+  productId            String
+  productName          String
+  rtsTime              Int
+  salePrice            Float
+  sellerDiscount       Float
+  sellerSku            String
+  shippingProviderId   String
+  shippingProviderName String
+  skuId                String
+  skuImage             String
+  skuName              String
+  skuType              String
+  trackingNumber       String
+  packages             OrderItemPackage[]
+  Order                Order              @relation(fields: [orderId], references: [id])
+}
+
+model OrderItemPackage {
+  id          String                     @id @default(auto()) @map("_id") @db.ObjectId
+  orderItemId String                     @db.ObjectId
+  packageId   String
+  trackings   OrderItemPackageTracking[]
+  OrderItem   OrderItem                  @relation(fields: [orderItemId], references: [id])
+}
+
+model OrderItemPackageTracking {
+  id                 String            @id @default(auto()) @map("_id") @db.ObjectId
+  packageId          String            @db.ObjectId
+  trackingNumber     String
+  OrderItemPackage   OrderItemPackage? @relation(fields: [orderItemPackageId], references: [id])
+  orderItemPackageId String?           @db.ObjectId
 }
 
 enum ProxyType {
