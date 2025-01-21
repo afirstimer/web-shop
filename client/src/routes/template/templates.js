@@ -71,6 +71,9 @@ const Templates = () => {
     const [templates, setTemplates] = useState([])
     const navigate = useNavigate()
 
+    // DELETE 
+    const [deleteTemplate, setDeleteTemplate] = useState({})
+
     useEffect(() => {
         const fetchTemplates = async () => {
             const response = await apiRequest.get('/templates')
@@ -87,9 +90,18 @@ const Templates = () => {
         navigate(`/template/edit/${id}`)
     }
 
+    const proceedDeleteTemplate = (template) => {
+        setDeleteTemplate(template)
+        setVisible(!visible)
+    }
+
+    const onChangeDelete = () => {
+        window.location.reload()
+    }
+
     return (
         <>
-            <DeleteTemplate visible={visible} setVisible={setVisible} />
+            <DeleteTemplate visible={visible} setVisible={setVisible} template={deleteTemplate} onChange={onChangeDelete}/>
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
@@ -138,7 +150,7 @@ const Templates = () => {
                                                     <CIcon icon={cilPencil} className="me-2" />
                                                     Update
                                                 </CButton>
-                                                <CButton className='me-2' color="danger" size="sm" onClick={() => setVisible(!visible)}>
+                                                <CButton className='me-2' color="danger" size="sm" onClick={() => proceedDeleteTemplate(template)}>
                                                     <CIcon icon={cilTrash} className="me-2" />
                                                     Delete
                                                 </CButton>

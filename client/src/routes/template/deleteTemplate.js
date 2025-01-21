@@ -6,9 +6,22 @@ import {
     CModalHeader, 
     CModalTitle 
 } from "@coreui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import apiRequest from "../../lib/apiRequest";
 
-const DeleteTemplate = ({ visible, setVisible }) => {
+const DeleteTemplate = ({ visible, setVisible, template, onChange }) => {        
+
+    const proceedDelete = () => {
+        try {
+            apiRequest.delete(`/templates/${template.id}`).then(() => {
+                setVisible(false);
+                onChange();
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <CModal
             visible={visible}
@@ -25,7 +38,7 @@ const DeleteTemplate = ({ visible, setVisible }) => {
                 <CButton color="secondary" onClick={() => setVisible(false)}>
                     Đóng
                 </CButton>
-                <CButton color="primary">Xóa</CButton>
+                <CButton color="primary" onClick={() => proceedDelete()}>Xóa</CButton>
             </CModalFooter>
         </CModal>
     );

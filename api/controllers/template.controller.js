@@ -9,11 +9,11 @@ export const getTemplates = async (req, res) => {
     try {        
         const templates = await prisma.template.findMany({});
 
-        const categories = await readJSONFile("./dummy/tiktok/categories.json");
-        templates.forEach(template => {
-            const category = categories.find(c => c.id === template.categoryId);
-            template.categoryId = category?.name;
-        });
+        // const categories = await readJSONFile("./dummy/tiktok/categories.json");
+        // templates.forEach(template => {
+        //     const category = categories.find(c => c.id === template.categoryId);
+        //     template.categoryId = category?.name;
+        // });
         res.status(200).json(templates);
     } catch (error) {
         console.log(error);
@@ -28,6 +28,11 @@ export const getTemplate = async (req, res) => {
                 id: id
             }
         });
+        
+        const categories = await readJSONFile("./dummy/tiktok/categories.json");
+        const category = categories.find(c => c.id === template.categoryId);
+        template.categoryName = category?.name;
+
         res.status(200).json(template);
     } catch (error) {
         console.log(error);
@@ -50,6 +55,7 @@ export const createTemplate = async (req, res) => {
                 compliances: req.body.compliances,
                 skus: req.body.skus,
                 identifierCode: req.body.identifierCode,
+                identifierValue: req.body.identifierCodeValue,
                 skuPrice: req.body.skuPrice,
                 skuQty: req.body.inventoryQuantity,
                 skuSeller: req.body.sellerSku,
@@ -104,4 +110,27 @@ export const updateTemplate = async (req, res) => {
     }
  }
 
-export const deleteTemplate = async (req, res) => { }
+export const deleteTemplate = async (req, res) => {
+    try { 
+        // find template by id
+        const template = await prisma.template.findUnique({
+            where: {
+                id: req.params.id
+            }
+        });
+        
+        if (!template) {
+            res.status(404).json({ message: "Template not found" });
+        }
+
+        await prisma.template.delete({
+            where: {
+                id: template.id
+            }
+        });
+
+        res.status(200).json({ message: "Template deleted successfully" });
+    } catch (error) {
+        console.log(error);
+    }
+}

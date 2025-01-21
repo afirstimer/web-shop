@@ -1,8 +1,10 @@
-import { promises as fs } from 'fs';
+import axios from 'axios';
+import prisma from '../lib/prisma.js';
+import fs from 'fs';
 
 export const getProductValueByKey = (productInfo, key) => {
-    const actualKey = Object.keys(productInfo).find(k => k.includes(key));
-    return actualKey ? productInfo[actualKey] : null;
+  const actualKey = Object.keys(productInfo).find(k => k.includes(key));
+  return actualKey ? productInfo[actualKey] : null;
 };
 
 export const readJSONFile = async (filePath) => {
@@ -23,3 +25,38 @@ export const writeJSONFile = async (filePath, data) => {
     throw error;
   }
 };
+
+export const getDefaultShop = async (req) => {
+  let shop = null;  
+  try {
+    // if req.shopId is not exist, get user from token
+    if (req.userId) {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: req.userId,
+        },
+      });
+      console.log(user);
+
+      if (user) {
+        shop = await prisma.shop.findFirst({
+          where: {
+            userId: user.id,
+          }
+        });
+      }
+
+      if (shop) return shop;
+    }
+
+    if (!shop) {
+      // if no shop. get first shop
+      shop = await prisma.shop.findFirst();
+    }
+    
+    if (shop) return shop;    
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}

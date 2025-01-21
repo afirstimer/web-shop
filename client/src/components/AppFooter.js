@@ -6,7 +6,7 @@ const AppFooter = () => {
     <CFooter className="px-4">
       <div>
         <a href="https://phapsuit.com" target="_blank" rel="noopener noreferrer">
-          WebShop
+          TikTok Shop
         </a>
         <span className="ms-1">&copy; 2025</span>
       </div>

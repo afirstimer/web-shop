@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CForm, CRow, CFormInput, CFormLabel, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CAvatar, CCol } from "@coreui/react";
+import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CForm, CRow, CFormInput, CFormLabel, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CAvatar, CCol, CBadge, CFooter, CFormSelect, CToast, CToastHeader, CToastBody, CFormTextarea, CLink, CImage } from "@coreui/react";
 import apiRequest from "../../lib/apiRequest";
 import MultiSelect from 'multiselect-react-dropdown'
 import { ToastNoti } from "../../components/notification/ToastNoti";
-import { cilCaretRight, cilPencil, cilPlus, cilTrash } from "@coreui/icons";
+import { cil3d, cilArrowLeft, cilBell, cilCaretRight, cilCheckCircle, cilCloudUpload, cilDiamond, cilLockLocked, cilPencil, cilPlus, cilTrash, cilX } from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
 import "./uploadToShop.css";
 import Toggle from 'react-toggle'
 import "react-toggle/style.css";
+import UploadWidget from "../../components/uploadWidget/UploadWidget";
 
 const UploadToShop = ({ visible, setVisible, listings }) => {
 
+    // step 1 - shop, template
     const [shops, setShops] = useState([]);
     const [templates, setTemplates] = useState([]);
+    const [selectedShops, setSelectedShops] = useState(null);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+
     // step 2 - review listings
     const [isStep2, setIsStep2] = useState(false);
 
@@ -26,7 +31,6 @@ const UploadToShop = ({ visible, setVisible, listings }) => {
             }
         }
         fetchShops();
-        console.log(listings);
     }, [listings]);
 
     useEffect(() => {
@@ -42,64 +46,165 @@ const UploadToShop = ({ visible, setVisible, listings }) => {
         fetchTemplates();
     }, [shops]);
 
+    const onSelectShops = (selectedList) => {
+        setSelectedShops(selectedList);
+    }
+
+    const onSelectTemplate = (selectTpl) => {
+        setSelectedTemplate(selectTpl);
+    }
+
+    const goToStep2 = (callback) => {
+        if (!selectedShops || !selectedTemplate) {
+            callback();
+            return;
+        }
+        setIsStep2(true);
+    }
+
     return (
         <>
-            <ChooseTemplate visible={visible} setVisible={setVisible} shops={shops} templates={templates} onChange={() => setIsStep2(true)} />
-            <ChooseListings visible={isStep2} setVisible={setIsStep2} listings={listings} />
+            <ChooseTemplate
+                visible={visible}
+                setVisible={setVisible}
+                shops={shops}
+                templates={templates}
+                onChange={goToStep2}
+                onSelectShops={onSelectShops}
+                onSelectTemplate={onSelectTemplate}
+            />
+            <ChooseListings
+                visible={isStep2}
+                setVisible={setIsStep2}
+                listings={listings}
+                selectedShops={selectedShops}
+                selectedTemplate={selectedTemplate}
+            />
         </>
     );
 };
 
-const ChooseTemplate = ({ visible, setVisible, shops, templates, onChange }) => {
+const ChooseTemplate = ({ visible, setVisible, shops, templates, onChange, onSelectShops, onSelectTemplate }) => {
+    const [toast, setToast] = useState(null);
 
     const goToStep2 = () => {
+        onChange(() => {
+            handleShowToast('Vui lòng chọn cửa hàng và template');
+        });
         setVisible(false);
-        onChange();
+    }
+
+    const handleShowToast = (message) => {
+        setToast(
+            <CToast>
+                <CToastHeader closeButton>
+                    <CIcon icon={cilBell} className="me-2" />
+                    <div className="fw-bold me-auto">Thông báo hệ thống</div>
+                    <small>Just now</small>
+                </CToastHeader>
+                <CToastBody>{message}</CToastBody>
+            </CToast>
+        )
     }
 
     return (
-        <CModal
-            visible={visible}
-            onClose={() => setVisible(false)}
-            aria-labelledby="LiveDemoExampleLabel"
-        >
-            <CModalHeader>
-                <CModalTitle id="LiveDemoExampleLabel">Đăng sản phẩm</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-                <CForm>
-                    <CRow className="mb-3" controlId="exampleForm.ControlInput1">
-                        <CFormLabel>Chọn cửa hàng</CFormLabel>
-                        <MultiSelect
-                            displayValue='name'
-                            options={shops}
-                        />
-                    </CRow>
-                    <CRow className="mb-3" controlId="exampleForm.ControlInput1">
-                        <CFormLabel>Chọn mẫu</CFormLabel>
-                        <MultiSelect
-                            displayValue='name'
-                            options={templates}
-                        />
-                    </CRow>
-                </CForm>
-            </CModalBody>
-            <CModalFooter>
-                <CButton type="submit" color="primary" className="col-8 me-5" onClick={goToStep2}>
-                    Đăng sản phẩm
-                </CButton>
-            </CModalFooter>
-        </CModal>
+        <>
+            <ToastNoti toast={toast} setToast={setToast} />
+            <CModal
+                visible={visible}
+                onClose={() => setVisible(false)}
+                aria-labelledby="LiveDemoExampleLabel"
+            >
+                <CModalHeader>
+                    <CModalTitle id="LiveDemoExampleLabel">Đăng sản phẩm</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    <CForm>
+                        <CRow className="mb-3" controlId="exampleForm.ControlInput1">
+                            <CFormLabel>Chọn cửa hàng</CFormLabel>
+                            <MultiSelect
+                                displayValue='name'
+                                options={shops}
+                                onSelect={onSelectShops}
+                                onRemove={onSelectShops}
+                            />
+                        </CRow>
+                        <CRow className="mb-3" controlId="exampleForm.ControlInput1">
+                            <CFormLabel>Chọn template</CFormLabel>
+                            <CFormSelect className="ms-2" aria-label="Default select example" onChange={(e) => onSelectTemplate(e.target.value)}>
+                                <option value="">-- Chọn template --</option>
+                                {templates && templates.map((template, index) => (
+                                    <option key={index} value={template.id}>{template.name}</option>
+                                ))}
+                            </CFormSelect>
+                        </CRow>
+                    </CForm>
+                </CModalBody>
+                <CModalFooter>
+                    <div className="mx-auto">
+                        <CButton type="submit" color="primary" className="me-3" onClick={goToStep2}>
+                            Tiếp tục
+                        </CButton>
+                        <CButton color="secondary" onClick={() => setVisible(false)}>
+                            Đóng
+                        </CButton>
+                    </div>
+                </CModalFooter>
+            </CModal>
+        </>
     );
 };
 
-const ChooseListings = ({ visible, setVisible, listings }) => {
+const ChooseListings = ({ visible, setVisible, listings, selectedShops, selectedTemplate }) => {
     const [toast, setToast] = useState(null);
     const [selectedListings, setSelectedListings] = useState([]);
+    const [step2Shops, setStep2Shops] = useState([]);
+    const [step2Template, setStep2Template] = useState({});
+    const [visibleUploadCert, setVisibleUploadCert] = useState(false);
+    const [listingNeedCert, setListingNeedCert] = useState({});
+
+    // data to upload to tiktok
+    const [draftMode, setDraftMode] = useState(true);
 
     useEffect(() => {
         listings && setSelectedListings(listings);
     }, [listings]);
+
+    useEffect(() => {
+        setStep2Shops(selectedShops);
+    }, [selectedShops]);
+
+    useEffect(() => {
+        const fetchTemplate = async () => {
+            try {
+                const findTpl = await apiRequest.get(`/templates/${selectedTemplate}`);
+                console.log(findTpl);
+                setStep2Template(findTpl.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchTemplate();
+    }, [selectedTemplate]);
+
+    const editListing = (listingId) => {
+        // loop listing and add isEdit true
+        setSelectedListings(selectedListings.map(l => l.id === listingId ? { ...l, isEdit: true } : l));
+    }
+
+    const processEditListing = (listingId, listingNameEdit) => {
+        setSelectedListings(selectedListings.map(l => l.id === listingId ? { ...l, name: listingNameEdit } : l));
+    }
+
+    const finishEditListing = (listingId) => {
+        setSelectedListings(selectedListings.map(l => l.id === listingId ? { ...l, isEdit: false } : l));
+    }
+
+    const showUploadCertModal = (listingId) => {
+        setListingNeedCert(selectedListings.find(l => l.id === listingId));
+        setVisibleUploadCert(true);
+    }
 
     const handleShowToast = () => {
         setToast(
@@ -120,11 +225,28 @@ const ChooseListings = ({ visible, setVisible, listings }) => {
         setVisible(false)
     };
 
+    const uploadTiktokProducts = async () => {
+        try {
+            const res = await apiRequest.post('/products/upload-to-tiktok', 
+                { 
+                    listings: selectedListings, 
+                    shops: step2Shops, 
+                    template: step2Template, 
+                    draftMode 
+                }
+            );
+
+            console.log(res);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="app">
             <CModal visible={visible} onClose={closeModal} alignment="center" size="xl" scrollable>
                 <CModalHeader>
-                    <CModalTitle>Quản lý nhóm</CModalTitle>
+                    <CModalTitle className="ms-5">Đăng sản phẩm</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
                     <ToastNoti toast={toast} setToast={setToast} />
@@ -133,28 +255,27 @@ const ChooseListings = ({ visible, setVisible, listings }) => {
                             <h5>Preview</h5>
                             <CRow className="mt-3">
                                 <CFormLabel className="col-4" controlId="exampleForm.ControlInput1">
-                                    Shop: <code>Shop1, Shop2, Shop3 </code>
+                                    Shop: {step2Shops && step2Shops.map((shop, index) => (<CBadge color="danger" key={index}>{shop.name}</CBadge>))}
                                 </CFormLabel>
                             </CRow>
                             <CRow className="mt-3">
                                 <CFormLabel className="col-4">
-                                    Template: <code>Template1, Template2</code>
+                                    Template: {step2Template && <CBadge color="info">{step2Template.name}</CBadge>}
                                 </CFormLabel>
                             </CRow>
                         </div>
                         <div className="column product-list">
-                            <div className="header-fixed">
+                            <div className="header-fixed d-flex justify-content-between align-items-center">
                                 <h5>Listings</h5>
-                                <div className="float-end">
+                                <div className="d-flex align-items-center ms-auto">
+                                    <CFormLabel htmlFor="isDraft" className="me-2 mb-0">Đăng Draft</CFormLabel>
                                     <Toggle
-                                        className='mt-2 me-2'
-                                        defaultChecked={false}
-                                        id="iSale"
-                                        name='isSale'
+                                        defaultChecked={draftMode}
+                                        id="isDraft"
+                                        name='isDraft'
                                         value='yes'
-                                        // onChange={(e) => setIsSale(e.target.checked)}
+                                        className='me-2'
                                     />
-                                    Sửa tên
                                 </div>
                             </div>
                             <div className="scrollable">
@@ -173,13 +294,31 @@ const ChooseListings = ({ visible, setVisible, listings }) => {
                                                     <CTableDataCell>
                                                         <CAvatar size="md" src={listing.images[0]} />
                                                     </CTableDataCell>
-                                                    <CTableDataCell>{listing.name}</CTableDataCell>
+                                                    <CTableDataCell>
+                                                        {listing.isEdit ?
+                                                            <CFormTextarea name="name" value={listing.name} onChange={(e) => processEditListing(listing.id, e.target.value)} />
+                                                            : <CFormLabel>{listing.name}</CFormLabel>
+                                                        }
+                                                    </CTableDataCell>
                                                     <CTableDataCell>
                                                         <CRow>
                                                             <CCol>
-                                                                <CButton color="warning" onClick={() => addMemberToTeam(listing.id)}>
+                                                                {listing.isEdit ?
+                                                                    <CButton color="success" className="me-2 mb-2" onClick={() => finishEditListing(listing.id, listing.name)}>
+                                                                        <CIcon icon={cilCheckCircle} className="me-2" />
+                                                                        Hoàn tất
+                                                                    </CButton>
+                                                                    : <CButton color="info" className="me-2 mb-2" onClick={() => editListing(listing.id)}>
+                                                                        <CIcon icon={cilPencil} className="me-2" />
+                                                                        Chỉnh sửa
+                                                                    </CButton>
+                                                                }
+                                                            </CCol>
+                                                            <CCol>
+                                                                {listing.isCertUpload == 0 ? <CButton color="warning" onClick={() => showUploadCertModal(listing.id)}>
+                                                                    <CIcon icon={cilLockLocked} className="me-2" />
                                                                     Certificate
-                                                                </CButton>
+                                                                </CButton> : <CBadge color="success">Đã up cert</CBadge>}
                                                             </CCol>
                                                         </CRow>
                                                     </CTableDataCell>
@@ -194,9 +333,118 @@ const ChooseListings = ({ visible, setVisible, listings }) => {
                         </div>
                     </div>
                 </CModalBody>
+                <CFooter>
+                    <div className="d-flex align-items-center ms-auto">
+                        <CButton color="primary" className="me-5" onClick={uploadTiktokProducts}>
+                            Đăng sản phẩm
+                        </CButton>
+                        <CFormLabel htmlFor="isCheckStatus" className="me-2 mb-0">Check Listing</CFormLabel>
+                        <Toggle
+                            defaultChecked={false}
+                            id="isCheckStatus"
+                            name='isCheckStatus'
+                            value='yes'
+                            className='me-2'
+                        />
+                    </div>
+                </CFooter>
             </CModal>
+            <UploadCertModal visible={visibleUploadCert} setVisible={setVisibleUploadCert} listingCert={listingNeedCert} />
         </div>
     );
 };
+
+const UploadCertModal = ({ visible, setVisible, listingCert }) => {
+
+    const [certImages, setCertImages] = useState([]);
+    const [toast, setToast] = useState(null);
+
+    const handleShowToast = (message) => {
+        setToast(
+            <CToast>
+                <CToastHeader closeButton>
+                    <CIcon icon={cilBell} className="me-2" />
+                    <div className="fw-bold me-auto">Thông báo hệ thống</div>
+                    <small>Just now</small>
+                </CToastHeader>
+                <CToastBody>{message}</CToastBody>
+            </CToast>
+        )
+    }
+
+    const processUploadImage = async () => {
+        try {
+            if (certImages[0] === undefined) return;
+            const response = await apiRequest.post('/products/upload-cert', {
+                listingId: listingCert.id,
+                imageUri: certImages[0]
+            });
+            console.log(response);
+            handleShowToast('Upload certificate thanh cong!');
+            setVisible(false);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return (
+        <div>
+            <ToastNoti toast={toast} setToast={setToast} />
+            <CModal
+                visible={visible}
+                onClose={() => setVisible(false)}
+                aria-labelledby="LiveDemoExampleLabel"
+                alignment="center"
+                scrollable
+                size="lg"
+            >
+                <CModalHeader>
+                    <CModalTitle id="LiveDemoExampleLabel">Upload Certificate</CModalTitle>
+                </CModalHeader>
+                <CModalBody className="d-flex flex-column">
+                    <CRow>
+                        <CFormLabel htmlFor="listingName" className="me-2 mb-0">Sản phẩm {listingCert && listingCert.name}</CFormLabel>
+                    </CRow>
+                    <CRow>
+                        <CFormLabel>Upload Certificate</CFormLabel>
+                        {listingCert && certImages.length > 0 ? certImages.map((image, index) => (
+                            <CCol xs={3} key={index} className="position-relative">
+                                <CImage
+                                    className="m-2 img-thumbnail"
+                                    rounded
+                                    src={image}
+                                    width={100}
+                                    height={100}
+                                />
+                                <CIcon icon={cilX} className="position-absolute top-0 float-start text-danger fw-bold"
+                                    onClick={() => {
+                                        const newImages = certImages.filter((img, i) => i !== index);
+                                        setCertImages(newImages);
+                                    }} />
+                            </CCol>
+                        )) : <div className="text-center">
+                            <UploadWidget
+                                uwConfig={{
+                                    multiple: true,
+                                    cloudName: "dg5multm4",
+                                    uploadPreset: "estate_3979",
+                                    folder: "posts",
+                                }}
+                                setState={setCertImages}
+                            />
+                        </div>}
+                    </CRow>
+                </CModalBody>
+                <CFooter className="d-flex justify-content-end">
+                    <div className="mx-auto">
+                        <CButton color="primary" onClick={processUploadImage}>
+                            <CIcon icon={cilCloudUpload} className="me-2" /> Gửi lên
+                        </CButton>
+                    </div>
+                </CFooter>
+            </CModal>
+        </div>
+    );
+}
 
 export default UploadToShop;

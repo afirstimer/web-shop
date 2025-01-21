@@ -83,6 +83,7 @@ model Listing {
   updatedAt        DateTime        @updatedAt
   shops            ListingOnShop[]
   products         Product[]       @relation("ListingProducts")
+  isCertUpload     Int             @default(0)
 }
 
 model Product {
@@ -119,6 +120,7 @@ model Template {
   compliances                String?
   skus                       String?
   identifierCode             String?
+  identifierValue            String?
   skuPrice                   String?
   skuQty                     String?
   skuSeller                  String?
@@ -229,6 +231,29 @@ model OrderItemPackageTracking {
   trackingNumber     String
   OrderItemPackage   OrderItemPackage? @relation(fields: [orderItemPackageId], references: [id])
   orderItemPackageId String?           @db.ObjectId
+}
+
+model Certificate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  listingId String
+  images    String[]
+  files     String[]
+}
+
+model TiktokFile {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  format     String
+  name       String
+  tiktokId   String
+  tiktokName String
+  url        String
+}
+
+model TiktokImage {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  uri     String
+  url     String
+  useCase String
 }
 
 enum ProxyType {

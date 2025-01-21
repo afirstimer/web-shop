@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
+    CBadge,
     CButton,
     CCard,
     CCardBody,
@@ -24,7 +25,7 @@ import { DocsComponents, DocsExample } from 'src/components'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import CIcon from '@coreui/icons-react';
-import { cilArrowLeft, cilPlus, cilReload, cilTrash } from '@coreui/icons';
+import { cilArrowLeft, cilPencil, cilPlus, cilReload, cilTrash } from '@coreui/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { auto } from '@popperjs/core';
 import TreeSelect from '../../components/TreeSelect';
@@ -39,7 +40,7 @@ import { IdentifierCode } from '../../utils/enums/product';
 const EditTemplate = () => {
     const navigate = useNavigate();
 
-    // 
+    // Initial state
     const params = useParams();
     const { id } = params;
     const [template, setTemplate] = useState(null);
@@ -58,26 +59,6 @@ const EditTemplate = () => {
     const [identifierCode, setIdentifierCode] = useState(IdentifierCode.GTIN);
     const [errorMessage, setErrorMessage] = useState('');
 
-    /** LOAD TEMPLATE */
-    useEffect(() => {
-        const fetchTemplate = async () => {
-            try {
-                const response = await apiRequest.get('/templates/' + id);
-                console.log('Template:', response.data);
-                setTemplate(response.data);
-                setCategoryId(response.data.categoryId);
-            } catch (error) {
-                console.error('Error fetching templates:', error);
-            }
-        };
-
-        fetchTemplate();
-    }, []);
-
-    useEffect(() => {
-        fetchAttributes(template?.categoryId);
-    }, [categoryId]);
-
     /**
      * RENDER FROM TITKOK
      */
@@ -89,6 +70,7 @@ const EditTemplate = () => {
     /**
      * SKU Fields
      */
+    const [skus, setSkus] = useState([]);
     const [skuFields, setSkuFields] = useState([]);
     const [skuTempValue, setSkuTempValue] = useState({});
     const [skuTempAttribute, setSkuTempAttribute] = useState([]);
@@ -97,6 +79,51 @@ const EditTemplate = () => {
 
     // Dynamic Form Fields
     const [formFields, setFormFields] = useState([]);
+
+    // PARSE ATTRIBUTES
+    const [existingAttributes, setExistingAttributes] = useState([]);
+    const [existingCompliances, setExistingCompliances] = useState([]);
+
+    /** LOAD TEMPLATE */
+    useEffect(() => {
+        const fetchTemplate = async () => {
+            try {
+                const response = await apiRequest.get('/templates/' + id);
+                console.log('Template:', response.data);
+                setTemplate(response.data);
+                setCategoryId(response.data.categoryId);
+
+                // Parse attributes and set existing attributes
+                const attributes = JSON.parse(response.data.attributes);
+                setExistingAttributes(attributes);
+
+                // Parse compliances and set existing compliances
+                const compliances = JSON.parse(response.data.compliances);
+                setExistingCompliances(compliances);
+
+                // set sku fields
+                const skus = JSON.parse(response.data.skus);
+                const parsedSkus = skus.map(sku => ({
+                    idSku: sku.idSku,
+                    image: sku.image,
+                    price: sku.price,
+                    qty: sku.qty,
+                    code: sku.code
+                }));
+                console.log(parsedSkus);
+                setSkus(parsedSkus);
+            } catch (error) {
+                console.error('Error fetching templates:', error);
+            }
+        };
+
+        fetchTemplate();
+    }, []);
+
+    useEffect(() => {
+        if (categoryId === null) return;
+        fetchAttributes(template?.categoryId);
+    }, [categoryId]);
 
     const handleFieldChange = (fieldKey, value) => {
         const isExisting = formFields.some(item => item.id === fieldKey);
@@ -422,11 +449,11 @@ const EditTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     <CCol md={6}>
-                                        <CFormInput type="text" id="name" name="name" label="Tên" value={template && template.name} required />
+                                        <CFormInput type="text" id="name" name="name" label="Tên" value={template && template.name} readOnly disabled />
                                     </CCol>
                                     <CCol md={6}>
                                         <CFormLabel>Loại</CFormLabel>
-                                        <CFormSelect id='type' name='type' aria-label='Loại' defaultValue={ template && template.type ? template.type : 'Dropshipping'}>
+                                        <CFormSelect id='type' name='type' aria-label='Loại' defaultValue={template && template.type ? template.type : 'Dropshipping'} readOnly disabled>
                                             <option value='Dropshipping'>Dropshipping</option>
                                             <option value='POD'>POD</option>
                                         </CFormSelect>
@@ -447,22 +474,34 @@ const EditTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     <CCol xs={12}>
-                                        <CFormInput id="productTemplate" name='productTemplate' label="Tên" placeholder="" value={template && template.productTemplate} />
+                                        <CFormInput id="productTemplate" name='productTemplate' label="Tên" placeholder="" value={template && template.productTemplate} readOnly disabled />
                                     </CCol>
                                     <CCol xs={12}>
                                         <CFormLabel>Mô tả</CFormLabel>
                                         <ReactQuill
                                             theme="snow"
-                                            value={template && template.templateDescription}
+                                            value={template && template.productTemplateDescription}
                                             onChange={setTemplateDescription}
+                                            readOnly
+                                            disabled
                                         />
                                     </CCol>
                                     <CCol xs={12}>
                                         <CFormLabel htmlFor="inputAddress2">Danh mục</CFormLabel>
-                                        <CButton color='warning' className='mt-2 mb-3 ms-2'>
-                                            <CIcon icon={cilReload} className="me-1" onClick={reloadCategories} />
-                                        </CButton>
-                                        <TreeSelect treeData={categories} onCategorySelect={fetchAttributes} />
+                                        {template && template.categoryName ?
+                                            <CFormInput
+                                                type="text"
+                                                id="inputCategoryName"
+                                                value={template.categoryName}
+                                                disabled
+                                                readOnly
+                                            />
+                                            : <>
+                                                <CButton color='warning' className='mt-2 mb-3 ms-2'>
+                                                    <CIcon icon={cilReload} className="me-1" onClick={reloadCategories} />
+                                                </CButton>
+                                                <TreeSelect treeData={categories} onCategorySelect={fetchAttributes} />
+                                            </>}
                                     </CCol>
                                 </div>
                             </CCardBody>
@@ -480,14 +519,29 @@ const EditTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     {attributes.map(field => (
-                                        <DropdownSearch
-                                            md={4}
-                                            key={field.id}
-                                            fieldData={field}
-                                            value=''
-                                            onChange={(data) => handleFormAttributeChange(data.id, data.value, data.label)}
-                                            style='col-4'
-                                        />
+                                        existingAttributes.some(item => item.id == field.id) ? (
+                                            <div className="col-4" key={field.id}>
+                                                <CFormInput
+                                                    type="text"
+                                                    id={field.id}
+                                                    name={field.id}
+                                                    value={existingAttributes.find(item => item.id == field.id).label}
+                                                    label={field.name}
+                                                    readOnly
+                                                    disabled
+                                                />
+                                            </div>
+                                        ) : <div className="col-4" key={field.id}>
+                                            <CFormInput
+                                                type="text"
+                                                id={field.id}
+                                                name={field.id}
+                                                value=''
+                                                label={field.name}
+                                                readOnly
+                                                disabled
+                                            />
+                                        </div>
                                     ))}
                                 </div>
                             </CCardBody>
@@ -505,15 +559,29 @@ const EditTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     {compliances.map((compliance, index) => (
-                                        <CCol md={4} key={index}>
-                                            <CFormLabel>{compliance.name}</CFormLabel>
-                                            <CFormSelect aria-label="Product Compliance" onChange={(e) => handleFormComplianceChange(compliance.id, e.target.value)}>
-                                                <option>Select..</option>
-                                                {compliance.options && compliance.options.map((value, index) => (
-                                                    <option key={index} value={value.id}>{value.name}</option>
-                                                ))}
-                                            </CFormSelect>
-                                        </CCol>
+                                        existingCompliances.some(item => item.id != compliance.id) ? (
+                                            <div className="col-4" key={compliance.id}>
+                                                <CFormLabel>{compliance.name}</CFormLabel>
+                                                <CIcon icon={cilPencil} size="sm" className="ms-2" />
+                                                <CFormInput
+                                                    type="text"
+                                                    id={compliance.id}
+                                                    name={compliance.id}
+                                                    value={existingCompliances.find(item => item.id == compliance.id)?.label}
+                                                    readOnly
+                                                    disabled
+                                                />
+                                            </div>
+                                        ) :
+                                            <CCol md={4} key={index}>
+                                                <CFormLabel>{compliance.name}</CFormLabel>
+                                                <CFormSelect aria-label="Product Compliance" onChange={(e) => handleFormComplianceChange(compliance.id, e.target.value)}>
+                                                    <option>Select..</option>
+                                                    {compliance.options && compliance.options.map((value, index) => (
+                                                        <option key={index} value={value.id}>{value.name}</option>
+                                                    ))}
+                                                </CFormSelect>
+                                            </CCol>
                                     ))}
                                 </div>
                             </CCardBody>
@@ -530,24 +598,69 @@ const EditTemplate = () => {
                             </CCardHeader>
                             <CCardBody>
                                 <CForm className="row g-3">
-                                    {sku && sku.map((sku) => (
-                                        <div key={sku.id}>
-                                            <CRow className='mt-2'>
-                                                <CCol md={4}>
-                                                    <CFormInput type="text" value={sku.name} label="Thuộc tính" disabled />
+                                    {skus && skus.map(row => (
+                                        <CRow key={row.idSku} className="mb-3 border p-3 rounded">
+                                            <CRow>
+                                                <CCol col='auto'>
+                                                    <CImage
+                                                        src={row.image}
+                                                        width="150px"
+                                                        height="150px"
+                                                        shape="square"
+                                                    />
                                                 </CCol>
-                                                <CCol md={4}>
-                                                    <CFormInput type="text" onChange={(e) => handleFormSKUTempChange(sku.id, e.target.value)} label="Giá trị" />
+                                                <CCol col='auto'>
+                                                    <CFormInput
+                                                        className='mt-5'
+                                                        type="text"
+                                                        id="skuAttributeName"
+                                                        name="skuAttributeName"
+                                                        value={row.name}
+                                                        readOnly
+                                                        disabled
+                                                    />
                                                 </CCol>
-                                                <CCol md={2}>
-                                                    <CButton className='mt-4 ms-5 circle float-start' color='warning' onClick={() => handleAddSku(sku.id)} >
-                                                        <CIcon icon={cilPlus} className="me-1" />
-                                                        Tạo
-                                                    </CButton>
+                                                <CCol col={3}>
+                                                    <CInputGroup className="mt-5">
+                                                        <CInputGroupText>Giá</CInputGroupText>
+                                                        <CFormInput 
+                                                            id="skuAttributePrice" 
+                                                            name="skuAttributePrice" 
+                                                            aria-label="Amount (to the nearest dollar)" 
+                                                            value={row.price}
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                        <CInputGroupText>$</CInputGroupText>
+                                                    </CInputGroup>
+                                                </CCol>
+                                                <CCol col={3}>
+                                                    <CInputGroup className="mt-5">
+                                                        <CInputGroupText id="basic-addon3">Số lượng</CInputGroupText>
+                                                        <CFormInput 
+                                                            id="skuAttributeQuantity" 
+                                                            name="skuAttributeQuantity" 
+                                                            aria-describedby="basic-addon3" 
+                                                            value={row.qty}
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                    </CInputGroup>
+                                                </CCol>
+                                                <CCol col={3}>
+                                                    <CInputGroup className="mt-5">
+                                                        <CInputGroupText id="basic-addon3">SKU</CInputGroupText>
+                                                        <CFormInput 
+                                                            id="basic-url"
+                                                            aria-describedby="basic-addon3" 
+                                                            value={row.code}
+                                                            readOnly
+                                                            disabled
+                                                        />
+                                                    </CInputGroup>
                                                 </CCol>
                                             </CRow>
-                                            <Sku parentId={sku.id} skuFields={skuFields} onChangeImage={setSkuImage} onChangeSkuImage={setTempSkuImageId} />
-                                        </div>
+                                        </CRow>
                                     ))}
                                 </CForm>
                                 <CForm className="row row-cols-lg-auto g-3 align-items-center mt-3">
@@ -565,26 +678,57 @@ const EditTemplate = () => {
                                                         ))}
                                                     </CDropdownMenu>
                                                 </CDropdown>
-                                                <CFormInput id='identifierCodeValue' name='identifierCodeValue' aria-label="Text input with dropdown button" required />
+                                                <CFormInput 
+                                                    id='identifierCodeValue' 
+                                                    name='identifierCodeValue' 
+                                                    aria-label="Text input with dropdown button" 
+                                                    value={template && template.identifierValue}
+                                                    required 
+                                                    readOnly
+                                                    disabled
+                                                />
                                             </CInputGroup>
                                         </CCol>
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText>Giá</CInputGroupText>
-                                                <CFormInput type='number' id='skuPrice' name='skuPrice' aria-label="Amount (to the nearest dollar)" required />
+                                                <CFormInput 
+                                                    type='number' 
+                                                    id='skuPrice' 
+                                                    name='skuPrice' 
+                                                    aria-label="Amount (to the nearest dollar)" 
+                                                    readOnly
+                                                    disabled
+                                                    value={template && template.skuPrice}
+                                                />
                                                 <CInputGroupText>$</CInputGroupText>
                                             </CInputGroup>
                                         </CCol>
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText id="basic-addon3">Số lượng</CInputGroupText>
-                                                <CFormInput type='number' id="inventoryQuantity" name='inventoryQuantity' aria-describedby="basic-addon3" required />
+                                                <CFormInput 
+                                                    type='number' 
+                                                    id="inventoryQuantity" 
+                                                    name='inventoryQuantity' 
+                                                    aria-describedby="basic-addon3"
+                                                    readOnly
+                                                    disabled
+                                                    value={template && template.skuQty}
+                                                />
                                             </CInputGroup>
                                         </CCol>
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText id="basic-addon3">Seller SKU</CInputGroupText>
-                                                <CFormInput id="sellerSku" name='sellerSku' aria-describedby="basic-addon3" value='{{code}}' />
+                                                <CFormInput 
+                                                    id="sellerSku" 
+                                                    name='sellerSku' 
+                                                    aria-describedby="basic-addon3" 
+                                                    value={template && template.skuSeller}
+                                                    readOnly
+                                                    disabled
+                                                />
                                             </CInputGroup>
                                         </CCol>
                                     </CRow>
@@ -604,49 +748,76 @@ const EditTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageWeightValue" name='packageWeightValue' label="Trọng lượng gói hàng (Pound)*" required />
+                                        <CFormInput 
+                                            type="number" 
+                                            id="packageWeightValue" 
+                                            name='packageWeightValue' 
+                                            label="Trọng lượng gói hàng (Pound)*"
+                                            value={template && template.packageWeight}
+                                            readOnly
+                                            disabled
+                                        />
                                     </CCol>
                                     <CCol md={4}>
                                         <CFormLabel className='col-12'>Đang giảm giá</CFormLabel>
                                         <Toggle
                                             className='mt-2 me-2'
-                                            defaultChecked={isSale}
+                                            defaultChecked={template && template.isSale == 1 ? true : false}
                                             id="iSale"
                                             name='isSale'
-                                            value='yes'
-                                            onChange={(e) => setIsSale(e.target.checked)}
+                                            value='yes'               
+                                            readOnly
+                                            disabled                             
                                         />
                                     </CCol>
                                     <CCol md={4}>
                                         <CFormLabel className='col-12'>Thanh toán khi nhận hàng (COD)</CFormLabel>
                                         <Toggle
                                             className='mt-2 me-2'
-                                            defaultChecked={isCOD}
+                                            defaultChecked={template && template.isCOD == 1 ? true : false}
                                             id='isCODAllowed'
                                             name='isCODAllowed'
                                             value='yes'
-                                            onChange={(e) => setIsCOD(e.target.checked)}
+                                            readOnly
+                                            disabled
                                         />
                                     </CCol>
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageDimensionLength" name='packageDimensionLength' label="Kích thước chiều dài gói hàng (Inch) " required />
+                                        <CFormInput 
+                                            type="number" 
+                                            id="packageDimensionLength" 
+                                            name='packageDimensionLength' 
+                                            label="Kích thước chiều dài gói hàng (Inch) " 
+                                            value={template && template.packageLength}
+                                            readOnly
+                                            disabled 
+                                        />
                                     </CCol>
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageDimensionWidth" name='packageDimensionWidth' label="Kích thước chiều rộng gói hàng (Inch)" required />
+                                        <CFormInput 
+                                            type="number" 
+                                            id="packageDimensionWidth" 
+                                            name='packageDimensionWidth' 
+                                            label="Kích thước chiều rộng gói hàng (Inch)" 
+                                            value={template && template.packageWidth}
+                                            readOnly
+                                            disabled
+                                        />
                                     </CCol>
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageDimensionHeight" name='packageDimensionHeight' label="Kích thước chiều cao gói hàng (Inch)" required />
+                                        <CFormInput 
+                                            type="number" 
+                                            id="packageDimensionHeight" 
+                                            name='packageDimensionHeight' 
+                                            label="Kích thước chiều cao gói hàng (Inch)" 
+                                            value={template && template.packageHeight}
+                                            readOnly
+                                            disabled
+                                        />
                                     </CCol>
                                 </div>
                             </CCardBody>
                         </CCard>
-                    </CCol>
-                </CRow>
-                <CRow className='mt-3'>
-                    <CCol xs={12} className='justify-content-center text-center'>
-                        <CButton type='submit' className='mb-5' color="primary">
-                            Tạo Template
-                        </CButton>
                     </CCol>
                 </CRow>
                 <CRow className='mt-3'>

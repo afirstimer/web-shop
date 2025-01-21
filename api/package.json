@@ -21,6 +21,8 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.21.2",
+    "form-data": "^4.0.1",
+    "image-downloader": "^4.3.0",
     "jsonwebtoken": "^9.0.2",
     "react-toggle": "^4.1.3"
   },

@@ -1,4 +1,4 @@
-import { cilTrash } from "@coreui/icons";
+import { cilPlus, cilTrash } from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
 import {
     CRow,
@@ -13,9 +13,13 @@ import React, { useEffect, useState } from "react";
 import ImageUpload from "react-image-easy-upload";
 import { uploadToCloudinary } from "../../services/cloudinaryService";
 
-const Sku = ({ parentId, skuFields, onChangeImage, onChangeSkuImage }) => {
+const Sku = ({ parentId, skuFields, handleSKUDataChange }) => {
 
     const [rows, setRows] = useState([]);
+    const [skuImage, setSkuImage] = useState('');
+    const [skuPrice, setSkuPrice] = useState(0);
+    const [skuQty, setSkuQty] = useState(0);    
+    const [skuCode, setSkuCode] = useState('');    
     
     useEffect(() => {
         // loop skuFields and create array rows with id match parentId
@@ -28,28 +32,34 @@ const Sku = ({ parentId, skuFields, onChangeImage, onChangeSkuImage }) => {
         setRows(
             updateDeleteSkus.filter(row => row.id === parentId)
         );
-    }    
-
-    const handleAddImage = (idSku) => {
-        onChangeSkuImage(idSku);
-    }
+    }        
 
     const handleImageUpload = async (file) => {
         try {
             const imageUrl = await uploadToCloudinary(file);
-            onChangeImage(imageUrl);
+            setSkuImage(imageUrl);
         } catch (error) {
             console.log(error);
         }
     };
+
+    const handleAddSku = (idSku, name) => {           
+        handleSKUDataChange(idSku, {
+            id: idSku,
+            name: name,
+            image: skuImage,
+            price: skuPrice,
+            qty: skuQty,
+            code: skuCode
+        });
+    }
 
     return (
         <>
             {rows && rows.map(row => (
                 <CRow key={row.idSku} className="mb-3 border p-3 rounded">
                     <CRow>
-                        <ImageUpload
-                            onChange={handleAddImage(row.idSku)}
+                        <ImageUpload                            
                             setImage={handleImageUpload}                            
                             width="150px"
                             height="150px"
@@ -61,24 +71,27 @@ const Sku = ({ parentId, skuFields, onChangeImage, onChangeSkuImage }) => {
                         <CCol col={3}>
                             <CInputGroup className="mt-5">
                                 <CInputGroupText>Giá</CInputGroupText>
-                                <CFormInput id="skuAttributePrice" name="skuAttributePrice" aria-label="Amount (to the nearest dollar)" />
+                                <CFormInput id="skuAttributePrice" name="skuAttributePrice" aria-label="Amount (to the nearest dollar)" onChange={(e) => setSkuPrice(e.target.value)}/>
                                 <CInputGroupText>$</CInputGroupText>
                             </CInputGroup>
                         </CCol>
                         <CCol col={3}>
                             <CInputGroup className="mt-5">
                                 <CInputGroupText id="basic-addon3">Số lượng</CInputGroupText>
-                                <CFormInput id="skuAttributeQuantity" name="skuAttributeQuantity" aria-describedby="basic-addon3" />
+                                <CFormInput id="skuAttributeQuantity" name="skuAttributeQuantity" aria-describedby="basic-addon3" onChange={(e) => setSkuQty(e.target.value)}/>
                             </CInputGroup>
                         </CCol>
                         <CCol col={3}>
                             <CInputGroup className="mt-5">
                                 <CInputGroupText id="basic-addon3">SKU</CInputGroupText>
-                                <CFormInput id="basic-url" aria-describedby="basic-addon3" value='{{code}}' />
+                                <CFormInput id="basic-url" aria-describedby="basic-addon3" onChange={(e) => setSkuCode(e.target.value)}/>
                             </CInputGroup>
                         </CCol>
-                        <CCol col={2}>
-                            <CButton color="danger" className="mt-5" onClick={() => handleDeleteSku(row.idSku)}>
+                        <CCol col={2} className="d-flex flex-column">
+                            <CButton color="primary" className="mt-5" onClick={() => handleAddSku(row.idSku, row.name)}>
+                                <CIcon icon={cilPlus} className="me-1" /> Tạo  
+                            </CButton>
+                            <CButton color="danger" className="mt-2" onClick={() => handleDeleteSku(row.idSku)}>
                                 <CIcon icon={cilTrash} className="me-1" /> Xóa
                             </CButton>
                         </CCol>

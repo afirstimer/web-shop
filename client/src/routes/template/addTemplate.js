@@ -50,6 +50,12 @@ const AddTemplate = () => {
     const [identifierCode, setIdentifierCode] = useState(IdentifierCode.GTIN);
     const [errorMessage, setErrorMessage] = useState('');
 
+    // SKU Form Field
+    const [identifierCodeValue, setIdentifierCodeValue] = useState('');
+    const [inventoryQuantity, setInventoryQuantity] = useState(0);
+    const [sellerSku, setSellerSku] = useState('');
+    const [sellerSkuPrice, setSellerSkuPrice] = useState(0);  
+
     /**
      * RENDER FROM TITKOK
      */
@@ -63,9 +69,11 @@ const AddTemplate = () => {
      */
     const [skuFields, setSkuFields] = useState([]);
     const [skuTempValue, setSkuTempValue] = useState({});
-    const [skuTempAttribute, setSkuTempAttribute] = useState([]);
-    const [skuImage, setSkuImage] = useState("");
+    const [skuTempAttribute, setSkuTempAttribute] = useState([]);    
     const [tempSkuImageId, setTempSkuImageId] = useState(null);
+    const [skuName, setSkuName] = useState("");
+    const [skuPrice, setSkuPrice] = useState(0);
+    const [skuQty, setSkuQty] = useState(0);
 
     // Dynamic Form Fields
     const [formFields, setFormFields] = useState([]);
@@ -85,10 +93,7 @@ const AddTemplate = () => {
         }
     };
 
-    /** SKU PROCESS */
-    useEffect(() => {
-        handleSKUImageChange();
-    }, [skuImage]);
+    /** SKU PROCESS */    
 
     const handleAddSku = (fieldKey) => {
         if (!skuTempAttribute || !skuTempValue) {
@@ -132,54 +137,17 @@ const AddTemplate = () => {
         }
 
         return setSkuTempAttribute({ id: fieldKey, value: [value] });
-    }
+    }       
 
-    const handleFormSKUChange = (fieldKey, value) => {
-        if (!value) {
-            return;
-        }
-
+    const handleSKUDataChange = (fieldKey, sku) => {
+        console.log(fieldKey, sku);
         const isExisting = formSkus.some(item => item.id === fieldKey);
         if (isExisting) {
-            const updatedFormSkus = formSkus.map(item => {
-                if (item.id === fieldKey) {
-                    return { ...item, value };
-                }
-                return item;
-            });
-            return setFormSkus(updatedFormSkus);
-        }
-
-        return setFormSkus([...formSkus, { id: fieldKey, value }]);
-    }
-
-    const handleSKUImageChange = () => {
-        if (!tempSkuImageId || !skuImage) {
+            // if existing, remove 
             return;
         }
-
-        const isExisting = formSkus.some(item => item.id === tempSkuImageId);
-        if (isExisting) {
-            const updatedFormSkus = formSkus.map(item => {
-                if (item.id === tempSkuImageId) {
-                    return { ...item, image: skuImage };
-                }
-                return item;
-            });
-            // clear tempSkuImageId and skuImage
-            setTempSkuImageId(null);
-            setSkuImage("");
-            return setFormSkus(updatedFormSkus);
-        } else {
-            const newSku = {
-                id: tempSkuImageId,
-                image: skuImage,
-            }
-            // clear tempSkuImageId and skuImage
-            setTempSkuImageId(null);
-            setSkuImage("");
-            return setFormSkus([...formSkus, newSku]);
-        }
+        
+        return setFormSkus([...formSkus, sku]);
     }
     /** END SKU PROCESS */
 
@@ -310,7 +278,8 @@ const AddTemplate = () => {
         return setFormAttributes([...formAttributes, { id: fieldKey, value, label }]);
     }
 
-    const handleFormComplianceChange = (fieldKey, value) => {
+    const handleFormComplianceChange = (fieldKey, value, label) => {
+        console.log(fieldKey, value, label);
         if (!value) {
             return;
         }
@@ -325,7 +294,7 @@ const AddTemplate = () => {
             return setFormCompliances(updatedFormCompliances);
         }
 
-        return setFormCompliances([...formCompliances, { id: fieldKey, value }]);
+        return setFormCompliances([...formCompliances, { id: fieldKey, value, label }]);
     }
 
     const handleIdentifierCodeChange = (code) => {
@@ -342,6 +311,7 @@ const AddTemplate = () => {
     // submit form
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(formSkus);
         try {
             const formData = new FormData(e.target);
 
@@ -355,10 +325,10 @@ const AddTemplate = () => {
                 compliances: JSON.stringify(formCompliances),
                 skus: JSON.stringify(formSkus),
                 identifierCode: identifierCode,
-                identifierCodeValue: formData.get('identifierCodeValue'),
-                skuPrice: formData.get('skuPrice'),
-                inventoryQuantity: formData.get('inventoryQuantity'),
-                sellerSku: formData.get('sellerSku'),
+                identifierCodeValue: identifierCodeValue,
+                skuPrice: sellerSkuPrice,
+                inventoryQuantity: inventoryQuantity,
+                sellerSku: sellerSku,
                 isSale: isSale,
                 isCOD: isCOD,
                 packageWeightValue: formData.get('packageWeightValue'),
@@ -479,7 +449,7 @@ const AddTemplate = () => {
                                     {compliances.map((compliance, index) => (
                                         <CCol md={4} key={index}>
                                             <CFormLabel>{compliance.name}</CFormLabel>
-                                            <CFormSelect aria-label="Product Compliance" onChange={(e) => handleFormComplianceChange(compliance.id, e.target.value)}>
+                                            <CFormSelect aria-label="Product Compliance" onChange={(e) => handleFormComplianceChange(compliance.id, e.target.value, e.target.options[e.target.selectedIndex].text)}>
                                                 <option>Select..</option>
                                                 {compliance.options && compliance.options.map((value, index) => (
                                                     <option key={index} value={value.id}>{value.name}</option>
@@ -518,7 +488,11 @@ const AddTemplate = () => {
                                                     </CButton>
                                                 </CCol>
                                             </CRow>
-                                            <Sku parentId={sku.id} skuFields={skuFields} onChangeImage={setSkuImage} onChangeSkuImage={setTempSkuImageId} />
+                                            <Sku 
+                                                parentId={sku.id} 
+                                                skuFields={skuFields} 
+                                                handleSKUDataChange={handleSKUDataChange}
+                                            />
                                         </div>
                                     ))}
                                 </CForm>
@@ -537,26 +511,26 @@ const AddTemplate = () => {
                                                         ))}
                                                     </CDropdownMenu>
                                                 </CDropdown>
-                                                <CFormInput id='identifierCodeValue' name='identifierCodeValue' aria-label="Text input with dropdown button" required />
+                                                <CFormInput id='identifierCodeValue' name='identifierCodeValue' onChange={(e) => setIdentifierCodeValue(e.target.value)} aria-label="Text input with dropdown button" required />
                                             </CInputGroup>
                                         </CCol>
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText>Giá</CInputGroupText>
-                                                <CFormInput type='number' id='skuPrice' name='skuPrice' aria-label="Amount (to the nearest dollar)" required />
+                                                <CFormInput type='number' id='skuPrice' name='skuPrice' onChange={(e) => setSellerSkuPrice(e.target.value)} aria-label="Amount (to the nearest dollar)" required />
                                                 <CInputGroupText>$</CInputGroupText>
                                             </CInputGroup>
                                         </CCol>
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText id="basic-addon3">Số lượng</CInputGroupText>
-                                                <CFormInput type='number' id="inventoryQuantity" name='inventoryQuantity' aria-describedby="basic-addon3" required />
+                                                <CFormInput type='number' id="inventoryQuantity" name='inventoryQuantity' onChange={(e) => setInventoryQuantity(e.target.value)} aria-describedby="basic-addon3" required />
                                             </CInputGroup>
                                         </CCol>
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText id="basic-addon3">Seller SKU</CInputGroupText>
-                                                <CFormInput id="sellerSku" name='sellerSku' aria-describedby="basic-addon3" value='{{code}}' />
+                                                <CFormInput id="sellerSku" name='sellerSku' aria-describedby="basic-addon3" onChange={(e) => setSellerSku(e.target.value)} placeholder='{{code}}' />
                                             </CInputGroup>
                                         </CCol>
                                     </CRow>
