@@ -107,9 +107,11 @@ const AddTemplate = () => {
 
         const newSku = {
             id: fieldKey,
+            parentIdSku: fieldKey,
             idSku: Date.now(),
             name: skuTempValue.name,
         }
+        console.log(newSku);
         setSkuTempAttribute([]);
         return setSkuFields([...skuFields, newSku]);
     }
@@ -475,10 +477,13 @@ const AddTemplate = () => {
                                     {sku && sku.map((sku) => (
                                         <div key={sku.id}>
                                             <CRow className='mt-2'>
-                                                <CCol md={4}>
+                                                <CCol md={3}>
                                                     <CFormInput type="text" value={sku.name} label="Thuộc tính" disabled />
                                                 </CCol>
-                                                <CCol md={4}>
+                                                <CCol md={3}>
+                                                    <CFormInput type="text" value={sku.id} label="ID" disabled />
+                                                </CCol>
+                                                <CCol md={3}>
                                                     <CFormInput type="text" onChange={(e) => handleFormSKUTempChange(sku.id, e.target.value)} label="Giá trị" />
                                                 </CCol>
                                                 <CCol md={2}>

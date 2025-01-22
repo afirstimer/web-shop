@@ -3,6 +3,7 @@ import classNames from 'classnames'
 
 import {
     CAvatar,
+    CBadge,
     CButton,
     CButtonGroup,
     CCard,
@@ -124,8 +125,10 @@ const Listings = () => {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [limit, setLimit] = useState(10);    
+    const [limit, setLimit] = useState(10);
     const [sort, setSort] = useState('newest');
+    // listings on shops
+    const [listingOnShops, setListingOnShops] = useState([]);
 
     // search
     const [searchTerm, setSearchTerm] = useState('');
@@ -153,7 +156,7 @@ const Listings = () => {
     const [selectAll, setSelectAll] = useState(false);
 
     // nút [đăng san pham]
-    const [uploadStatusBtn, setUploadStatusBtn] = useState(false);    
+    const [uploadStatusBtn, setUploadStatusBtn] = useState(false);
 
     /**
      * Load listings
@@ -166,13 +169,13 @@ const Listings = () => {
                     params: {
                         page,
                         limit,
-                        sort                        
+                        sort
                     }
                 });
                 setListings(res.data.listings);
                 setTotal(res.data.total);
                 setTotalPages(Math.ceil(res.data.total / limit));
-                
+
             } catch (error) {
                 console.log(error);
             }
@@ -180,6 +183,20 @@ const Listings = () => {
 
         fetchListings();
     }, [page, limit, sort]);
+
+    useEffect(() => {
+        const fetchListingsOnShops = async () => {
+            try {
+                const res = await apiRequest.get('/listings/listing-on-shops');
+                console.log(res.data);
+                setListingOnShops(res.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchListingsOnShops();
+    }, []);
 
     useEffect(() => {
         const filteredListings = listings.filter(product => {
@@ -294,7 +311,7 @@ const Listings = () => {
 
     const renderPagination = () => {
         const pageNumbers = [];
-        for(let i = 1; i <= totalPages; i++) {
+        for (let i = 1; i <= totalPages; i++) {
             pageNumbers.push(
                 <CPaginationItem key={i} active={i === page} onClick={() => handlePageChange(i)}>{i}</CPaginationItem>
             );
@@ -387,7 +404,7 @@ const Listings = () => {
                             <CDropdownItem onClick={() => handleSortChange("newest")} className={sort === "newest" ? 'active' : ''}>Mới nhất</CDropdownItem>
                             <CDropdownItem onClick={() => handleSortChange("oldest")} className={sort === "oldest" ? 'active' : ''}>Cũ nhất</CDropdownItem>
                             <CDropdownItem onClick={() => handleSortChange("updated_newest")} className={sort === "updated_newest" ? 'active' : ''}>Cập nhật mới nhất</CDropdownItem>
-                            <CDropdownItem onClick={() => handleSortChange("updated_oldest")} className={sort === "updated_oldest" ? 'active' : ''}>Cập nhật cũ nhất</CDropdownItem>                            
+                            <CDropdownItem onClick={() => handleSortChange("updated_oldest")} className={sort === "updated_oldest" ? 'active' : ''}>Cập nhật cũ nhất</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
                 </CCol>
@@ -448,7 +465,17 @@ const Listings = () => {
                                                 <div>{format(item.createdAt)}</div>
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center">
-                                                <div>{item.shop}</div>
+                                                {listingOnShops && listingOnShops.map((los) => (
+                                                    los.listingId === item.id ? (
+                                                        <>
+                                                            <div key={los.id} className="d-flex flex-row">
+                                                                <CCol>{los.shop.name}</CCol>
+                                                                <CCol>{los.status === 'SUCCESS' ? <CBadge color='success'>SUCCESS</CBadge> : <CBadge color='danger'>ERROR</CBadge>}</CCol>
+                                                            </div>
+                                                            <hr />
+                                                        </>
+                                                    ) : null
+                                                ))}
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center d-none d-md-table-cell">
                                                 <CButton className='me-2 mb-2 d-block' color="warning" size="sm" onClick={() => callEdit(item.id)}>
@@ -469,15 +496,15 @@ const Listings = () => {
                                 </CTableBody>
                             </CTable>
                             <CPagination className='d-flex justify-content-center mt-3' aria-label="Page navigation example">
-                                <CPaginationItem 
-                                    aria-label="Previous" 
+                                <CPaginationItem
+                                    aria-label="Previous"
                                     onClick={() => handlePageChange(page - 1)}
                                     disabled={page === 1}
                                 >
                                     <span aria-hidden="true">&laquo;</span>
                                 </CPaginationItem>
                                 {renderPagination()}
-                                <CPaginationItem 
+                                <CPaginationItem
                                     aria-label="Next"
                                     onClick={() => handlePageChange(page + 1)}
                                     disabled={page === totalPages}

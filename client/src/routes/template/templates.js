@@ -48,7 +48,9 @@ import {
     cilReload,
     cilTrash,
     cilLinkAlt,
-    cilPencil
+    cilPencil,
+    cilEyedropper,
+    cilViewQuilt
 } from '@coreui/icons'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
@@ -147,12 +149,12 @@ const Templates = () => {
                                             </CTableDataCell>
                                             <CTableDataCell className="text-center d-none d-md-table-cell">
                                                 <CButton className='me-2' color="warning" size="sm" onClick={() => editTemplate(template.id)}>
-                                                    <CIcon icon={cilPencil} className="me-2" />
-                                                    Update
+                                                    <CIcon icon={cilViewQuilt} className="me-2" />
+                                                    Xem
                                                 </CButton>
                                                 <CButton className='me-2' color="danger" size="sm" onClick={() => proceedDeleteTemplate(template)}>
                                                     <CIcon icon={cilTrash} className="me-2" />
-                                                    Delete
+                                                    Xóa
                                                 </CButton>
                                                 <CButton color="info" size="sm">
                                                     <CIcon icon={cilLinkAlt} className="me-2" />

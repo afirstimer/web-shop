@@ -177,6 +177,7 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
     useEffect(() => {
         const fetchTemplate = async () => {
             try {
+                if (!selectedTemplate) return;
                 const findTpl = await apiRequest.get(`/templates/${selectedTemplate}`);
                 console.log(findTpl);
                 setStep2Template(findTpl.data);
@@ -206,7 +207,7 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
         setVisibleUploadCert(true);
     }
 
-    const handleShowToast = () => {
+    const handleShowToast = (message) => {
         setToast(
             <CToast>
                 <CToastHeader closeButton>
@@ -214,7 +215,7 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
                     <div className="fw-bold me-auto">Thông báo hệ thống</div>
                     <small>Just now</small>
                 </CToastHeader>
-                <CToastBody>Thêm thành viên vào nhóm thanh cong!</CToastBody>
+                <CToastBody>{message}</CToastBody>
             </CToast>
         )
     }
@@ -223,7 +224,7 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
     const closeModal = () => {
         // onChange();
         setVisible(false)
-    };
+    };  
 
     const uploadTiktokProducts = async () => {
         try {
@@ -236,8 +237,10 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
                 }
             );
 
+            setVisible(false);
+            handleShowToast('Đăng sản phẩm thành công!');
             console.log(res);
-        } catch (error) {
+        } catch (error) {            
             console.log(error);
         }
     }

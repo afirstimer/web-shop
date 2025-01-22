@@ -153,3 +153,35 @@ export const deleteListing = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const getListingsOnShop = async (req, res) => {
+    try {
+        const listings = await prisma.listingOnShop.findMany();
+        // loop listings and get new array, find shop with shopId
+        let newListings = [];
+        for(const listing of listings) {   
+            // find shopId in newListings
+            const shopId = listing.shopId;
+            const existingListing = newListings.find(listing => listing.shopId === shopId);
+            if (existingListing) {
+                // Check if the existing listing has the same shopId
+                if (existingListing.shopId === shopId) {
+                    continue;
+                }                                               
+            }            
+            
+            const shop = await prisma.shop.findUnique({
+                where: {
+                    id: listing.shopId
+                }
+            });
+            listing.shop = shop;
+            newListings.push(listing);
+        }
+        
+        res.status(200).json(newListings);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}

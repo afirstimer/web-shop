@@ -1,6 +1,6 @@
 import axios from 'axios';
 import prisma from '../lib/prisma.js';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 
 export const getProductValueByKey = (productInfo, key) => {
   const actualKey = Object.keys(productInfo).find(k => k.includes(key));

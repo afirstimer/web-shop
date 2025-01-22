@@ -5,7 +5,8 @@ import {
     getListings,
     getListing,
     updateListing,
-    deleteListing
+    deleteListing,
+    getListingsOnShop
 } from "../controllers/listing.controller.js";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.post("/", crawlAmazonProduct);
 
 // verify token
 router.get("/",  verifyToken, getListings);
+router.get("/listing-on-shops", verifyToken, getListingsOnShop);
 router.get("/:id", verifyToken, getListing);
 router.put("/:id", verifyToken, updateListing);
 router.delete("/:id", verifyToken, deleteListing);

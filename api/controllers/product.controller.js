@@ -12,10 +12,10 @@ export const createProduct = async (req, res) => { }
 
 export const editProduct = async (req, res) => { }
 
-export const uploadCert = async (req, res) => {
+export const uploadCert = async (req, shop, uriImage, res) => {
     try {
         // upload image to tiktok
-        const result = await uploadImageToTiktok(req, 'CERTIFICATION_IMAGE');
+        const result = await uploadImageToTiktok(req, shop, uriImage, 'CERTIFICATION_IMAGE');
         let image = null;
         if (result.message == 'Success') {
             // create Tiktok Image
@@ -105,12 +105,60 @@ export const uploadTiktokProducts = async (req, res) => {
             shops.forEach(async (shop) => {
                 // console.log(listing, existingTemplate, shop, draftMode);
                 let response = createTiktokProduct(req, listing, existingTemplate, shop, draftMode);
+
+                // if success, create ListingOnShop
+                const listingOnShop = await prisma.listingOnShop.create({
+                    data: {
+                        listingId: listing.id,
+                        shopId: shop.id,
+                        status: response ? 'SUCCESS' : 'FAILURE',
+                    }
+                });
+                console.log(listingOnShop);
+
+                // create product
+                const product = await prisma.product.create({
+                    data: {
+                        name: listing.name,
+                        description: listing.description,
+                        price: listing.price,
+                        listingId: listing.id,
+                        shopId: shop.id
+                    }
+                });
+                console.log(product);
+
+                // update listing.shops and listing.products
+                const newestListing = await prisma.listing.update({
+                    where: {
+                        id: listing.id
+                    },
+                    data: {
+                        shops: {
+                            connect: {
+                                id: shop.id
+                            }
+                        },
+                        products: {
+                            connect: {
+                                id: product.id
+                            }
+                        }
+                    }
+                })
+                console.log(newestListing);
+
                 results.push(response);
             })
         })        
 
-        res.status(200).json(results);
+        if (results.length > 0) {
+            res.status(200).json({ message: "Success" });
+        } else {
+            res.status(500).json({ message: "Failed to create products" });
+        }
     } catch (error) {
+        res.status(500).json({ message: error.message });
         console.log(error);
     }
 }

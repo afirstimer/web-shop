@@ -8,7 +8,7 @@ import { getDefaultShop } from "../helper/helper.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const callTiktokApi = async (req, shop, payload, method, pathURL, contentType, extraParams = {}) => {
+export const callTiktokApi = async (req, shop, payload = false, formData = false, method, pathURL, contentType, extraParams = {}) => {
     try {
         const app_key = process.env.TIKTOK_SHOP_APP_KEY;
         const secret = process.env.TIKTOK_SHOP_APP_SECRET;
@@ -42,7 +42,7 @@ export const callTiktokApi = async (req, shop, payload, method, pathURL, content
         }
         const timestamp = Math.floor(Date.now() / 1000);
         const header = contentType;
-        const sign = generateSign(req, secret, timestamp, header);
+        const sign = generateSign(req, secret, timestamp, header, payload);
         console.log(sign);
 
         // define query params
@@ -77,12 +77,31 @@ export const callTiktokApi = async (req, shop, payload, method, pathURL, content
         const queryString = new URLSearchParams(options.query).toString();
         options.url = `${options.url}?${queryString}`;
 
-        const response = await axios({
-            method: options.method,
-            url: options.url,
-            data: payload,
-            headers: options.headers
-        });
+        console.log(options.url);
+
+        let response = null;
+        if (formData) {
+            response = await axios({
+                method: options.method,
+                url: options.url,
+                data: formData,
+                headers: options.headers
+            });
+        } else if (payload) {
+            console.log(payload);
+            response = await axios({
+                method: options.method,
+                url: options.url,
+                data: payload,
+                headers: options.headers
+            });            
+        } else {
+            response = await axios({
+                method: options.method,
+                url: options.url,                
+                headers: options.headers
+            });
+        }  
 
         return response;
     } catch (error) {

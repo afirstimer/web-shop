@@ -106,6 +106,11 @@ export const getTikTokCategories = async (request, res) => {
         const categories = response.data.data.categories;
         const categoryRes = [];
         for (const category of categories) {
+            // TODO: if AVAILABLE not in category.permission_statuses, skip
+            if (category.permission_statuses.includes("INVITE_ONLY")) {
+                continue;
+            }            
+            
             categoryRes.push({
                 id: category.id,
                 name: category.local_name,
@@ -152,7 +157,7 @@ export const getTikTokCategoryAttributes = async (request, res) => {
 
     // Param
     request.query.category_version = category_version;
-    request.query.shop_id = shop.id;
+    // request.query.shop_id = shop.id;
     request.query.category_id = category_id;
     request.query.access_token = access_token;
     request.query.app_key = app_key;

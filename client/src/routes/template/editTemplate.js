@@ -104,7 +104,7 @@ const EditTemplate = () => {
                 // set sku fields
                 const skus = JSON.parse(response.data.skus);
                 const parsedSkus = skus.map(sku => ({
-                    idSku: sku.idSku,
+                    idSku: sku.id,
                     image: sku.image,
                     price: sku.price,
                     qty: sku.qty,
@@ -615,7 +615,7 @@ const EditTemplate = () => {
                                                         type="text"
                                                         id="skuAttributeName"
                                                         name="skuAttributeName"
-                                                        value={row.name}
+                                                        value={row.idSku}
                                                         readOnly
                                                         disabled
                                                     />

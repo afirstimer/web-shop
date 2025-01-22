@@ -3,12 +3,19 @@ import jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import axios from "axios";
 import { readJSONFile, writeJSONFile } from "../helper/helper.js";
+import { getTiktokOrders } from "../services/order.service.js";
 
 const ORDER_FILE = "./dummy/tiktok/orders.json";
 
 export const getOrders = async (req, res) => {
     try {
-        const data = await readJSONFile(ORDER_FILE);
+        // get first shop
+        const shop = await prisma.shop.findFirst();
+        const data = await getTiktokOrders(req, shop, {});
+        if (!data) {
+            return res.status(500).json({ error: "Failed to get orders" });
+        }
+        
         const orders = data.orders;
         // Loop orders and count total amount of orders with group by month
         const ordersByMonth = {};
