@@ -60,6 +60,19 @@ export const getTeam = async (req, res) => {
                 id: req.params.id,
             },
         });
+
+        // loop team.members and get user details for each member id and add to team.members array
+        team.users = [];
+        if (team && team.members) {
+            for (let i = 0; i < team.members.length; i++) {
+                const user = await prisma.user.findUnique({
+                    where: {
+                        id: team.members[i],
+                    },
+                });                
+                team.users[i] = user;
+            }
+        }       
         res.status(200).json(team);
     } catch (error) {
         console.log(error);

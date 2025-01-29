@@ -39,6 +39,9 @@ import {
     CTableHead,
     CTableHeaderCell,
     CTableRow,
+    CToast,
+    CToastBody,
+    CToastHeader,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -72,7 +75,8 @@ import {
     cilSearch,
     cilFilter,
     cilApplicationsSettings,
-    cilCog
+    cilCog,
+    cilBell
 } from '@coreui/icons'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
@@ -95,6 +99,7 @@ import UploadToShop from './uploadToShop'
 import { useNavigate } from 'react-router-dom'
 import MultiSelect from 'multiselect-react-dropdown'
 import { format } from 'timeago.js'
+import { ToastNoti } from "../../components/notification/ToastNoti";
 
 const Listings = () => {
     const navigate = useNavigate();
@@ -137,6 +142,7 @@ const Listings = () => {
     const [visibleCrawl, setVisibleCrawl] = useState(false)
 
     // delete modal
+    const [deleteListingName, setDeleteListingName] = useState('');
     const [visible, setVisible] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
 
@@ -157,6 +163,9 @@ const Listings = () => {
 
     // nút [đăng san pham]
     const [uploadStatusBtn, setUploadStatusBtn] = useState(false);
+
+    // Toast
+    const [toast, setToast] = useState(null);
 
     /**
      * Load listings
@@ -206,6 +215,19 @@ const Listings = () => {
         });
         setListings(filteredListings);
     }, [searchTerm]);
+
+    const handleShowToast = (message) => {
+        setToast(
+            <CToast>
+                <CToastHeader closeButton>
+                    <CIcon icon={cilBell} className="me-2" />
+                    <div className="fw-bold me-auto">Thông báo hệ thống</div>
+                    <small>Just now</small>
+                </CToastHeader>
+                <CToastBody>{message}</CToastBody>
+            </CToast>
+        )
+    }
 
     // search filter
     const searchBy = (selectedList, selectedItem) => {
@@ -263,9 +285,10 @@ const Listings = () => {
     }
 
     // delete modal
-    const callDelete = (id) => {
+    const callDelete = (id, name) => {
         setVisible(true);
         setDeleteId(id);
+        setDeleteListingName(name);
     }
 
     const deleteListing = () => {
@@ -274,6 +297,8 @@ const Listings = () => {
             apiRequest.delete(`/listings/${id}`);
             setVisible(false);
             setListings(listings.filter(listing => listing.id !== id));
+            handleShowToast(`Xóa sản phẩm thành công!`);
+            setDeleteListingName('');
         } catch (error) {
             console.log(error);
         }
@@ -337,6 +362,7 @@ const Listings = () => {
 
     return (
         <>
+            <ToastNoti toast={toast} setToast={setToast} />
             <DeleteListing visible={visible} setVisible={setVisible} deleteListing={deleteListing} />
             <CrawlListing visible={visibleCrawl} setVisible={setVisibleCrawl} />
             <ViewListing visible={visibleListing} setVisible={setVisibleListing} listing={selectedListing} />
@@ -433,7 +459,10 @@ const Listings = () => {
                                             Giá
                                         </CTableHeaderCell>
                                         <CTableHeaderCell className="bg-body-tertiary">
-                                            Crawed lúc
+                                            Cào lúc
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell className="bg-body-tertiary">
+                                            Cập nhật lúc
                                         </CTableHeaderCell>
                                         <CTableHeaderCell className="bg-body-tertiary text-center">
                                             Cửa hàng đăng lên
@@ -464,13 +493,27 @@ const Listings = () => {
                                             <CTableDataCell>
                                                 <div>{format(item.createdAt)}</div>
                                             </CTableDataCell>
+                                            <CTableDataCell>
+                                                <div>{format(item.updatedAt)}</div>
+                                            </CTableDataCell>
                                             <CTableDataCell className="text-center">
                                                 {listingOnShops && listingOnShops.map((los) => (
                                                     los.listingId === item.id ? (
                                                         <>
-                                                            <div key={los.id} className="d-flex flex-row">
-                                                                <CCol>{los.shop.name}</CCol>
-                                                                <CCol>{los.status === 'SUCCESS' ? <CBadge color='success'>SUCCESS</CBadge> : <CBadge color='danger'>ERROR</CBadge>}</CCol>
+                                                            <div key={los.id} className="d-flex flex-row justify-content-between ">
+                                                                <div class="p-2">{los.shop.name}</div>
+                                                                <div class="p-2">{format(los.createdAt)}</div>
+                                                                <div class="p-2">
+                                                                    {los.status === 'SUCCESS' ?
+                                                                        <CBadge color='success'>ACTIVE</CBadge> :
+                                                                        <>
+                                                                            <CBadge color='danger'>ERROR</CBadge>
+                                                                            <CLink color='info' href='#' target="_blank">
+                                                                                <CIcon icon={cilReload} className="me-2" />
+                                                                            </CLink>
+                                                                        </>
+                                                                    }
+                                                                </div>
                                                             </div>
                                                             <hr />
                                                         </>
@@ -482,7 +525,7 @@ const Listings = () => {
                                                     <CIcon icon={cilPencil} className="me-2" />
                                                     Sửa
                                                 </CButton>
-                                                <CButton className='me-2 mb-2 d-block' color="danger" size="sm" onClick={() => callDelete(item.id)}>
+                                                <CButton className='me-2 mb-2 d-block' color="danger" size="sm" onClick={() => callDelete(item.id, item.name)}>
                                                     <CIcon icon={cilTrash} className="me-2" />
                                                     Xóa
                                                 </CButton>

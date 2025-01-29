@@ -1,9 +1,9 @@
-import e from "express";
 import prisma from "../lib/prisma.js";
 import bcrypt from "bcrypt";
+import { setDefaultShopForUser } from "../services/shop.service.js";
 
 export const getUsers = async (req, res) => {
-  try {    
+  try {
     const { page = 1, limit = process.env.DEFAULT_LIMIT, username, email, sort } = req.query;
 
     const pageNum = parseInt(page, 10);
@@ -21,7 +21,7 @@ export const getUsers = async (req, res) => {
           contains: email,
           mode: "insensitive",
         },
-      })      
+      })
     };
 
     const orderBy = (() => {
@@ -54,13 +54,7 @@ export const getUsers = async (req, res) => {
             select: {
               name: true,
             },
-          },
-          shops: {
-            select: {
-              id: true,
-              name: true,
-            },
-          }
+          }          
         }
       }
     );
@@ -77,24 +71,37 @@ export const getUsers = async (req, res) => {
   }
 };
 
+export const getMembers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        isActive: 1
+      }
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export const getUsersByTeamID = async (req, res) => {
-  const {teamId} = req.params;
+  const { teamId } = req.params;
   console.log(teamId);
   try {
     const team = await prisma.team.findUnique({
-      where: {id: teamId}
+      where: { id: teamId }
     });
     if (!team) {
       return res.status(404).json({ message: "Team not found" });
     }
-    const userIds = team.members;  
-    
+    const userIds = team.members;
+
     console.log(userIds);
 
     const users = []
     for (const userId of userIds) {
       const user = await prisma.user.findUnique({
-        where: {id: userId}
+        where: { id: userId }
       });
       users.push(user);
     }
@@ -148,7 +155,7 @@ export const createUser = async (req, res) => {
     // create a new user and save to DB
     const newUser = await prisma.user.create({
       data: {
-       ...inputs,
+        ...inputs,
         ...(shops && {
           shops: {
             connect: validShops.map((shopId) => (shopId))
@@ -176,11 +183,23 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
-  const { password, avatar, shops, ...inputs } = req.body;
+  const { password, avatar, shops, shopId, ...inputs } = req.body;
 
-  // if (id !== tokenUserId) {
-  //   return res.status(403).json({ message: "Not Authorized!" });
-  // }
+  const loggedinUser = await prisma.user.findUnique({
+    where: { id: tokenUserId },
+  });
+
+  const requestUser = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!requestUser) {
+    return res.status(404).json({ message: "User not found!" });
+  }
+
+  if (requestUser.id !== loggedinUser.id && loggedinUser.isAdmin !== 1) {
+    return res.status(403).json({ message: "Not Authorized!" });
+  }
 
   let updatedPassword = null;
   try {
@@ -193,38 +212,44 @@ export const updateUser = async (req, res) => {
       shopIds = JSON.parse(shops);
     }
 
-    const validShops = await prisma.shop.findMany({
-      where: {
-        id: {
-          in: shopIds,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
+    let existingShopIds = requestUser.shops;
+    if (shopId) {
+      if (existingShopIds.includes(shopId)) {
+        res.status(400).json({ message: "Shop already exists in user's shopIds!" });
+      } else {
+        // add shopId to existing shopIds array
+        existingShopIds.push(shopId);
+      }
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
         ...inputs,
         ...(shops && {
-          shops: {
-            connect: validShops.map((shopId) => (shopId))
-          }
+          shops: shopIds
         }),
         ...(updatedPassword && { password: updatedPassword }),
         ...(avatar && { avatar }),
       },
     });
 
+    if (shopId) {
+      await prisma.user.update({
+        where: { id },
+        data: {
+          ...(!requestUser.defaultShop && { defaultShop: shopId }),
+          shops: existingShopIds
+        }
+      });
+    }
+
     const { password: userPassword, ...rest } = updatedUser;
 
     res.status(200).json(rest);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to update users!" });
+    res.status(500).json({ message: "Failed to update user!" });
   }
 };
 
@@ -240,6 +265,7 @@ export const deleteUser = async (req, res) => {
       }
     });
     res.status(200).json({ message: "User deleted" });
+
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to delete users!" });
@@ -273,7 +299,7 @@ export const deleteMultiUsers = async (req, res) => {
 
 export const addUsersToGroup = async (req, res) => {
   try {
-    const {userIds, teamId} = req.body;
+    const { userIds, teamId } = req.body;
 
     if (!userIds || !teamId) {
       throw new Error("Vui lồng chọn nhóm");
@@ -374,5 +400,100 @@ export const getNotificationNumber = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to get profile posts!" });
+  }
+};
+
+/**
+ * Upgrades a user to admin status.
+ *
+ * This function updates the user's isAdmin field to 1
+ * in the database, effectively granting admin privileges.
+ * 
+ * @param {Object} req - The request object, containing the user's ID in the params.
+ * @param {Object} res - The response object, used to send back the HTTP response.
+ */
+
+export const upgradeToAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.user.update({
+      where: { id },
+      data: {
+        isAdmin: 1,
+      }
+    });
+
+    res.status(200).json({ message: "User upgraded to admin" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to upgrade to admin!" });
+  }
+}
+
+export const checkHasDefaultShop = async (req, res) => {
+  try {
+    const requestUser = await prisma.user.findUnique({
+      where: { id: req.userId },
+    });
+
+    if (!requestUser || !requestUser.defaultShop) {
+      return res.status(404).json({ message: "Không tìm thấy cửa hàng mặc định. Vui lòng tạo một cửa hàng mặc định" });
+    }
+
+    const defaultShop = await prisma.shop.findUnique({
+      where: { id: requestUser.defaultShop },
+    });
+
+    if (!defaultShop) {
+      return res.status(404).json({ message: "Không tìm thấy cửa hàng mặc định. Vui lòng tạo một cửa hàng mặc định" });
+    }
+
+    res.status(200).json({ message: "Default shop found", defaultShop });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to check default shop!" });
+  }
+}
+
+export const removeDefaultShop = async (req, res) => {
+  const id = req.params.id;
+  const { shopId } = req.body;
+
+  try {
+    if (!shopId) {
+      res.status(404).json({ message: "Shop not found" });
+    }
+
+    // get user
+    const requestUser = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!requestUser) {
+      res.status(404).json({ message: "User not found" });
+    }
+
+    // check shopId in shops
+    if (!requestUser.shops.includes(shopId)) {
+      res.status(404).json({ message: "Shop not found" });
+    }
+
+    const newShops = requestUser.shops.filter((shop) => shop !== shopId);
+    const defaultShop = requestUser.defaultShop;
+
+    // remove shopId from shops
+    await prisma.user.update({
+      where: { id },
+      data: {
+        ...(defaultShop == shopId && { defaultShop: null }),
+        shops: newShops
+      }
+    });
+
+    res.status(200).json({ message: "Xóa shop khỏi user" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to delete users!" });
   }
 };

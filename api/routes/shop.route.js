@@ -10,6 +10,8 @@ import {
     updateShop, 
     requestAuthorizedShops, 
     getTiktokShopInfo,
+    getMembersOnShop,
+    syncOrders,
     refreshToken
 } from "../controllers/shop.controller.js";
 
@@ -25,5 +27,9 @@ router.get("/user/:id", verifyToken, getShopsByUser);
 router.post("/", verifyToken, createShop);
 router.put("/:id", verifyToken, updateShop);
 router.get("/tiktok/:id", verifyToken, getTiktokShopInfo);
+router.get("/members-on-shop/:id", verifyToken, getMembersOnShop);
+
+/** SYNC */
+router.get("/sync-orders/:id", verifyToken, syncOrders);
 
 export default router;

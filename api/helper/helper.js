@@ -1,11 +1,27 @@
-import axios from 'axios';
 import prisma from '../lib/prisma.js';
 import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 export const getProductValueByKey = (productInfo, key) => {
   const actualKey = Object.keys(productInfo).find(k => k.includes(key));
   return actualKey ? productInfo[actualKey] : null;
 };
+
+export const createFolder = async (folderPath) => {
+  try {
+    // if exist , delete and create again
+    if (fs.existsSync(folderPath)) {
+      await fs.rm(folderPath, { recursive: true, force: true });
+    }
+    await fs.mkdir(folderPath, { recursive: true });
+    console.log("Folder created successfully", shopPath);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
 
 export const readJSONFile = async (filePath) => {
   try {
@@ -18,7 +34,8 @@ export const readJSONFile = async (filePath) => {
 };
 
 export const writeJSONFile = async (filePath, data) => {
-  try {
+  try {    
+    console.log(filePath);
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('Error writing JSON file:', error.message);
@@ -27,34 +44,13 @@ export const writeJSONFile = async (filePath, data) => {
 };
 
 export const getDefaultShop = async (req) => {
-  let shop = null;  
   try {
-    // if req.shopId is not exist, get user from token
-    if (req.userId) {
-      const user = await prisma.user.findUnique({
-        where: {
-          id: req.userId,
-        },
-      });
-      console.log(user);
+    const user = await prisma.user.findUnique({ where: { id: req.userId } });
+    if (!user) return null;
 
-      if (user) {
-        shop = await prisma.shop.findFirst({
-          where: {
-            userId: user.id,
-          }
-        });
-      }
-
-      if (shop) return shop;
-    }
-
-    if (!shop) {
-      // if no shop. get first shop
-      shop = await prisma.shop.findFirst();
-    }
-    
-    if (shop) return shop;    
+    if (user.defaultShop === null) return null;
+    const shop = await prisma.shop.findUnique({ where: { id: user.defaultShop } });
+    if (shop) return shop;
   } catch (error) {
     console.log(error);
     return null;

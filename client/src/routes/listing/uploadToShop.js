@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CForm, CRow, CFormInput, CFormLabel, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CAvatar, CCol, CBadge, CFooter, CFormSelect, CToast, CToastHeader, CToastBody, CFormTextarea, CLink, CImage } from "@coreui/react";
+import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CForm, CRow, CFormInput, CFormLabel, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CAvatar, CCol, CBadge, CFooter, CFormSelect, CToast, CToastHeader, CToastBody, CFormTextarea, CLink, CImage, CProgress } from "@coreui/react";
 import apiRequest from "../../lib/apiRequest";
 import MultiSelect from 'multiselect-react-dropdown'
 import { ToastNoti } from "../../components/notification/ToastNoti";
@@ -163,6 +163,12 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
     const [visibleUploadCert, setVisibleUploadCert] = useState(false);
     const [listingNeedCert, setListingNeedCert] = useState({});
 
+    const [progress, setProgress] = useState(0);
+
+    // button upload
+    const [uploadBtnStatus, setUploadBtnStatus] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+
     // data to upload to tiktok
     const [draftMode, setDraftMode] = useState(true);
 
@@ -192,6 +198,8 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
     const editListing = (listingId) => {
         // loop listing and add isEdit true
         setSelectedListings(selectedListings.map(l => l.id === listingId ? { ...l, isEdit: true } : l));
+        // disable upload button
+        setUploadBtnStatus(true);
     }
 
     const processEditListing = (listingId, listingNameEdit) => {
@@ -200,6 +208,7 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
 
     const finishEditListing = (listingId) => {
         setSelectedListings(selectedListings.map(l => l.id === listingId ? { ...l, isEdit: false } : l));
+        setUploadBtnStatus(false);
     }
 
     const showUploadCertModal = (listingId) => {
@@ -224,24 +233,49 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
     const closeModal = () => {
         // onChange();
         setVisible(false)
-    };  
+    };
 
     const uploadTiktokProducts = async () => {
         try {
-            const res = await apiRequest.post('/products/upload-to-tiktok', 
-                { 
-                    listings: selectedListings, 
-                    shops: step2Shops, 
-                    template: step2Template, 
-                    draftMode 
+            // initial state for upload, should reset all fields            
+            setUploadBtnStatus(true);
+            setProgress(0);
+            setIsUploading(true);
+
+            const res = await apiRequest.post('/products/upload-to-tiktok',
+                {
+                    listings: selectedListings,
+                    shops: step2Shops,
+                    template: step2Template,
+                    draftMode
+                },
+                {
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        setProgress(percentCompleted);
+                    }
                 }
             );
 
-            setVisible(false);
-            handleShowToast('Đăng sản phẩm thành công!');
             console.log(res);
-        } catch (error) {            
+            if (res.data.message === 'Success') {
+                handleShowToast('Đăng sản phẩm thành công!');
+
+                // reset state
+                setIsUploading(false);
+                setUploadBtnStatus(false);
+                setProgress(0);
+                setVisible(false);
+                
+                window.location.reload();
+            }
+        } catch (error) {
+            handleShowToast('Đã có lỗi xảy ra. Xin vui lòng thử lại!');
             console.log(error);
+            // reset state
+            setIsUploading(false);
+            setUploadBtnStatus(false);
+            setProgress(0);            
         }
     }
 
@@ -304,23 +338,20 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
                                                         }
                                                     </CTableDataCell>
                                                     <CTableDataCell>
-                                                        <CRow>
+                                                        <CRow className="d-flex flex-column">
                                                             <CCol>
                                                                 {listing.isEdit ?
                                                                     <CButton color="success" className="me-2 mb-2" onClick={() => finishEditListing(listing.id, listing.name)}>
-                                                                        <CIcon icon={cilCheckCircle} className="me-2" />
-                                                                        Hoàn tất
+                                                                        <CIcon icon={cilCheckCircle} className="me-2" /> Xong
                                                                     </CButton>
                                                                     : <CButton color="info" className="me-2 mb-2" onClick={() => editListing(listing.id)}>
-                                                                        <CIcon icon={cilPencil} className="me-2" />
-                                                                        Chỉnh sửa
+                                                                        <CIcon icon={cilPencil} className="me-2" /> Sửa
                                                                     </CButton>
                                                                 }
                                                             </CCol>
                                                             <CCol>
                                                                 {listing.isCertUpload == 0 ? <CButton color="warning" onClick={() => showUploadCertModal(listing.id)}>
-                                                                    <CIcon icon={cilLockLocked} className="me-2" />
-                                                                    Certificate
+                                                                    <CIcon icon={cilLockLocked} className="me-2" />  Chứng chỉ
                                                                 </CButton> : <CBadge color="success">Đã up cert</CBadge>}
                                                             </CCol>
                                                         </CRow>
@@ -336,19 +367,28 @@ const ChooseListings = ({ visible, setVisible, listings, selectedShops, selected
                         </div>
                     </div>
                 </CModalBody>
-                <CFooter>
-                    <div className="d-flex align-items-center ms-auto">
-                        <CButton color="primary" className="me-5" onClick={uploadTiktokProducts}>
-                            Đăng sản phẩm
-                        </CButton>
-                        <CFormLabel htmlFor="isCheckStatus" className="me-2 mb-0">Check Listing</CFormLabel>
-                        <Toggle
-                            defaultChecked={false}
-                            id="isCheckStatus"
-                            name='isCheckStatus'
-                            value='yes'
-                            className='me-2'
-                        />
+                <CFooter className="d-flex justify-content-center">
+                    <div>
+                        {isUploading ?
+                            <div>
+                                <div>Đang đăng sản phẩm ..</div>
+                                <CProgress color='success' value={100} max={100} />
+                            </div>
+                            :
+                            <>
+                                <CButton color="primary" className="me-5" onClick={uploadTiktokProducts} disabled={uploadBtnStatus ? true : false}>
+                                    Đăng sản phẩm
+                                </CButton>
+                                <CFormLabel htmlFor="isCheckStatus" className="me-2 mb-0">Check Listing</CFormLabel>
+                                <Toggle
+                                    defaultChecked={false}
+                                    id="isCheckStatus"
+                                    name='isCheckStatus'
+                                    value='yes'
+                                    className='me-2'
+                                />
+                            </>
+                        }
                     </div>
                 </CFooter>
             </CModal>

@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
-export const AuthContextProvider = ({ children }) => {    
+export const AuthContextProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(
         JSON.parse(localStorage.getItem("user")) || null
     );
 
     const updateUser = (data) => {
         setCurrentUser(data);
-    };
-    
-    useEffect(() => {        
+    };    
+
+    useEffect(() => {
         localStorage.setItem("user", JSON.stringify(currentUser));
     }, [currentUser]);
 

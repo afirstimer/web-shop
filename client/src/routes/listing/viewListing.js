@@ -29,17 +29,19 @@ const ViewListing = ({ visible, setVisible, listing }) => {
             <CModalHeader>
                 <CModalTitle id="LiveDemoExampleLabel">Sản phẩm #{listing && listing.sku}</CModalTitle>
             </CModalHeader>
-            <CModalBody>
-                <div className="clearfix">
+            <CModalBody className="d-flex flex-column">
+                <div className="row justify-content-center mt-3 mb-3">
                     {listing && listing.images && listing.images.map((image, index) => (
-                        <CImage
-                            className="m-2"
-                            rounded
-                            src={image}
-                            width={100}
-                            height={100}
-                            key={index}
-                        />
+                        <div className="col-3 position-relative">
+                            <CImage
+                                className="m-2"
+                                rounded
+                                src={image}
+                                width={100}
+                                height={100}
+                                key={index}
+                            />
+                        </div>
                     ))}
                 </div>
                 <CRow className="mt-3">
@@ -68,7 +70,7 @@ const ViewListing = ({ visible, setVisible, listing }) => {
                         ></div>
                     </CFormLabel>
                 </CRow>
-            </CModalBody>            
+            </CModalBody>
         </CModal>
     );
 };

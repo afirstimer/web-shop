@@ -51,7 +51,7 @@ export const crawlAmazonProduct = async (req, res) => {
 }
 
 export const getListings = async (req, res) => {
-    try {
+    try {        
         const { page = 1, limit = process.env.DEFAULT_LIMIT, name, sku, sort } = req.query;
 
         const pageNum = parseInt(page, 10);
@@ -70,6 +70,7 @@ export const getListings = async (req, res) => {
                     mode: "insensitive",
                 },
             }),
+            isActive: 1
         };
 
         const orderBy = (() => {
@@ -130,6 +131,7 @@ export const getListing = async (req, res) => {
         const listing = await prisma.listing.findUnique({
             where: {
                 id: req.params.id,
+                isActive: 1
             },
         });
         res.status(200).json(listing);
@@ -141,9 +143,12 @@ export const getListing = async (req, res) => {
 
 export const deleteListing = async (req, res) => {
     try {        
-        await prisma.listing.delete({
+        await prisma.listing.update({
             where: {
                 id: req.params.id,
+            },
+            data: {
+                isActive: 0
             },
         });
 
@@ -155,20 +160,20 @@ export const deleteListing = async (req, res) => {
 }
 
 export const getListingsOnShop = async (req, res) => {
-    try {
+    try {        
         const listings = await prisma.listingOnShop.findMany();
         // loop listings and get new array, find shop with shopId
         let newListings = [];
         for(const listing of listings) {   
             // find shopId in newListings
-            const shopId = listing.shopId;
-            const existingListing = newListings.find(listing => listing.shopId === shopId);
-            if (existingListing) {
-                // Check if the existing listing has the same shopId
-                if (existingListing.shopId === shopId) {
-                    continue;
-                }                                               
-            }            
+            // const shopId = listing.shopId;
+            // const existingListing = newListings.find(listing => listing.shopId === shopId);
+            // if (existingListing) {
+            //     // Check if the existing listing has the same shopId
+            //     if (existingListing.shopId === shopId) {
+            //         continue;
+            //     }                                               
+            // }            
             
             const shop = await prisma.shop.findUnique({
                 where: {

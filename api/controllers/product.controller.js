@@ -1,10 +1,87 @@
 import prisma from "../lib/prisma.js";
-import { 
+import {
     uploadImageToTiktok,
     createTiktokProduct
 } from "../services/product.service.js";
 
-export const getProducts = async (req, res) => { }
+export const getProducts = async (req, res) => {
+    try {
+        const { page = 1, limit = process.env.DEFAULT_LIMIT, name, sku, sort } = req.query;
+
+        const pageNum = parseInt(page, 10);
+        const pageSize = parseInt(limit, 10);
+
+        const where = {
+            ...(name && {
+                name: {
+                    contains: name,
+                    mode: "insensitive",
+                },
+            }),
+            ...(sku && {
+                sku: {
+                    contains: sku,
+                    mode: "insensitive",
+                },
+            }),
+            isActive: 1
+        };
+
+        const orderBy = (() => {
+            switch (sort) {
+                case "newest":
+                    return { createdAt: "desc" };
+                case "oldest":
+                    return { createdAt: "asc" };
+                case "updated_newest":
+                    return { updatedAt: "desc" };
+                case "updated_oldest":
+                    return { updatedAt: "asc" };
+                default:
+                    return { createdAt: "desc" };
+            }
+        })();
+
+        const total = await prisma.product.count({
+            where
+        });
+
+        const products = await prisma.product.findMany({
+            where,
+            include: {
+                shop: true,
+                listing: true
+            },
+            skip: (pageNum - 1) * pageSize,
+            take: pageSize,
+            orderBy
+        });
+
+        // loop products and add ListingOnShop        
+        for (const product of products) {
+            const listingOnShop = await prisma.listingOnShop.findFirst({
+                where: {
+                    listingId: product.listingId,
+                    shopId: product.shopId
+                }
+            })
+
+            if (listingOnShop) {
+                product.listingOnShop = listingOnShop;
+            }
+        }
+
+        res.status(200).json({
+            total,
+            page: pageNum,
+            limit: pageSize,
+            products
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
 
 export const getProduct = async (req, res) => { }
 
@@ -100,59 +177,83 @@ export const uploadTiktokProducts = async (req, res) => {
         console.log(draftMode);
 
         // Loop listings, and submit to tiktok
-        let results = [];
-        listings.forEach(async (listing) => {
-            shops.forEach(async (shop) => {
-                // console.log(listing, existingTemplate, shop, draftMode);
-                let response = createTiktokProduct(req, listing, existingTemplate, shop, draftMode);
+        // Biến theo dõi trạng thái upload
+        let uploadStatus = false;
 
-                // if success, create ListingOnShop
-                const listingOnShop = await prisma.listingOnShop.create({
-                    data: {
-                        listingId: listing.id,
-                        shopId: shop.id,
-                        status: response ? 'SUCCESS' : 'FAILURE',
+        // Tạo một mảng promises cho tất cả các thao tác upload
+        const uploadTasks = listings.flatMap((listing) =>
+            shops.map(async (shop) => {
+                try {
+                    const response = await createTiktokProduct(req, listing, existingTemplate, shop, draftMode);
+
+                    // status
+                    const exportStatus = 'PENDING';
+                    let tiktokProductId = null;
+                    if (response.code == 0) {
+                        tiktokProductId = response.data.product_id;
+                        exportStatus = draftMode ? 'DRAFT' : 'SUCCESS';
+                    } else {
+                        exportStatus = 'FAILURE';
                     }
-                });
-                console.log(listingOnShop);
 
-                // create product
-                const product = await prisma.product.create({
-                    data: {
-                        name: listing.name,
-                        description: listing.description,
-                        price: listing.price,
-                        listingId: listing.id,
-                        shopId: shop.id
-                    }
-                });
-                console.log(product);
-
-                // update listing.shops and listing.products
-                const newestListing = await prisma.listing.update({
-                    where: {
-                        id: listing.id
-                    },
-                    data: {
-                        shops: {
-                            connect: {
-                                id: shop.id
-                            }
-                        },
-                        products: {
-                            connect: {
-                                id: product.id
-                            }
+                    // Tạo ListingOnShop
+                    const listingOnShop = await prisma.listingOnShop.create({
+                        data: {
+                            listingId: listing.id,
+                            shopId: shop.id,
+                            status: exportStatus,
                         }
-                    }
-                })
-                console.log(newestListing);
+                    });
+                    console.log(listingOnShop);
 
-                results.push(response);
+                    // Tạo product
+                    const product = await prisma.product.create({
+                        data: {
+                            name: listing.name,
+                            description: listing.description,
+                            price: listing.price,
+                            listingId: listing.id,
+                            shopId: shop.id
+                        }
+                    });
+                    console.log(product);
+
+                    // Tạo log
+                    const logg = await prisma.log.create({
+                        data: {
+                            shopId: shop.id,
+                            listingId: listing.id,
+                            productTiktokId: tiktokProductId,
+                            code: response.code,
+                            status: exportStatus,
+                            payload: JSON.stringify(response)
+                        }
+                    })
+                    console.log(logg);
+
+                    return response;
+                } catch (err) {
+                    console.error("Error uploading product:", err);
+                    return null; // Xử lý lỗi từng shop
+                }
             })
-        })        
+        );
 
-        if (results.length > 0) {
+        // Đợi tất cả các promises hoàn tất
+        const results = await Promise.allSettled(uploadTasks);
+
+        // Kiểm tra trạng thái upload
+        uploadStatus = results.some((result) => result.status === 'fulfilled' && result.value);
+
+        // Chờ uploadStatus hoặc timeout sau 20s
+        const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Timeout waiting for uploads to complete")), 20000)
+        );
+
+        // Đợi upload hoàn thành hoặc timeout
+        await Promise.race([Promise.resolve(uploadStatus), timeout]);
+
+        if (uploadStatus) {
             res.status(200).json({ message: "Success" });
         } else {
             res.status(500).json({ message: "Failed to create products" });
@@ -163,6 +264,53 @@ export const uploadTiktokProducts = async (req, res) => {
     }
 }
 
+export const deleteProduct = async (req, res) => {
+    try {
+        const { productId, shopId } = req.body;
+        const product = await prisma.product.findUnique({
+            where: {
+                id: productId
+            }
+        });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }        
+
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: shopId
+            }
+        });
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }
+
+        const listingOnShop = await prisma.listingOnShop.findUnique({
+            where: {
+                listingId_shopId: {
+                    listingId: product.listingId,
+                    shopId: shopId
+                }
+            }
+        });
+        if (!listingOnShop) {
+            return res.status(404).json({ message: "Listing on shop not found" });
+        }
+
+        const extraParams = {
+            'shop_cipher': shop.tiktokShopCipher,
+            'listing_platforms': ['TIKTOK_SHOP'],
+            'product_ids': [product.id],
+            'version': '202309',
+            'shop_id': defaultShop.tiktokShopId
+        }
+
+        const response = await callTiktokApi(req, shop, payload, false, "POST", "/product/202309/products/deactivate", "application/json", extraParams);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
 
 
 

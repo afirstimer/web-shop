@@ -13,7 +13,7 @@ const MainChart = () => {
   useEffect(() => {
     const fetchTotalOrders = async () => {
       try {
-        const orders = await apiRequest.get('/orders');        
+        const orders = await apiRequest.get('/orders/stats');        
         const tmpMonths = [];
         const tmpOrders = [];
         const tmpRevenues = [];

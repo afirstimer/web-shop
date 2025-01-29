@@ -1,9 +1,7 @@
 import prisma from "../lib/prisma.js";
-import jwt from "jsonwebtoken";
 import { generateSign } from "../helper/tiktok.api.js";
-import fetch from "node-fetch";
 import axios from "axios";
-import { readJSONFile, writeJSONFile } from "../helper/helper.js";
+import { getDefaultShop, readJSONFile, writeJSONFile } from "../helper/helper.js";
 
 const CATEGORY_FILE = "./dummy/tiktok/categories.json";
 
@@ -24,21 +22,8 @@ export const getTikTokCategories = async (request, res) => {
     const secret = process.env.TIKTOK_SHOP_APP_SECRET;
     const category_version = process.env.TIKTOK_CATEGORY_VERSION;    
 
-    // TODO: lấy token
-    const setting = await prisma.setting.findFirst();
-    if (!setting) {
-        console.error("Setting not found");
-        return res.status(404).json({ message: "Setting not found" });
-    }
-    const access_token = setting.shopAccessToken;
-    console.log(access_token);
-
-    // TODO: lấy shop mặc định
-    const shop = await prisma.shop.findFirst({
-        where: {
-            defaultShop: 1
-        }
-    });    
+    // Default shop: token
+    const shop = await getDefaultShop(request);    
     console.log(shop);    
     if (!shop) {
         console.error("Shop not found");
@@ -49,7 +34,7 @@ export const getTikTokCategories = async (request, res) => {
     // Param
     request.query.category_version = category_version;
     request.query.shop_id = shop.id;
-    request.query.access_token = access_token;
+    request.query.access_token = shop.shopAccessToken;
     request.query.app_key = app_key;
     request.query.secret = secret;
     request.query.shop_cipher = shop_cipher;
@@ -71,7 +56,7 @@ export const getTikTokCategories = async (request, res) => {
             category_version: category_version
         },
         headers: {
-            "x-tts-access-token": setting.shopAccessToken,
+            "x-tts-access-token": shop.shopAccessToken,
         }
     };
 
@@ -136,24 +121,14 @@ export const getTikTokCategoryAttributes = async (request, res) => {
     const category_version = process.env.TIKTOK_CATEGORY_VERSION;    
 
     //TODO: nên lấy shop mặc định (lưu ý chỉ 1 shop mặc định)
-    const shop = await prisma.shop.findFirst({
-        where: {
-            defaultShop: 1
-        }
-    });
+    const shop = await getDefaultShop(request);
     console.log(shop);
     if (!shop) {
         console.error("Shop not found");
         return res.status(404).json({ message: "Shop not found" });
     }
 
-    // TODO: lấy token
-    const setting = await prisma.setting.findFirst();
-    if (!setting) {
-        console.error("Setting not found");
-        return res.status(404).json({ message: "Setting not found" });
-    }
-    const access_token = setting.shopAccessToken;
+    const access_token = shop.shopAccessToken;
 
     // Param
     request.query.category_version = category_version;
@@ -181,7 +156,7 @@ export const getTikTokCategoryAttributes = async (request, res) => {
             category_version: 'v2'
         },
         headers: {
-            "x-tts-access-token": setting.shopAccessToken,
+            "x-tts-access-token": shop.shopAccessToken,
             "Content-Type": "application/json"
         }
     };

@@ -1,28 +1,60 @@
 import prisma from "../lib/prisma.js";
-import jwt from "jsonwebtoken";
 import { generateSign } from "../helper/tiktok.api.js";
-import fetch from "node-fetch";
 import axios from "axios";
-import { readJSONFile, writeJSONFile } from "../helper/helper.js";
+import { createFolder, getDefaultShop, writeJSONFile } from "../helper/helper.js";
+import { getTiktokOrders } from "../services/order.service.js";
+import { createOrders } from "../services/shop.service.js";
+import path from 'path';
 
 const ORDER_FILE = "./dummy/tiktok/orders.json";
+const ORDER_FOLDER = "./dummy/tiktok/orders/shop/";
 
 // get all shops
 export const getShops = async (req, res) => {
     try {
         const { page = 1, limit = process.env.DEFAULT_LIMIT, search, sort } = req.query;
 
+        /**
+         * If user is admin, get all shops
+         * If user is manager, get all shops of the team
+         * If user is user, get all shops of the user
+         */
+        const requestUser = await prisma.user.findUnique({
+            where: {
+                id: req.userId
+            }
+        });
+
+        if (!requestUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
         const pageNum = parseInt(page, 10);
         const pageSize = parseInt(limit, 10);
 
-        const where = {
-            ...(search && {
-                name: {
-                    contains: search,
-                    mode: "insensitive",
+        let where = {};
+        if (requestUser && requestUser.isAdmin == 1) {
+            where = {
+                ...(search && {
+                    name: {
+                        contains: search,
+                        mode: "insensitive",
+                    },
+                })
+            };
+        } else {
+            where = {
+                id: {
+                    in: requestUser.shops,
                 },
-            })
-        };
+                ...(search && {
+                    name: {
+                        contains: search,
+                        mode: "insensitive",
+                    },
+                })
+            };
+        }
 
         const orderBy = (() => {
             switch (sort) {
@@ -48,15 +80,6 @@ export const getShops = async (req, res) => {
             skip: (pageNum - 1) * pageSize,
             take: pageSize,
             orderBy: orderBy,
-            include: {
-                User: {
-                    select: {
-                        username: true,
-                        email: true,
-                        avatar: true
-                    }
-                }
-            },
         });
         res.status(200).json({
             total,
@@ -112,7 +135,7 @@ export const getShop = async (req, res) => {
 }
 
 export const getShopOrders = async (request, res) => {
-    try {        
+    try {
         const app_key = process.env.TIKTOK_SHOP_APP_KEY;
         const secret = process.env.TIKTOK_SHOP_APP_SECRET;
         const setting = await prisma.setting.findFirst();
@@ -133,7 +156,7 @@ export const getShopOrders = async (request, res) => {
             where: {
                 id: shopId
             }
-        })        
+        })
 
         if (!shop) {
             return res.status(404).json({ message: "Shop not found" });
@@ -142,11 +165,11 @@ export const getShopOrders = async (request, res) => {
         request.query.path = "/order/202309/orders/search";
         request.query.access_token = access_token;
         request.query.app_key = app_key;
-        request.query.secret = secret;  
+        request.query.secret = secret;
         request.query.shop_cipher = shop.tiktokShopCipher;
         request.query.page_size = 20;
         request.query.sort_order = 'ASC';
-        request.query.sort_field = 'create_time';      
+        request.query.sort_field = 'create_time';
         request.query.page_token = '';
         const timestamp = Math.floor(Date.now() / 1000);
         const header = request.headers['content-type'];
@@ -192,7 +215,7 @@ export const getShopOrders = async (request, res) => {
         });
         console.log(response);
 
-        if (response.data.message == 'Success') {            
+        if (response.data.message == 'Success') {
             await writeJSONFile(ORDER_FILE, response.data.data);
 
             res.status(200).json(response.data.data);
@@ -476,6 +499,89 @@ export const requestAuthorizedShops = async (request, res) => {
 // get shop info from tiktok
 export const getTiktokShopInfo = async (req, res) => {
 
+}
+
+export const getMembersOnShop = async (req, res) => {
+    try {
+        if (!req.params.id) {
+            return res.status(400).json({ message: "Missing shop id" });
+        }
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }
+        console.log(shop);
+
+        const users = await prisma.user.findMany({
+            where: {
+                isActive: 1
+            }
+        });
+        console.log(users);
+
+        let shopUsers = [];
+        users.forEach(user => {
+            if (user.shops.includes(shop.id)) {
+                shopUsers.push(user);
+            }
+        });
+        console.log(shopUsers);
+
+        res.status(200).json(shopUsers);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const syncOrders = async (req, res) => {
+    try {
+        const shopId = req.params.id;
+
+        if (!shopId) {
+            return res.status(400).json({ error: "Missing shop id" });
+        }
+
+        // get request shop
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: shopId
+            }
+        });
+        if (!shop) {
+            return res.status(500).json({ error: "Failed to get shop" });
+        }
+
+        let isHasPageToken = true;
+        let nextPageToken = null;
+        let page = 1;
+        const folderPath = path.join(ORDER_FOLDER, shop.id);
+        await createFolder(folderPath);
+        while (isHasPageToken) {
+            const data = await getTiktokOrders(req, shop, { nextPageToken: nextPageToken });
+            if (data) {
+                if (data.next_page_token) {
+                    nextPageToken = data.next_page_token;
+                    isHasPageToken = true;
+                    createOrders(data, shop.id + "/" + page + ".json");
+                } else {
+                    isHasPageToken = false;
+                }
+            }
+            page++;
+        }
+
+        res.status(200).json({ message: "Orders synced successfully" });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const syncProducts = async (req, res) => {
 }
 
 // refresh token

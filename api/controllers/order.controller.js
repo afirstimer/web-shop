@@ -1,22 +1,49 @@
 import prisma from "../lib/prisma.js";
-import jwt from "jsonwebtoken";
-import fetch from "node-fetch";
-import axios from "axios";
-import { readJSONFile, writeJSONFile } from "../helper/helper.js";
-import { getTiktokOrders } from "../services/order.service.js";
+import { getLocalTiktokOrders, getTiktokOrders } from "../services/order.service.js";
+import { getDefaultShop } from "../helper/helper.js";
 
-const ORDER_FILE = "./dummy/tiktok/orders.json";
-
-export const getOrders = async (req, res) => {
+export const getOrderStats = async (req, res) => {
     try {
-        // get first shop
-        const shop = await prisma.shop.findFirst();
-        const data = await getTiktokOrders(req, shop, {});
-        if (!data) {
-            return res.status(500).json({ error: "Failed to get orders" });
+        // get requested user
+        const requestUser = await prisma.user.findUnique({
+            where: {
+                id: req.userId
+            }
+        });
+
+        if (!requestUser) {
+            return res.status(500).json({ error: "Failed to get user" });
         }
+
+        let orders = [];
+        // if admin, get full shops
+        if (requestUser.isAdmin == 1) {
+            const shops = await prisma.shop.findMany();
+            if (!shops) {
+                return res.status(500).json({ error: "Failed to get shops" });
+            }
+
+            for (const shop of shops) {
+                const localOrders = await getLocalTiktokOrders(shop);
+                orders = orders.concat(localOrders);
+            }
+        } else {
+            // get default shop
+            const shop = await getDefaultShop(req);
+
+            if (!shop) {
+                return res.status(500).json({ error: "Failed to get shop" });
+            }
+
+            const localOrders = await getLocalTiktokOrders(shop);
+            if (!localOrders) {
+                return res.status(500).json({ error: "Failed to get orders" });
+            }
+
+            orders = localOrders;
+        }
+        console.log(orders);
         
-        const orders = data.orders;
         // Loop orders and count total amount of orders with group by month
         const ordersByMonth = {};
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -71,10 +98,20 @@ export const getOrders = async (req, res) => {
             const revenue = paymentByMonth[month] || 0;
             analysis.push({ month, total, revenue });
         }
-        
+
         res.status(200).json(analysis);
     } catch (error) {
         console.error("Error get orders: ", error);
+        res.status(500).json({ error: "Failed to get orders" });
+    }
+}
+
+export const getOrders = async (req, res) => {
+    try {
+        const orders = await prisma.order.findMany();
+        res.status(200).json(orders);
+    } catch (error) {
+        console.log(error);
         res.status(500).json({ error: "Failed to get orders" });
     }
 }

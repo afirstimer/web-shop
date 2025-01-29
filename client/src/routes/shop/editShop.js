@@ -42,14 +42,14 @@ const EditShop = ({ visible, setVisible, shop }) => {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const STATUS_ENUMS = ['CONNECTED', 'DISCONNECTED'];
 
-    const [shopName, setShopName] = useState(shop.name);
-    const [shopTeamId, setShopTeamId] = useState(shop.teamId);
-    const [shopProfile, setShopProfile] = useState(shop.profile || "");
-    const [shopCode, setShopCode] = useState(shop.code);
-    const [shopCreatedBy, setShopCreatedBy] = useState(shop.createdBy);
-    const [shopPriceDiff, setShopPriceDiff] = useState(shop.priceDiff);
-    const [shopItems, setShopItems] = useState(shop.shopItems);
-    const [shopStatus, setShopStatus] = useState(shop.status);
+    const [shopProfile, setShopProfile] = useState('');
+    const [shopName, setShopName] = useState('');
+    const [shopTeamId, setShopTeamId] = useState('');
+    const [shopCode, setShopCode] = useState('');
+    const [shopCreatedBy, setShopCreatedBy] = useState('');
+    const [shopPriceDiff, setShopPriceDiff] = useState('');
+    const [shopItems, setShopItems] = useState([]);
+    const [shopStatus, setShopStatus] = useState('');
 
     useEffect(() => {
         const fetchTeams = async () => {
@@ -63,8 +63,19 @@ const EditShop = ({ visible, setVisible, shop }) => {
             }
         }
 
+        if (shop) {
+            setShopProfile(shop.profile);
+            setShopName(shop.name);
+            setShopTeamId(shop.teamId);
+            setShopCode(shop.code);
+            setShopCreatedBy(shop.createdBy);
+            setShopPriceDiff(shop.priceDiff);
+            setShopItems(shop.shopItems);
+            setShopStatus(shop.status);
+            setImages(shop.images);
+        }
+
         fetchTeams();
-        setImages(shop.images);
     }, [shop]);
 
     useEffect(() => {
@@ -97,13 +108,11 @@ const EditShop = ({ visible, setVisible, shop }) => {
                 profile: shopProfile || shop.profile,
                 code: shopCode || shop.code,
                 priceDiff: shopPriceDiff || shop.priceDiff,
-                shopItems: shopItems || shop.shopItems,                
-                images: JSON.stringify(images),
-                teamId: selectedTeam,
-                managers: JSON.stringify(selectedUsers),
+                shopItems: shopItems || shop.shopItems,
+                images: JSON.stringify(images),                                
                 status: shopStatus || shop.status,
             }
-            
+
             const res = await apiRequest.put(`/shops/${shop.id}`, payload);
             setVisible(false);
         } catch (error) {
@@ -124,7 +133,7 @@ const EditShop = ({ visible, setVisible, shop }) => {
         )
     }
 
-    const handleSelectUsers = (selectedList, selectedItem) => {
+    const handleSelectUsers = (selectedList, selectedItem) => {        
         setSelectedUsers(selectedList.map(item => item.id));
     }
 
@@ -141,54 +150,23 @@ const EditShop = ({ visible, setVisible, shop }) => {
                 <CModalHeader>
                     <CModalTitle id="LiveDemoExampleLabel">Cập nhật shop #{shop.sku}</CModalTitle>
                 </CModalHeader>
-                <CModalBody>
+                <CModalBody className="d-flex flex-column">
                     <CRow className="mt-3">
                         <CCol md={6}>
-                            <CFormInput type="text" id="name" name="name" label="Shop name" value={shop && shop.name} onChange={(e) => setShopName(e.target.value)}/>
+                            <CFormInput type="text" id="name" name="name" label="Shop name" value={shop.name} onChange={(e) => setShopName(e.target.value)} />
                         </CCol>
                         <CCol md={6}>
-                            <CFormInput type="text" id="profile" name="profile" label="Profile name" value={shopProfile} onChange={(e) => setShopProfile(e.target.value)}/>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mt-3">
-                        <CCol md={6}>
-                            <CFormInput type="text" id="code" name="code" label="Shop code" value={shop && shop.code}  onChange={(e) => setShopCode(e.target.value)}/>
-                        </CCol>
-                        <CCol md={6}>
-                            <CFormInput type="text" id="createdBy" name="createdBy" label="Created by" value={shop && shop.User && shop.User.username} readOnly disabled/>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mt-3 mb-5">
-                        <CCol md={12}>
-                            <CFormLabel className="col-2 col-form-label">
-                                Nhóm
-                            </CFormLabel>
-                            <CFormSelect aria-label="Default select example" value={selectedTeam} defaultValue={shop.teamId} onChange={(e) => setSelectedTeam(e.target.value)}>
-                                <option>--Chọn team--</option>
-                                {teams && teams.map((team, index) => (
-                                    <option key={index} value={team.id}>{team.name}</option>
-                                ))}
-                            </CFormSelect>
-                        </CCol>
-                    </CRow>
-                    <CRow className="mt-3 mb-5">
-                        <CCol md={12}>
-                            <CFormLabel className="col-2 col-form-label">
-                                Người quản lý
-                            </CFormLabel>
-                            <MultiSelect
-                                options={users}
-                                displayValue="username"
-                                onSelect={handleSelectUsers}
-                                onRemove={handleSelectUsers}
-                                placeholder="Select Status"
-                                selectedValues={selectedUsers}
-                            />
+                            <CFormInput type="text" id="profile" name="profile" label="Profile name" value={shopProfile} onChange={(e) => setShopProfile(e.target.value)} />
                         </CCol>
                     </CRow>
                     <CRow className="mt-3">
                         <CCol md={6}>
-                            <CFormInput type="text" id="priceDiff" name="priceDiff" label="Price List" value={shopPriceDiff}  onChange={(e) => setShopPriceDiff(e.target.value)}/>
+                            <CFormInput type="text" id="code" name="code" label="Shop code" value={shop.code} onChange={(e) => setShopCode(e.target.value)} />
+                        </CCol>
+                    </CRow>                                        
+                    <CRow className="mt-3">
+                        <CCol md={6}>
+                            <CFormInput type="text" id="priceDiff" name="priceDiff" label="Price List" value={shopPriceDiff} onChange={(e) => setShopPriceDiff(e.target.value)} />
                         </CCol>
                         <CCol md={6}>
                             <CFormInput type="text" id="shopItems" name="shopItems" label="Quantity" value={shopItems} onChange={(e) => setShopItems(e.target.value)} />
@@ -198,7 +176,7 @@ const EditShop = ({ visible, setVisible, shop }) => {
                         <CFormLabel className="col-2 col-form-label">
                             Images Frames
                         </CFormLabel>
-                        {shop && images && images.map((image, index) => (
+                        {images && images.map((image, index) => (
                             <CCol xs={3} key={index} className="position-relative">
                                 <CImage
                                     className="m-2 img-thumbnail"
@@ -226,21 +204,20 @@ const EditShop = ({ visible, setVisible, shop }) => {
                             />
                         </div>
                     </CRow>
-                    <CRow className="mt-3 mb-5">
+                    <CRow className="mt-3 mb-2">
                         <CCol md={12}>
                             <CFormLabel>
                                 Status
                             </CFormLabel>
-                            <CFormSelect aria-label="Default select example" defaultValue={shop && shop.status} onChange={(e) => setShopStatus(e.target.value)}>
+                            <CFormSelect aria-label="Default select example" defaultValue={shop.status} onChange={(e) => setShopStatus(e.target.value)}>
                                 <option>--Chọn status--</option>
                                 {STATUS_ENUMS.map((status, index) => (
                                     <option key={index} value={status}>{status}</option>
                                 ))}
                             </CFormSelect>
                         </CCol>
-                    </CRow>
-                    <div className="clearfix"></div>
-                    <CRow className="mt-5 d-flex justify-content-center" >
+                    </CRow>                    
+                    <CRow className="d-flex justify-content-center" >
                         <CButton color="primary" className=" col-3" onClick={handleSubmit}>
                             Cập nhật
                         </CButton>

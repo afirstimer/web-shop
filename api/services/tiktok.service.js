@@ -19,12 +19,7 @@ export const callTiktokApi = async (req, shop, payload = false, formData = false
         console.log(API);
 
         //TODO: Lấy shop access token theo default shop
-        const setting = await prisma.setting.findFirst();
-        if (!setting) {
-            console.error("Setting not found");
-            return false;
-        }
-        const access_token = setting.shopAccessToken;
+        const access_token = shop.shopAccessToken;
 
         console.log(shop);
         const shop_cipher = shop.tiktokShopCipher;
@@ -62,7 +57,7 @@ export const callTiktokApi = async (req, shop, payload = false, formData = false
             url: API + pathURL,
             query: params,
             headers: {
-                "x-tts-access-token": setting.shopAccessToken,
+                "x-tts-access-token": access_token,
                 "content-type": contentType,
             }
         };

@@ -12,6 +12,7 @@ import proxyRoute from "./routes/proxy.route.js";
 import templateRoute from "./routes/template.route.js";
 import orderRoute from "./routes/order.route.js";
 import productRoute from "./routes/product.route.js";
+import logRoute from "./routes/log.route.js";
 import testRoute from "./routes/test.route.js";
 
 const app = express();
