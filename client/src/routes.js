@@ -63,6 +63,9 @@ const Products = React.lazy(() => import('./routes/product/products'))
 const Tool = React.lazy(() => import('./routes/tool/tool'))
 const Proxy = React.lazy(() => import('./routes/proxy/proxy'))
 const Proxies = React.lazy(() => import('./routes/proxy/proxies'))
+const Orders = React.lazy(() => import('./routes/order/orders'))
+const Filter = React.lazy(() => import('./routes/tool/filter'))
+const Notify = React.lazy(() => import('./routes/tool/notify'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -80,10 +83,13 @@ const routes = [
   { path: '/template/edit/:id', name: 'EditTemplate', element: EditTemplate },
   { path: '/products', name: 'Products', element: Products },  
   { path: '/shops', name: 'Shops', element: Dashboard },  
+  { path: '/orders', name: 'Orders', element: Orders },  
   { path: '/users', name: 'Users', element: Users },  
   { path: '/tools', name: 'Tool', element: Tool },  
   { path: '/proxies', name: 'Proxies', element: Proxies },
   { path: '/proxy', name: 'Proxy', element: Proxy },
+  { path: '/filters', name: 'Filter', element: Filter },
+  { path: '/notify', name: 'Notify', element: Notify },
   /**
    * THEME ROUTES
    */

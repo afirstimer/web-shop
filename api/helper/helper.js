@@ -9,13 +9,9 @@ export const getProductValueByKey = (productInfo, key) => {
 };
 
 export const createFolder = async (folderPath) => {
-  try {
-    // if exist , delete and create again
-    if (fs.existsSync(folderPath)) {
-      await fs.rm(folderPath, { recursive: true, force: true });
-    }
+  try {        
     await fs.mkdir(folderPath, { recursive: true });
-    console.log("Folder created successfully", shopPath);
+    console.log("Folder created successfully", folderPath);
     return true;
   } catch (error) {
     console.log(error);

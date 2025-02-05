@@ -752,7 +752,7 @@ const EditTemplate = () => {
                                             type="number" 
                                             id="packageWeightValue" 
                                             name='packageWeightValue' 
-                                            label="Trọng lượng gói hàng (Pound)*"
+                                            label="Trọng lượng gói hàng (KILOGRAM)*"
                                             value={template && template.packageWeight}
                                             readOnly
                                             disabled
@@ -787,7 +787,7 @@ const EditTemplate = () => {
                                             type="number" 
                                             id="packageDimensionLength" 
                                             name='packageDimensionLength' 
-                                            label="Kích thước chiều dài gói hàng (Inch) " 
+                                            label="Kích thước chiều dài gói hàng (CENTIMETER) " 
                                             value={template && template.packageLength}
                                             readOnly
                                             disabled 
@@ -798,7 +798,7 @@ const EditTemplate = () => {
                                             type="number" 
                                             id="packageDimensionWidth" 
                                             name='packageDimensionWidth' 
-                                            label="Kích thước chiều rộng gói hàng (Inch)" 
+                                            label="Kích thước chiều rộng gói hàng (CENTIMETER)" 
                                             value={template && template.packageWidth}
                                             readOnly
                                             disabled
@@ -809,7 +809,7 @@ const EditTemplate = () => {
                                             type="number" 
                                             id="packageDimensionHeight" 
                                             name='packageDimensionHeight' 
-                                            label="Kích thước chiều cao gói hàng (Inch)" 
+                                            label="Kích thước chiều cao gói hàng (CENTIMETER)" 
                                             value={template && template.packageHeight}
                                             readOnly
                                             disabled

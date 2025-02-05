@@ -1,5 +1,4 @@
-import React, { use, useEffect, useState } from 'react'
-import classNames from 'classnames'
+import React, { useEffect, useState } from 'react'
 
 import {
     CAvatar,
@@ -91,6 +90,7 @@ import EditShop from './editShop'
 import DefaultShopModal from './defaultShopModal'
 import ToggleShopModal from './toggleShopStatus'
 import AssignToModal from './assignTo'
+import { ToastNoti } from "../../components/notification/ToastNoti";
 
 
 const Shops = () => {
@@ -127,6 +127,9 @@ const Shops = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [limit, setLimit] = useState(10);
     const [sort, setSort] = useState('newest');
+
+    // Toast
+    const [toast, setToast] = useState(null);
 
     // enum
     const StatusEnum = {
@@ -279,10 +282,19 @@ const Shops = () => {
         }
     }
 
-    const processSyncOrders = (shop) => {
+    const processSyncOrders = async (shop) => {
         try {
-            const response = apiRequest.get('/shops/sync-orders/' + shop.id);
+            const response = await apiRequest.get('/shops/sync-orders/' + shop.id);
             handleShowToast('Bắt đầu sync đơn hàng!');
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const processSyncProducts = async (shop) => {
+        try {
+            const response = await apiRequest.get('/shops/sync-products/' + shop.id);
+            handleShowToast('Bắt đầu sync sản phẩm!');
         } catch (error) {
             console.log(error);
         }
@@ -303,6 +315,7 @@ const Shops = () => {
 
     return (
         <>
+            <ToastNoti toast={toast} setToast={setToast} />
             <DefaultShopModal visible={visibleDefault} setVisible={setVisibleDefault} shop={requestShop} user={requestUser} />
             <ToggleShopModal visible={visibleToggle} setVisible={setVisibleToggle} shop={requestShop} status={requestShop.status} />
             <AddShop visible={visibleAuthShop} setVisible={setVisibleAuthShop} />
@@ -453,7 +466,7 @@ const Shops = () => {
                                                     <CIcon icon={cilSync} className='me-2' />
                                                     Sync đơn hàng
                                                 </CButton>
-                                                <CButton color="primary" size="sm" className='me-2 mb-2'>
+                                                <CButton color="primary" size="sm" className='me-2 mb-2' onClick={() => processSyncProducts(shop)}>
                                                     <CIcon icon={cilSync} className='me-2' />
                                                     Sync sản phẩm
                                                 </CButton>

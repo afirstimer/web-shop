@@ -156,10 +156,10 @@ const Templates = () => {
                                                     <CIcon icon={cilTrash} className="me-2" />
                                                     Xóa
                                                 </CButton>
-                                                <CButton color="info" size="sm">
+                                                {/* <CButton color="info" size="sm">
                                                     <CIcon icon={cilLinkAlt} className="me-2" />
                                                     View
-                                                </CButton>
+                                                </CButton> */}
                                             </CTableDataCell>
                                         </CTableRow>
                                     ))}

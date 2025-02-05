@@ -53,7 +53,7 @@ const AddTemplate = () => {
     // SKU Form Field
     const [identifierCodeValue, setIdentifierCodeValue] = useState('');
     const [inventoryQuantity, setInventoryQuantity] = useState(0);
-    const [sellerSku, setSellerSku] = useState('');
+    const [sellerSku, setSellerSku] = useState('{{code}}');
     const [sellerSkuPrice, setSellerSkuPrice] = useState(0);  
 
     /**
@@ -535,7 +535,7 @@ const AddTemplate = () => {
                                         <CCol col={3}>
                                             <CInputGroup className="mb-3">
                                                 <CInputGroupText id="basic-addon3">Seller SKU</CInputGroupText>
-                                                <CFormInput id="sellerSku" name='sellerSku' aria-describedby="basic-addon3" onChange={(e) => setSellerSku(e.target.value)} placeholder='{{code}}' />
+                                                <CFormInput id="sellerSku" name='sellerSku' aria-describedby="basic-addon3" value={sellerSku} onChange={(e) => setSellerSku(e.target.value)} placeholder='{{code}}' />
                                             </CInputGroup>
                                         </CCol>
                                     </CRow>
@@ -555,7 +555,7 @@ const AddTemplate = () => {
                             <CCardBody>
                                 <div className="row g-3">
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageWeightValue" name='packageWeightValue' label="Trọng lượng gói hàng (Pound)*" required />
+                                        <CFormInput type="number" id="packageWeightValue" name='packageWeightValue' label="Trọng lượng gói hàng (KILOGRAM)*" required />
                                     </CCol>
                                     <CCol md={4}>
                                         <CFormLabel className='col-12'>Đang giảm giá</CFormLabel>
@@ -580,13 +580,13 @@ const AddTemplate = () => {
                                         />
                                     </CCol>
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageDimensionLength" name='packageDimensionLength' label="Kích thước chiều dài gói hàng (Inch) " required />
+                                        <CFormInput type="number" id="packageDimensionLength" name='packageDimensionLength' label="Kích thước chiều dài gói hàng (CENTIMETER) " value='10' required />
                                     </CCol>
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageDimensionWidth" name='packageDimensionWidth' label="Kích thước chiều rộng gói hàng (Inch)" required />
+                                        <CFormInput type="number" id="packageDimensionWidth" name='packageDimensionWidth' label="Kích thước chiều rộng gói hàng (CENTIMETER)" value='10' required />
                                     </CCol>
                                     <CCol md={4}>
-                                        <CFormInput type="number" id="packageDimensionHeight" name='packageDimensionHeight' label="Kích thước chiều cao gói hàng (Inch)" required />
+                                        <CFormInput type="number" id="packageDimensionHeight" name='packageDimensionHeight' label="Kích thước chiều cao gói hàng (CENTIMETER)" value='10' required />
                                     </CCol>
                                 </div>
                             </CCardBody>

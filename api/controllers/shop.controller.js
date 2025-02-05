@@ -2,9 +2,10 @@ import prisma from "../lib/prisma.js";
 import { generateSign } from "../helper/tiktok.api.js";
 import axios from "axios";
 import { createFolder, getDefaultShop, writeJSONFile } from "../helper/helper.js";
-import { getTiktokOrders } from "../services/order.service.js";
-import { createOrders } from "../services/shop.service.js";
+import { getTiktokOrders, getTiktokProducts } from "../services/order.service.js";
+import { createOrders, createProducts, processSyncProducts, reqSyncOrders } from "../services/shop.service.js";
 import path from 'path';
+import { callTiktokApi } from "../services/tiktok.service.js";
 
 const ORDER_FILE = "./dummy/tiktok/orders.json";
 const ORDER_FOLDER = "./dummy/tiktok/orders/shop/";
@@ -93,18 +94,35 @@ export const getShops = async (req, res) => {
     }
 }
 
+export const getAllShops = async (req, res) => {
+    try {
+        const shops = await prisma.shop.findMany();
+        res.status(200).json(shops);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Failed to get shops!" });
+    }
+}
+
 // create shop
 export const createShop = async (req, res) => {
     try {
-        const { name, manager, team } = req.body;
+        const { name, tiktokShopId, tiktokShopCipher, accessToken, shopRefreshToken } = req.body;
         const newShop = await prisma.shop.create({
             data: {
                 name,
-                manager,
-                team,
+                code: 'new tiktok shop [need change]',
+                status: 'CONNECTED',
+                priceDiff: 1,
+                shopItems: 0,
+                accessToken,
+                shopRefreshToken,
+                signString: 'need change',
+                tiktokShopId,
+                tiktokShopCipher                
             },
         });
-        res.status(201).json(newShop);
+        res.status(201).json({message: "Shop created successfully", shop: newShop});
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Failed to create shop!" });
@@ -538,6 +556,38 @@ export const getMembersOnShop = async (req, res) => {
     }
 }
 
+export const syncAllOrderShops = async (req, res) => {
+    try {
+        const reqUser = await prisma.user.findUnique({
+            where: {
+                id: req.userId
+            }
+        });
+
+        if (!reqUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (reqUser.isAdmin == 1) {
+            const shops = await prisma.shop.findMany();
+            for (const shop of shops) {
+                await reqSyncOrders(req, shop);
+            }                    
+        } else {
+            // get default shop
+            const shop = await getDefaultShop(req);
+            if (!shop) {
+                return res.status(404).json({ message: "Default shop not found" });
+            }            
+            await reqSyncOrders(req, shop);
+        }
+
+        res.status(200).json({ message: "Shops synced successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Failed to sync shops" });
+    }
+}
+
 export const syncOrders = async (req, res) => {
     try {
         const shopId = req.params.id;
@@ -556,24 +606,7 @@ export const syncOrders = async (req, res) => {
             return res.status(500).json({ error: "Failed to get shop" });
         }
 
-        let isHasPageToken = true;
-        let nextPageToken = null;
-        let page = 1;
-        const folderPath = path.join(ORDER_FOLDER, shop.id);
-        await createFolder(folderPath);
-        while (isHasPageToken) {
-            const data = await getTiktokOrders(req, shop, { nextPageToken: nextPageToken });
-            if (data) {
-                if (data.next_page_token) {
-                    nextPageToken = data.next_page_token;
-                    isHasPageToken = true;
-                    createOrders(data, shop.id + "/" + page + ".json");
-                } else {
-                    isHasPageToken = false;
-                }
-            }
-            page++;
-        }
+        await reqSyncOrders(req, shop);
 
         res.status(200).json({ message: "Orders synced successfully" });
     } catch (error) {
@@ -582,6 +615,64 @@ export const syncOrders = async (req, res) => {
 }
 
 export const syncProducts = async (req, res) => {
+    try {
+        const shopId = req.params.id;
+
+        if (!shopId) {
+            return res.status(400).json({ error: "Missing shop id" });
+        }
+
+        // get request shop
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: shopId
+            }
+        });
+        if (!shop) {
+            return res.status(500).json({ error: "Failed to get shop" });
+        }
+
+        const result = await processSyncProducts(req, shop);
+
+        if (result) {
+            res.status(200).json({ message: "Products synced successfully" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Failed to sync products" });
+    }
+}
+
+export const syncAllShops = async (req, res) => {
+    try {
+        const reqUser = await prisma.user.findUnique({
+            where: {
+                id: req.userId
+            }
+        });
+
+        if (!reqUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (reqUser.isAdmin == 1) {
+            const shops = await prisma.shop.findMany();
+            for (const shop of shops) {
+                await processSyncProducts(req, shop);
+            }                    
+        } else {
+            // get default shop
+            const shop = await getDefaultShop(req);
+            if (!shop) {
+                return res.status(404).json({ message: "Default shop not found" });
+            }            
+            await processSyncProducts(req, shop);
+        }
+
+        res.status(200).json({ message: "Shops synced successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Failed to sync shops" });
+    }
 }
 
 // refresh token

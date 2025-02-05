@@ -13,6 +13,8 @@ import templateRoute from "./routes/template.route.js";
 import orderRoute from "./routes/order.route.js";
 import productRoute from "./routes/product.route.js";
 import logRoute from "./routes/log.route.js";
+import filterRoute from "./routes/filter.route.js";
+import warehouseRoute from "./routes/warehouse.route.js";
 import testRoute from "./routes/test.route.js";
 
 const app = express();
@@ -38,6 +40,10 @@ app.use("/api/settings", settingRoute);
 app.use("/api/proxy", proxyRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/products", productRoute);
+app.use("/api/logs", logRoute);
+app.use("/api/warehouses", warehouseRoute);
+app.use("/api/filters", filterRoute);
+
 app.use("/api/test", testRoute);
 
 app.listen(8800, () => {

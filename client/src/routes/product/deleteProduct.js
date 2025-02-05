@@ -9,7 +9,7 @@ import {
     CToastBody,
     CToastHeader
 } from "@coreui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import apiRequest from "../../lib/apiRequest";
 import { ToastNoti } from "../../components/notification/ToastNoti";
 import CIcon from "@coreui/icons-react";

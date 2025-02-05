@@ -3,14 +3,19 @@ import {
     getSetting,
     createSetting,
     updateSetting,
-    deleteSetting
+    deleteSetting,
+    getNotis
 } from "../controllers/setting.controller.js";
 
 const router = express.Router();
 
 router.get("/", getSetting);
 router.post("/", createSetting);
-router.put("/:id", updateSetting);
+router.put("/", updateSetting);
 router.delete("/:id", deleteSetting);
+
+// Noti
+router.get("/notis", getNotis);
+
 
 export default router;

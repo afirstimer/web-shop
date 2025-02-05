@@ -1,6 +1,601 @@
 {
-  "next_page_token": "aDV5MHJHS1ViMDlMUzJOTjlTNklidGtmT0tiYnV5QkFoRmRIM0J2eTg1bmlEQT09",
+  "next_page_token": "aDV5MHJHS1VaRTFCVDJ0UCt5V0licERKeElWSEFRVDlaQVZXUTRzRkZ3cU5Qdz09",
   "orders": [
+    {
+      "buyer_email": "v4bD3U2BOSD4YDNEHVPMVU6WWKN24@scs.tiktokw.us",
+      "buyer_message": "",
+      "cancel_order_sla_time": 1739429999,
+      "create_time": 1738643628,
+      "delivery_option_id": "7129736060325594926",
+      "delivery_option_name": "Standard Shipping",
+      "delivery_option_required_delivery_time": 1739421232,
+      "delivery_sla_time": 1739516399,
+      "delivery_type": "HOME_DELIVERY",
+      "fulfillment_type": "FULFILLMENT_BY_SELLER",
+      "has_updated_recipient_address": false,
+      "id": "576876235711484190",
+      "is_cod": false,
+      "is_on_hold_order": true,
+      "is_replacement_order": false,
+      "is_sample_order": false,
+      "line_items": [
+        {
+          "currency": "USD",
+          "display_status": "AWAITING_SHIPMENT",
+          "id": "576876235712008478",
+          "is_dangerous_good": false,
+          "is_gift": false,
+          "item_tax": [
+            {
+              "tax_amount": "0",
+              "tax_rate": "0.08",
+              "tax_type": "SALES_TAX"
+            }
+          ],
+          "original_price": "7.49",
+          "platform_discount": "0",
+          "product_id": "1729613320388121184",
+          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
+          "sale_price": "3.38",
+          "seller_discount": "4.11",
+          "seller_sku": "B0CC3VQKQY",
+          "sku_id": "1729613313322685024",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_name": "Default",
+          "sku_type": "NORMAL",
+          "tracking_number": ""
+        }
+      ],
+      "packages": [],
+      "paid_time": 1738643632,
+      "payment": {
+        "currency": "USD",
+        "original_shipping_fee": "7.99",
+        "original_total_product_price": "7.49",
+        "platform_discount": "0",
+        "product_tax": "0",
+        "seller_discount": "4.11",
+        "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
+        "shipping_fee_platform_discount": "0",
+        "shipping_fee_seller_discount": "0",
+        "shipping_fee_tax": "0",
+        "sub_total": "3.38",
+        "tax": "0",
+        "total_amount": "11.37"
+      },
+      "payment_method_name": "CCDC",
+      "recipient_address": {
+        "address_detail": "46 Regina Drive",
+        "address_line1": "46 Regina Drive",
+        "address_line2": "",
+        "address_line3": "",
+        "address_line4": "",
+        "district_info": [
+          {
+            "address_level": "L0",
+            "address_level_name": "Country",
+            "address_name": "United States"
+          },
+          {
+            "address_level": "L1",
+            "address_level_name": "State",
+            "address_name": "New York"
+          },
+          {
+            "address_level": "L2",
+            "address_level_name": "County",
+            "address_name": "Monroe"
+          },
+          {
+            "address_level": "L3",
+            "address_level_name": "City",
+            "address_name": "Rochester"
+          }
+        ],
+        "first_name": "Cynthia",
+        "full_address": "United States, New York, Monroe, Rochester,46 Regina Drive",
+        "last_name": "Mroszczak",
+        "name": "Cynthia Mroszczak",
+        "phone_number": "(+1)5857378673",
+        "postal_code": "14606",
+        "region_code": "US"
+      },
+      "rts_sla_time": 1738911599,
+      "seller_note": "",
+      "shipping_due_time": 1739429999,
+      "shipping_type": "SELLER",
+      "status": "AWAITING_SHIPMENT",
+      "tts_sla_time": 1738911599,
+      "update_time": 1738647233,
+      "user_id": "7494005405081831710",
+      "warehouse_id": "7386105412573562667"
+    },
+    {
+      "buyer_email": "v4bD3U2BOSD4YDNEGVJUGCVY57F2I@scs.tiktokw.us",
+      "buyer_message": "",
+      "cancel_order_sla_time": 1739429999,
+      "collection_time": 1738759757,
+      "create_time": 1738616310,
+      "delivery_option_id": "7129736060325594926",
+      "delivery_option_name": "Standard Shipping",
+      "delivery_option_required_delivery_time": 1739393914,
+      "delivery_sla_time": 1739516399,
+      "delivery_type": "HOME_DELIVERY",
+      "fulfillment_type": "FULFILLMENT_BY_SELLER",
+      "has_updated_recipient_address": false,
+      "id": "576875835239076653",
+      "is_cod": false,
+      "is_on_hold_order": true,
+      "is_replacement_order": false,
+      "is_sample_order": false,
+      "line_items": [
+        {
+          "currency": "USD",
+          "display_status": "IN_TRANSIT",
+          "id": "576875835288490797",
+          "is_dangerous_good": false,
+          "is_gift": false,
+          "item_tax": [
+            {
+              "tax_amount": "0.22",
+              "tax_rate": "0.0625",
+              "tax_type": "SALES_TAX"
+            }
+          ],
+          "original_price": "7.49",
+          "package_id": "1153866151227462445",
+          "package_status": "FULFILLING",
+          "platform_discount": "0",
+          "product_id": "1729613320388121184",
+          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
+          "rts_time": 1738759492,
+          "sale_price": "3.38",
+          "seller_discount": "4.11",
+          "seller_sku": "B0CC3VQKQY",
+          "shipping_provider_id": "7117858858072016686",
+          "shipping_provider_name": "USPS",
+          "sku_id": "1729613313322685024",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_name": "Default",
+          "sku_type": "NORMAL",
+          "tracking_number": "9361289724244011168288"
+        }
+      ],
+      "packages": [
+        {
+          "id": "1153866151227462445"
+        }
+      ],
+      "paid_time": 1738616314,
+      "payment": {
+        "currency": "USD",
+        "original_shipping_fee": "7.99",
+        "original_total_product_price": "7.49",
+        "platform_discount": "0",
+        "product_tax": "0.22",
+        "seller_discount": "4.11",
+        "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
+        "shipping_fee_platform_discount": "0",
+        "shipping_fee_seller_discount": "0",
+        "shipping_fee_tax": "0.5",
+        "sub_total": "3.38",
+        "tax": "0.72",
+        "total_amount": "12.09"
+      },
+      "payment_method_name": "PayPal",
+      "recipient_address": {
+        "address_detail": "8850 Seven Lakes Dr",
+        "address_line1": "8850 Seven Lakes Dr",
+        "address_line2": "",
+        "address_line3": "",
+        "address_line4": "",
+        "delivery_preferences": {
+          "drop_off_location": "Front door"
+        },
+        "district_info": [
+          {
+            "address_level": "L0",
+            "address_level_name": "Country",
+            "address_name": "United States"
+          },
+          {
+            "address_level": "L1",
+            "address_level_name": "State",
+            "address_name": "Tennessee"
+          },
+          {
+            "address_level": "L2",
+            "address_level_name": "County",
+            "address_name": "Hamilton"
+          },
+          {
+            "address_level": "L3",
+            "address_level_name": "City",
+            "address_name": "Ooltewah"
+          }
+        ],
+        "first_name": "Tammy",
+        "full_address": "United States, Tennessee, Hamilton, Ooltewah,8850 Seven Lakes Dr",
+        "last_name": "Cooper",
+        "name": "Tammy Cooper",
+        "phone_number": "(+1)7705987657",
+        "postal_code": "37363",
+        "region_code": "US"
+      },
+      "rts_sla_time": 1738911599,
+      "rts_time": 1738759492,
+      "seller_note": "",
+      "shipping_due_time": 1739429999,
+      "shipping_provider": "USPS",
+      "shipping_provider_id": "7117858858072016686",
+      "shipping_type": "SELLER",
+      "status": "IN_TRANSIT",
+      "tracking_number": "9361289724244011168288",
+      "tts_sla_time": 1738911599,
+      "update_time": 1738759757,
+      "user_id": "7495825892982491949",
+      "warehouse_id": "7386105412573562667"
+    },
+    {
+      "buyer_email": "v4bD3U2BOSD4YDNEHXPEIPGLISB2A@scs.tiktokw.us",
+      "buyer_message": "",
+      "cancel_order_sla_time": 1739429999,
+      "create_time": 1738590620,
+      "delivery_option_id": "7129736060325594926",
+      "delivery_option_name": "Standard Shipping",
+      "delivery_option_required_delivery_time": 1739368245,
+      "delivery_sla_time": 1739516399,
+      "delivery_type": "HOME_DELIVERY",
+      "fulfillment_type": "FULFILLMENT_BY_SELLER",
+      "has_updated_recipient_address": false,
+      "id": "576875573146850107",
+      "is_cod": false,
+      "is_on_hold_order": true,
+      "is_replacement_order": false,
+      "is_sample_order": false,
+      "line_items": [
+        {
+          "currency": "USD",
+          "display_status": "AWAITING_SHIPMENT",
+          "id": "576875573147308859",
+          "is_dangerous_good": false,
+          "is_gift": false,
+          "item_tax": [
+            {
+              "tax_amount": "0.07",
+              "tax_rate": "0.02",
+              "tax_type": "SALES_TAX"
+            }
+          ],
+          "original_price": "7.49",
+          "platform_discount": "0",
+          "product_id": "1729613320388121184",
+          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
+          "sale_price": "3.37",
+          "seller_discount": "4.12",
+          "seller_sku": "B0CC3VQKQY",
+          "sku_id": "1729613313322685024",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_name": "Default",
+          "sku_type": "NORMAL",
+          "tracking_number": ""
+        }
+      ],
+      "packages": [],
+      "paid_time": 1738590645,
+      "payment": {
+        "currency": "USD",
+        "original_shipping_fee": "7.99",
+        "original_total_product_price": "7.49",
+        "platform_discount": "0",
+        "product_tax": "0.07",
+        "seller_discount": "4.12",
+        "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
+        "shipping_fee_platform_discount": "0",
+        "shipping_fee_seller_discount": "0",
+        "shipping_fee_tax": "0.16",
+        "sub_total": "3.37",
+        "tax": "0.23",
+        "total_amount": "11.59"
+      },
+      "payment_method_name": "Klarna Pay over time",
+      "recipient_address": {
+        "address_detail": "3009 S Elm St",
+        "address_line1": "3009 S Elm St",
+        "address_line2": "",
+        "address_line3": "",
+        "address_line4": "",
+        "district_info": [
+          {
+            "address_level": "L0",
+            "address_level_name": "Country",
+            "address_name": "United States"
+          },
+          {
+            "address_level": "L1",
+            "address_level_name": "State",
+            "address_name": "North Carolina"
+          },
+          {
+            "address_level": "L2",
+            "address_level_name": "County",
+            "address_name": "Pitt"
+          },
+          {
+            "address_level": "L3",
+            "address_level_name": "City",
+            "address_name": "Greenville"
+          }
+        ],
+        "first_name": "Naomi",
+        "full_address": "United States, North Carolina, Pitt, Greenville,3009 S Elm St",
+        "last_name": "Howard",
+        "name": "Naomi Howard",
+        "phone_number": "(+1)2522587692",
+        "postal_code": "27858",
+        "region_code": "US"
+      },
+      "rts_sla_time": 1738911599,
+      "seller_note": "",
+      "shipping_due_time": 1739429999,
+      "shipping_type": "SELLER",
+      "status": "AWAITING_SHIPMENT",
+      "tts_sla_time": 1738911599,
+      "update_time": 1738594246,
+      "user_id": "7494006104249830203",
+      "warehouse_id": "7386105412573562667"
+    },
+    {
+      "buyer_email": "v4bD3U2BOSD4YDNEGVP4N46J2BF24@scs.tiktokw.us",
+      "buyer_message": "",
+      "cancel_order_sla_time": 1739343599,
+      "collection_time": 1738759152,
+      "create_time": 1738543235,
+      "delivery_option_id": "7129736060325594926",
+      "delivery_option_name": "Standard Shipping",
+      "delivery_option_required_delivery_time": 1739320883,
+      "delivery_sla_time": 1739429999,
+      "delivery_type": "HOME_DELIVERY",
+      "fulfillment_type": "FULFILLMENT_BY_SELLER",
+      "has_updated_recipient_address": false,
+      "id": "576875101674246408",
+      "is_cod": false,
+      "is_on_hold_order": true,
+      "is_replacement_order": false,
+      "is_sample_order": false,
+      "line_items": [
+        {
+          "currency": "USD",
+          "display_status": "IN_TRANSIT",
+          "id": "576875101674770696",
+          "is_dangerous_good": false,
+          "is_gift": false,
+          "item_tax": [
+            {
+              "tax_amount": "0",
+              "tax_rate": "0.1",
+              "tax_type": "SALES_TAX"
+            }
+          ],
+          "original_price": "7.49",
+          "package_id": "1153863631269433608",
+          "package_status": "FULFILLING",
+          "platform_discount": "0",
+          "product_id": "1729613320388121184",
+          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
+          "rts_time": 1738758918,
+          "sale_price": "3.38",
+          "seller_discount": "4.11",
+          "seller_sku": "B0CC3VQKQY",
+          "shipping_provider_id": "7117858858072016686",
+          "shipping_provider_name": "USPS",
+          "sku_id": "1729613313322685024",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_name": "Default",
+          "sku_type": "NORMAL",
+          "tracking_number": "9400109206094673658089"
+        }
+      ],
+      "packages": [
+        {
+          "id": "1153863631269433608"
+        }
+      ],
+      "paid_time": 1738543283,
+      "payment": {
+        "currency": "USD",
+        "original_shipping_fee": "7.99",
+        "original_total_product_price": "7.49",
+        "platform_discount": "0",
+        "product_tax": "0",
+        "seller_discount": "4.11",
+        "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
+        "shipping_fee_platform_discount": "0",
+        "shipping_fee_seller_discount": "0",
+        "shipping_fee_tax": "0",
+        "sub_total": "3.38",
+        "tax": "0",
+        "total_amount": "11.37"
+      },
+      "payment_method_name": "Affirm Pay in 4",
+      "recipient_address": {
+        "address_detail": "940 S Flower St Apt 7",
+        "address_line1": "940 S Flower St Apt 7",
+        "address_line2": "",
+        "address_line3": "",
+        "address_line4": "",
+        "district_info": [
+          {
+            "address_level": "L0",
+            "address_level_name": "Country",
+            "address_name": "United States"
+          },
+          {
+            "address_level": "L1",
+            "address_level_name": "State",
+            "address_name": "California"
+          },
+          {
+            "address_level": "L2",
+            "address_level_name": "County",
+            "address_name": "Los Angeles"
+          },
+          {
+            "address_level": "L3",
+            "address_level_name": "City",
+            "address_name": "Inglewood"
+          }
+        ],
+        "first_name": "Everie",
+        "full_address": "United States, California, Los Angeles, Inglewood,940 S Flower St Apt 7",
+        "last_name": "Smith",
+        "name": "Everie Smith",
+        "phone_number": "(+1)3236773036",
+        "postal_code": "90301",
+        "region_code": "US"
+      },
+      "rts_sla_time": 1738825199,
+      "rts_time": 1738758918,
+      "seller_note": "",
+      "shipping_due_time": 1739343599,
+      "shipping_provider": "USPS",
+      "shipping_provider_id": "7117858858072016686",
+      "shipping_type": "SELLER",
+      "status": "IN_TRANSIT",
+      "tracking_number": "9400109206094673658089",
+      "tts_sla_time": 1738825199,
+      "update_time": 1738759152,
+      "user_id": "7494769063994034440",
+      "warehouse_id": "7386105412573562667"
+    },
+    {
+      "buyer_email": "v4bD3U2BOSD4YDNEG5PMEOH3E3W24@scs.tiktokw.us",
+      "buyer_message": "",
+      "cancel_order_sla_time": 1739343599,
+      "collection_time": 1738758948,
+      "create_time": 1738500086,
+      "delivery_option_id": "7129736060325594926",
+      "delivery_option_name": "Standard Shipping",
+      "delivery_option_required_delivery_time": 1739277689,
+      "delivery_sla_time": 1739429999,
+      "delivery_type": "HOME_DELIVERY",
+      "fulfillment_type": "FULFILLMENT_BY_SELLER",
+      "has_updated_recipient_address": false,
+      "id": "576874490915492429",
+      "is_cod": false,
+      "is_on_hold_order": true,
+      "is_replacement_order": false,
+      "is_sample_order": false,
+      "line_items": [
+        {
+          "currency": "USD",
+          "display_status": "IN_TRANSIT",
+          "id": "576874490915689037",
+          "is_dangerous_good": false,
+          "is_gift": false,
+          "item_tax": [
+            {
+              "tax_amount": "0.36",
+              "tax_rate": "0.056",
+              "tax_type": "SALES_TAX"
+            }
+          ],
+          "original_price": "11.96",
+          "package_id": "1153862355865735757",
+          "package_status": "FULFILLING",
+          "platform_discount": "0",
+          "product_id": "1729591981069079136",
+          "product_name": "Gushers Fruit Flavored Snacks, Variety Pack, Strawberry and Tropical, 20 ct",
+          "rts_time": 1738758699,
+          "sale_price": "6.58",
+          "seller_discount": "5.38",
+          "seller_sku": "B07L4QGYLV",
+          "shipping_provider_id": "7117858858072016686",
+          "shipping_provider_name": "USPS",
+          "sku_id": "1729592004516549216",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/f2d771169e1549e0ab5aaa58fafc23ac~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_name": "Default",
+          "sku_type": "NORMAL",
+          "tracking_number": "9400109206094672915237"
+        }
+      ],
+      "packages": [
+        {
+          "id": "1153862355865735757"
+        }
+      ],
+      "paid_time": 1738500089,
+      "payment": {
+        "currency": "USD",
+        "original_shipping_fee": "7.99",
+        "original_total_product_price": "11.96",
+        "platform_discount": "0",
+        "product_tax": "0.36",
+        "seller_discount": "5.38",
+        "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
+        "shipping_fee_platform_discount": "0",
+        "shipping_fee_seller_discount": "0",
+        "shipping_fee_tax": "0.72",
+        "sub_total": "6.58",
+        "tax": "1.08",
+        "total_amount": "15.65"
+      },
+      "payment_method_name": "ApplePay",
+      "recipient_address": {
+        "address_detail": "23 Tealwood Dr",
+        "address_line1": "23 Tealwood Dr",
+        "address_line2": "",
+        "address_line3": "",
+        "address_line4": "",
+        "district_info": [
+          {
+            "address_level": "L0",
+            "address_level_name": "Country",
+            "address_name": "United States"
+          },
+          {
+            "address_level": "L1",
+            "address_level_name": "State",
+            "address_name": "Missouri"
+          },
+          {
+            "address_level": "L2",
+            "address_level_name": "County",
+            "address_name": "Saint Louis"
+          },
+          {
+            "address_level": "L3",
+            "address_level_name": "City",
+            "address_name": "Saint Louis"
+          }
+        ],
+        "first_name": "Ren",
+        "full_address": "United States, Missouri, Saint Louis, Saint Louis,23 Tealwood Dr",
+        "last_name": "Cockrell",
+        "name": "Ren Cockrell",
+        "phone_number": "(+1)3143703922",
+        "postal_code": "63141",
+        "region_code": "US"
+      },
+      "rts_sla_time": 1738825199,
+      "rts_time": 1738758699,
+      "seller_note": "",
+      "shipping_due_time": 1739343599,
+      "shipping_provider": "USPS",
+      "shipping_provider_id": "7117858858072016686",
+      "shipping_type": "SELLER",
+      "status": "IN_TRANSIT",
+      "tracking_number": "9400109206094672915237",
+      "tts_sla_time": 1738825199,
+      "update_time": 1738758948,
+      "user_id": "7494010579645205069",
+      "warehouse_id": "7386105412573562667"
+    },
     {
       "buyer_email": "v4bD3U2BOSD4YDNEGXP4CYGS4WP24@scs.tiktokw.us",
       "buyer_message": "",
@@ -47,7 +642,7 @@
           "shipping_provider_id": "7117858858072016686",
           "shipping_provider_name": "USPS",
           "sku_id": "1729613313322685024",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "9400109206094642477369"
@@ -67,6 +662,7 @@
         "product_tax": "0.6",
         "seller_discount": "0",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -191,6 +787,7 @@
         "product_tax": "0",
         "seller_discount": "4.11",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -295,7 +892,7 @@
           "shipping_provider_id": "7117858858072016686",
           "shipping_provider_name": "USPS",
           "sku_id": "1729916831146414688",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/059a4923d4db4e0282c152f9f7ade1c6~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/059a4923d4db4e0282c152f9f7ade1c6~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Assorted Flavors",
           "sku_type": "NORMAL",
           "tracking_number": "9405536208070293853780"
@@ -315,6 +912,7 @@
         "product_tax": "0.5",
         "seller_discount": "5.38",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0.6",
@@ -439,6 +1037,7 @@
         "product_tax": "0",
         "seller_discount": "4.11",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -543,7 +1142,7 @@
           "shipping_provider_id": "7117859084333745966",
           "shipping_provider_name": "UPS",
           "sku_id": "1729814995806032480",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/90e5c4f541d34d4cb243e62fa249167b~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/90e5c4f541d34d4cb243e62fa249167b~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Green Apple",
           "sku_type": "NORMAL",
           "tracking_number": "1Z7W06130304456913"
@@ -563,6 +1162,7 @@
         "product_tax": "0",
         "seller_discount": "6.03",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -667,7 +1267,7 @@
           "shipping_provider_id": "7117858858072016686",
           "shipping_provider_name": "USPS",
           "sku_id": "1729613313322685024",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "9361289718041571448220"
@@ -687,6 +1287,7 @@
         "product_tax": "0",
         "seller_discount": "4.11",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -791,7 +1392,7 @@
           "shipping_provider_id": "7117859084333745966",
           "shipping_provider_name": "UPS",
           "sku_id": "1729613313322685024",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "1ZF211K3YN10740999"
@@ -811,6 +1412,7 @@
         "product_tax": "0.23",
         "seller_discount": "4.11",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0.54",
@@ -915,7 +1517,7 @@
           "shipping_provider_id": "7117859084333745966",
           "shipping_provider_name": "UPS",
           "sku_id": "1729581432682680928",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/a993d2c1cc3943ca8ead83c31c4e5b1d~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/a993d2c1cc3943ca8ead83c31c4e5b1d~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "1Z0R38R71391548930"
@@ -935,6 +1537,7 @@
         "product_tax": "0",
         "seller_discount": "5.29",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1090,6 +1693,7 @@
         "product_tax": "0.6",
         "seller_discount": "0",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0.32",
@@ -1194,7 +1798,7 @@
           "shipping_provider_id": "7117858858072016686",
           "shipping_provider_name": "USPS",
           "sku_id": "1729613313322685024",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "9434636208070296063628"
@@ -1245,6 +1849,7 @@
         "product_tax": "0",
         "seller_discount": "0",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1350,7 +1955,7 @@
           "shipping_provider_id": "7117858858072016686",
           "shipping_provider_name": "USPS",
           "sku_id": "1729613313322685024",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "9361289722641410532184"
@@ -1371,6 +1976,7 @@
         "retail_delivery_fee": "0",
         "seller_discount": "4.11",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1526,6 +2132,7 @@
         "product_tax": "0",
         "seller_discount": "0",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1630,7 +2237,7 @@
           "shipping_provider_id": "7117859084333745966",
           "shipping_provider_name": "UPS",
           "sku_id": "1729613313322685024",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Default",
           "sku_type": "NORMAL",
           "tracking_number": "1Z3285110376005020"
@@ -1650,6 +2257,7 @@
         "product_tax": "0.33",
         "seller_discount": "3.37",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1805,6 +2413,7 @@
         "product_tax": "0.15",
         "seller_discount": "0",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1909,7 +2518,7 @@
           "shipping_provider_id": "7117859084333745966",
           "shipping_provider_name": "UPS",
           "sku_id": "1729733778376266336",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0ca51488f9cb48e0aef7ea9f1b9334f5~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
+          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0ca51488f9cb48e0aef7ea9f1b9334f5~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
           "sku_name": "Strawberry",
           "sku_type": "NORMAL",
           "tracking_number": "1Z7539010379996015"
@@ -1929,6 +2538,7 @@
         "product_tax": "0.09",
         "seller_discount": "7.26",
         "shipping_fee": "7.99",
+        "shipping_fee_cofunded_discount": "0",
         "shipping_fee_platform_discount": "0",
         "shipping_fee_seller_discount": "0",
         "shipping_fee_tax": "0",
@@ -1986,627 +2596,7 @@
       "update_time": 1736698049,
       "user_id": "7495798758724372590",
       "warehouse_id": "7386105412573562667"
-    },
-    {
-      "buyer_email": "v4bD3U2BOSD4YDNEHTPEKTYE3DW24@scs.tiktokw.us",
-      "buyer_message": "",
-      "cancel_order_sla_time": 1734591599,
-      "collection_time": 1733839350,
-      "create_time": 1733582755,
-      "delivery_option_id": "7129736060325594926",
-      "delivery_option_name": "Standard Shipping",
-      "delivery_option_required_delivery_time": 1734446758,
-      "delivery_sla_time": 1734677999,
-      "delivery_time": 1733939734,
-      "delivery_type": "HOME_DELIVERY",
-      "fulfillment_type": "FULFILLMENT_BY_SELLER",
-      "has_updated_recipient_address": false,
-      "id": "576806814913368375",
-      "is_cod": false,
-      "is_on_hold_order": true,
-      "is_replacement_order": false,
-      "is_sample_order": false,
-      "line_items": [
-        {
-          "currency": "USD",
-          "display_status": "COMPLETED",
-          "id": "576806814913630519",
-          "is_dangerous_good": false,
-          "is_gift": false,
-          "item_tax": [
-            {
-              "tax_amount": "0.22",
-              "tax_rate": "0.0625",
-              "tax_type": "SALES_TAX"
-            }
-          ],
-          "original_price": "7.49",
-          "package_id": "1153673765431775543",
-          "package_status": "COMPLETED",
-          "platform_discount": "0",
-          "product_id": "1729613320388121184",
-          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
-          "rts_time": 1733839093,
-          "sale_price": "3.38",
-          "seller_discount": "4.11",
-          "seller_sku": "B0CC3VQKQY",
-          "shipping_provider_id": "7117858858072016686",
-          "shipping_provider_name": "USPS",
-          "sku_id": "1729613313322685024",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
-          "sku_name": "Default",
-          "sku_type": "NORMAL",
-          "tracking_number": "92055903470167300042033283"
-        }
-      ],
-      "packages": [
-        {
-          "id": "1153673765431775543"
-        }
-      ],
-      "paid_time": 1733582758,
-      "payment": {
-        "currency": "USD",
-        "original_shipping_fee": "7.99",
-        "original_total_product_price": "7.49",
-        "platform_discount": "0",
-        "product_tax": "0.22",
-        "seller_discount": "4.11",
-        "shipping_fee": "7.99",
-        "shipping_fee_platform_discount": "0",
-        "shipping_fee_seller_discount": "0",
-        "shipping_fee_tax": "0.5",
-        "sub_total": "3.38",
-        "tax": "0.72",
-        "total_amount": "12.09"
-      },
-      "payment_method_name": "CCDC",
-      "recipient_address": {
-        "address_detail": "416 Solitude Circle",
-        "address_line1": "416 Solitude Circle",
-        "address_line2": "",
-        "address_line3": "",
-        "address_line4": "",
-        "district_info": [
-          {
-            "address_level": "L0",
-            "address_level_name": "Country",
-            "address_name": "United States"
-          },
-          {
-            "address_level": "L1",
-            "address_level_name": "State",
-            "address_name": "Tennessee"
-          },
-          {
-            "address_level": "L2",
-            "address_level_name": "County",
-            "address_name": "Davidson"
-          },
-          {
-            "address_level": "L3",
-            "address_level_name": "City",
-            "address_name": "Goodlettsville"
-          }
-        ],
-        "first_name": "Sonja",
-        "full_address": "United States, Tennessee, Davidson, Goodlettsville,416 Solitude Circle",
-        "last_name": "Crews",
-        "name": "Sonja Crews",
-        "phone_number": "(+1)6155063807",
-        "postal_code": "37072",
-        "region_code": "US"
-      },
-      "rts_sla_time": 1734073199,
-      "rts_time": 1733839093,
-      "seller_note": "",
-      "shipping_due_time": 1734591599,
-      "shipping_provider": "USPS",
-      "shipping_provider_id": "7117858858072016686",
-      "shipping_type": "SELLER",
-      "status": "COMPLETED",
-      "tracking_number": "92055903470167300042033283",
-      "tts_sla_time": 1734073199,
-      "update_time": 1736531735,
-      "user_id": "7494531289293818167",
-      "warehouse_id": "7386105412573562667"
-    },
-    {
-      "buyer_email": "v4bD3U2BOSD4YDNEHTP4HWAPL2N24@scs.tiktokw.us",
-      "buyer_message": "",
-      "cancel_order_sla_time": 1734591599,
-      "collection_time": 1733838937,
-      "create_time": 1733575676,
-      "delivery_option_id": "7129736060325594926",
-      "delivery_option_name": "Standard Shipping",
-      "delivery_option_required_delivery_time": 1734439680,
-      "delivery_sla_time": 1734677999,
-      "delivery_time": 1734013026,
-      "delivery_type": "HOME_DELIVERY",
-      "fulfillment_type": "FULFILLMENT_BY_SELLER",
-      "has_updated_recipient_address": false,
-      "id": "576806720506794921",
-      "is_cod": false,
-      "is_on_hold_order": true,
-      "is_replacement_order": false,
-      "is_sample_order": false,
-      "line_items": [
-        {
-          "currency": "USD",
-          "display_status": "COMPLETED",
-          "id": "576806720507319209",
-          "is_dangerous_good": false,
-          "is_gift": false,
-          "item_tax": [
-            {
-              "tax_amount": "0",
-              "tax_rate": "0.08",
-              "tax_type": "SALES_TAX"
-            }
-          ],
-          "original_price": "7.49",
-          "package_id": "1153673444872393641",
-          "package_status": "COMPLETED",
-          "platform_discount": "0",
-          "product_id": "1729613320388121184",
-          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
-          "rts_time": 1733838927,
-          "sale_price": "3.38",
-          "seller_discount": "4.11",
-          "seller_sku": "B0CC3VQKQY",
-          "shipping_provider_id": "7117859084333745966",
-          "shipping_provider_name": "UPS",
-          "sku_id": "1729613313322685024",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
-          "sku_name": "Default",
-          "sku_type": "NORMAL",
-          "tracking_number": "1Z80E16V0330797725"
-        }
-      ],
-      "packages": [
-        {
-          "id": "1153673444872393641"
-        }
-      ],
-      "paid_time": 1733575680,
-      "payment": {
-        "currency": "USD",
-        "original_shipping_fee": "7.99",
-        "original_total_product_price": "7.49",
-        "platform_discount": "0",
-        "product_tax": "0",
-        "seller_discount": "4.11",
-        "shipping_fee": "7.99",
-        "shipping_fee_platform_discount": "0",
-        "shipping_fee_seller_discount": "0",
-        "shipping_fee_tax": "0",
-        "sub_total": "3.38",
-        "tax": "0",
-        "total_amount": "11.37"
-      },
-      "payment_method_name": "CCDC",
-      "recipient_address": {
-        "address_detail": "8137 Crestview Dr",
-        "address_line1": "8137 Crestview Dr",
-        "address_line2": "",
-        "address_line3": "",
-        "address_line4": "",
-        "district_info": [
-          {
-            "address_level": "L0",
-            "address_level_name": "Country",
-            "address_name": "United States"
-          },
-          {
-            "address_level": "L1",
-            "address_level_name": "State",
-            "address_name": "New York"
-          },
-          {
-            "address_level": "L2",
-            "address_level_name": "County",
-            "address_name": "Niagara"
-          },
-          {
-            "address_level": "L3",
-            "address_level_name": "City",
-            "address_name": "Niagara Falls"
-          }
-        ],
-        "first_name": "Lauren",
-        "full_address": "United States, New York, Niagara, Niagara Falls,8137 Crestview Dr",
-        "last_name": "DeWitt",
-        "name": "Lauren DeWitt",
-        "phone_number": "(+1)7166289972",
-        "postal_code": "14304",
-        "region_code": "US"
-      },
-      "rts_sla_time": 1734073199,
-      "rts_time": 1733838927,
-      "seller_note": "",
-      "shipping_due_time": 1734591599,
-      "shipping_provider": "UPS",
-      "shipping_provider_id": "7117859084333745966",
-      "shipping_type": "SELLER",
-      "status": "COMPLETED",
-      "tracking_number": "1Z80E16V0330797725",
-      "tts_sla_time": 1734073199,
-      "update_time": 1736605027,
-      "user_id": "7493999887845854121",
-      "warehouse_id": "7386105412573562667"
-    },
-    {
-      "buyer_email": "v4bD3U2BOSD4YDNEHXPMAKJBG3R24@scs.tiktokw.us",
-      "buyer_message": "",
-      "cancel_order_sla_time": 1734591599,
-      "collection_time": 1734014384,
-      "create_time": 1733550808,
-      "delivery_option_id": "7129736060325594926",
-      "delivery_option_name": "Standard Shipping",
-      "delivery_option_required_delivery_time": 1734501211,
-      "delivery_sla_time": 1734677999,
-      "delivery_time": 1734397614,
-      "delivery_type": "HOME_DELIVERY",
-      "fulfillment_type": "FULFILLMENT_BY_SELLER",
-      "has_updated_recipient_address": false,
-      "id": "576806551513633341",
-      "is_cod": false,
-      "is_on_hold_order": true,
-      "is_replacement_order": false,
-      "is_sample_order": false,
-      "line_items": [
-        {
-          "currency": "USD",
-          "display_status": "COMPLETED",
-          "id": "576806551513829949",
-          "is_dangerous_good": false,
-          "is_gift": false,
-          "item_tax": [
-            {
-              "tax_amount": "0",
-              "tax_rate": "0.07",
-              "tax_type": "SALES_TAX"
-            }
-          ],
-          "original_price": "16.49",
-          "package_id": "1153672804980331069",
-          "package_status": "COMPLETED",
-          "platform_discount": "0",
-          "product_id": "1729733710530777696",
-          "product_name": "Krunchy Melts Original Meringue Cookies - Fat Free, Gluten Free, Dairy Free (4 Oz) - Pick Your Flavor - Snack Low Sugar",
-          "rts_time": 1734014251,
-          "sale_price": "9.07",
-          "seller_discount": "7.42",
-          "seller_sku": "B06WVJVSZ7",
-          "shipping_provider_id": "7117858858072016686",
-          "shipping_provider_name": "USPS",
-          "sku_id": "1729733758882779744",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/489caaf2f95e4439abf5d4f88deed86f~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
-          "sku_name": "Peppermint Crush",
-          "sku_type": "NORMAL",
-          "tracking_number": "9434636208070294372067"
-        }
-      ],
-      "packages": [
-        {
-          "id": "1153672804980331069"
-        }
-      ],
-      "paid_time": 1733550811,
-      "payment": {
-        "currency": "USD",
-        "original_shipping_fee": "7.99",
-        "original_total_product_price": "16.49",
-        "platform_discount": "0",
-        "product_tax": "0",
-        "seller_discount": "7.42",
-        "shipping_fee": "7.99",
-        "shipping_fee_platform_discount": "0",
-        "shipping_fee_seller_discount": "0",
-        "shipping_fee_tax": "0",
-        "sub_total": "9.07",
-        "tax": "0",
-        "total_amount": "17.06"
-      },
-      "payment_method_name": "CCDC",
-      "recipient_address": {
-        "address_detail": "1948 Kansas Ave Ne",
-        "address_line1": "1948 Kansas Ave Ne",
-        "address_line2": "",
-        "address_line3": "",
-        "address_line4": "",
-        "district_info": [
-          {
-            "address_level": "L0",
-            "address_level_name": "Country",
-            "address_name": "United States"
-          },
-          {
-            "address_level": "L1",
-            "address_level_name": "State",
-            "address_name": "Florida"
-          },
-          {
-            "address_level": "L2",
-            "address_level_name": "County",
-            "address_name": "Pinellas"
-          },
-          {
-            "address_level": "L3",
-            "address_level_name": "City",
-            "address_name": "St Petersburg"
-          }
-        ],
-        "first_name": "William",
-        "full_address": "United States, Florida, Pinellas, St Petersburg,1948 Kansas Ave Ne",
-        "last_name": "Lischer",
-        "name": "William Lischer",
-        "phone_number": "(+1)4022087770",
-        "postal_code": "33703",
-        "region_code": "US"
-      },
-      "rts_sla_time": 1734073199,
-      "rts_time": 1734014251,
-      "seller_note": "ship chậm, chờ",
-      "shipping_due_time": 1734591599,
-      "shipping_provider": "USPS",
-      "shipping_provider_id": "7117858858072016686",
-      "shipping_type": "SELLER",
-      "status": "COMPLETED",
-      "tracking_number": "9434636208070294372067",
-      "tts_sla_time": 1734073199,
-      "update_time": 1737167863,
-      "user_id": "7494005791129111101",
-      "warehouse_id": "7386105412573562667"
-    },
-    {
-      "buyer_email": "v4bD3U2BOSD4YDNEHVPMDLFRX3X24@scs.tiktokw.us",
-      "buyer_message": "",
-      "cancel_order_sla_time": 1734591599,
-      "cancel_reason": "High shipping fee",
-      "cancel_time": 1733664921,
-      "cancellation_initiator": "BUYER",
-      "create_time": 1733542543,
-      "delivery_option_id": "7129736060325594926",
-      "delivery_option_name": "Standard Shipping",
-      "delivery_option_required_delivery_time": 1734492946,
-      "delivery_sla_time": 1734677999,
-      "delivery_type": "HOME_DELIVERY",
-      "fulfillment_type": "FULFILLMENT_BY_SELLER",
-      "has_updated_recipient_address": false,
-      "id": "576806404970615548",
-      "is_cod": false,
-      "is_on_hold_order": true,
-      "is_replacement_order": false,
-      "is_sample_order": false,
-      "line_items": [
-        {
-          "cancel_reason": "High shipping fee",
-          "cancel_user": "BUYER",
-          "currency": "USD",
-          "display_status": "CANCELLED",
-          "id": "576806404970746620",
-          "is_dangerous_good": false,
-          "is_gift": false,
-          "item_tax": [
-            {
-              "tax_amount": "0.07",
-              "tax_rate": "0.0225",
-              "tax_type": "SALES_TAX"
-            }
-          ],
-          "original_price": "7.49",
-          "package_id": "1153672467546804988",
-          "package_status": "CANCELLED",
-          "platform_discount": "0",
-          "product_id": "1729613320388121184",
-          "product_name": "Diamond of California Pecan Pie Snack Pecans, 3.5 oz, 1 Pack",
-          "sale_price": "3.38",
-          "seller_discount": "4.11",
-          "seller_sku": "B0CC3VQKQY",
-          "sku_id": "1729613313322685024",
-          "sku_image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0d2a32f7112c473abb73f21661de3b4e~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
-          "sku_name": "Default",
-          "sku_type": "NORMAL",
-          "tracking_number": ""
-        }
-      ],
-      "packages": [
-        {
-          "id": "1153672467546804988"
-        }
-      ],
-      "paid_time": 1733542546,
-      "payment": {
-        "currency": "USD",
-        "original_shipping_fee": "7.99",
-        "original_total_product_price": "7.49",
-        "platform_discount": "0",
-        "product_tax": "0.07",
-        "seller_discount": "4.11",
-        "shipping_fee": "7.99",
-        "shipping_fee_platform_discount": "0",
-        "shipping_fee_seller_discount": "0",
-        "shipping_fee_tax": "0.18",
-        "sub_total": "3.38",
-        "tax": "0.25",
-        "total_amount": "11.62"
-      },
-      "payment_method_name": "CCDC",
-      "recipient_address": {
-        "address_detail": "115 E 117th Pl Green grass box front porch",
-        "address_line1": "115 E 117th Pl",
-        "address_line2": "Green grass box front porch",
-        "address_line3": "",
-        "address_line4": "",
-        "delivery_preferences": {
-          "drop_off_location": "Front door"
-        },
-        "district_info": [
-          {
-            "address_level": "L0",
-            "address_level_name": "Country",
-            "address_name": "United States"
-          },
-          {
-            "address_level": "L1",
-            "address_level_name": "State",
-            "address_name": "Illinois"
-          },
-          {
-            "address_level": "L2",
-            "address_level_name": "County",
-            "address_name": "Cook"
-          },
-          {
-            "address_level": "L3",
-            "address_level_name": "City",
-            "address_name": "Chicago"
-          }
-        ],
-        "first_name": "Erica",
-        "full_address": "United States, Illinois, Cook, Chicago,115 E 117th Pl Green grass box front porch",
-        "last_name": "Wilkes",
-        "name": "Erica Wilkes",
-        "phone_number": "(+1)7733839261",
-        "postal_code": "60628",
-        "region_code": "US"
-      },
-      "rts_sla_time": 1734073199,
-      "seller_note": "",
-      "shipping_due_time": 1734591599,
-      "shipping_type": "SELLER",
-      "status": "CANCELLED",
-      "tracking_number": "",
-      "tts_sla_time": 1734073199,
-      "update_time": 1733664921,
-      "user_id": "7494630102909291260",
-      "warehouse_id": "7386105412573562667"
-    },
-    {
-      "buyer_email": "v4bD3U2BOSD4YDNEG3PMCC7ZDLW24@scs.tiktokw.us",
-      "buyer_message": "",
-      "cancel_order_sla_time": 1734591599,
-      "collection_time": 1733991313,
-      "create_time": 1733524361,
-      "delivery_option_id": "7129736060325594926",
-      "delivery_option_name": "Standard Shipping",
-      "delivery_option_required_delivery_time": 1734474764,
-      "delivery_sla_time": 1734677999,
-      "delivery_time": 1734037553,
-      "delivery_type": "HOME_DELIVERY",
-      "fulfillment_type": "FULFILLMENT_BY_SELLER",
-      "has_updated_recipient_address": false,
-      "id": "576806059984786307",
-      "is_cod": false,
-      "is_on_hold_order": true,
-      "is_replacement_order": false,
-      "is_sample_order": false,
-      "line_items": [
-        {
-          "currency": "USD",
-          "display_status": "COMPLETED",
-          "id": "576806059984982915",
-          "is_dangerous_good": false,
-          "is_gift": false,
-          "item_tax": [
-            {
-              "tax_amount": "0.33",
-              "tax_rate": "0.03625",
-              "tax_type": "SALES_TAX"
-            }
-          ],
-          "original_price": "16.26",
-          "package_id": "1153671484976501635",
-          "package_status": "COMPLETED",
-          "platform_discount": "0",
-          "product_id": "1729733710530777696",
-          "product_name": "Krunchy Melts Original Meringue Cookies - Fat Free, Gluten Free, Dairy Free (4 Oz) - Pick Your Flavor - Snack Low Sugar",
-          "rts_time": 1733991305,
-          "sale_price": "9",
-          "seller_discount": "7.26",
-          "seller_sku": "B00JJYHD9O",
-          "shipping_provider_id": "7117859084333745966",
-          "shipping_provider_name": "UPS",
-          "sku_id": "1729733778376266336",
-          "sku_image": "https://p19-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0ca51488f9cb48e0aef7ea9f1b9334f5~tplv-omjb5zjo8w-origin-jpeg.jpeg?from=1568152328",
-          "sku_name": "Strawberry",
-          "sku_type": "NORMAL",
-          "tracking_number": "1ZX373F90345023120"
-        }
-      ],
-      "packages": [
-        {
-          "id": "1153671484976501635"
-        }
-      ],
-      "paid_time": 1733524364,
-      "payment": {
-        "currency": "USD",
-        "original_shipping_fee": "7.99",
-        "original_total_product_price": "16.26",
-        "platform_discount": "0",
-        "product_tax": "0.33",
-        "seller_discount": "7.26",
-        "shipping_fee": "7.99",
-        "shipping_fee_platform_discount": "0",
-        "shipping_fee_seller_discount": "0",
-        "shipping_fee_tax": "0.29",
-        "sub_total": "9",
-        "tax": "0.62",
-        "total_amount": "17.61"
-      },
-      "payment_method_name": "ApplePay",
-      "recipient_address": {
-        "address_detail": "104 Nelson St",
-        "address_line1": "104 Nelson St",
-        "address_line2": "",
-        "address_line3": "",
-        "address_line4": "",
-        "district_info": [
-          {
-            "address_level": "L0",
-            "address_level_name": "Country",
-            "address_name": "United States"
-          },
-          {
-            "address_level": "L1",
-            "address_level_name": "State",
-            "address_name": "Arkansas"
-          },
-          {
-            "address_level": "L2",
-            "address_level_name": "County",
-            "address_name": "Mississippi"
-          },
-          {
-            "address_level": "L3",
-            "address_level_name": "City",
-            "address_name": "Leachville"
-          }
-        ],
-        "first_name": "Shyla",
-        "full_address": "United States, Arkansas, Mississippi, Leachville,104 Nelson St",
-        "last_name": "Clayton",
-        "name": "Shyla Clayton",
-        "phone_number": "(+1)8704506963",
-        "postal_code": "72438",
-        "region_code": "US"
-      },
-      "rts_sla_time": 1734073199,
-      "rts_time": 1733991305,
-      "seller_note": "",
-      "shipping_due_time": 1734591599,
-      "shipping_provider": "UPS",
-      "shipping_provider_id": "7117859084333745966",
-      "shipping_type": "SELLER",
-      "status": "COMPLETED",
-      "tracking_number": "1ZX373F90345023120",
-      "tts_sla_time": 1734073199,
-      "update_time": 1736629553,
-      "user_id": "7494049627152354179",
-      "warehouse_id": "7386105412573562667"
     }
   ],
-  "total_count": 176
+  "total_count": 181
 }

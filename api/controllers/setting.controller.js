@@ -45,15 +45,20 @@ export const updateSetting = async (req, res) => {
         }, process.env.JWT_SECRET_KEY);
         const expiredIn = Date.now() + 3600000;
 
+        // find first setting
+        const setting = await prisma.setting.findFirst();
+
         const updatedSetting = await prisma.setting.update({
             where: {
-                id: req.params.id,
+                id: setting.id,
             },
             data: {
                 accessToken,
                 expiredIn,
-                shopAccessToken: req.body.shopAccessToken ? req.body.shopAccessToken : null,
-                shopRefreshToken: req.body.shopRefreshToken ? req.body.shopRefreshToken : null
+                shopAccessToken: req.body.shopAccessToken ? req.body.shopAccessToken : setting.shopAccessToken,
+                shopRefreshToken: req.body.shopRefreshToken ? req.body.shopRefreshToken : setting.shopRefreshToken,
+                telegramToken: req.body.telegramToken ? req.body.telegramToken : null,
+                telegramReceiver: req.body.telegramReceiver ? req.body.telegramReceiver : null
             },
         });
         res.status(200).json(updatedSetting);
@@ -63,7 +68,6 @@ export const updateSetting = async (req, res) => {
     }
 }
 
-
 export const deleteSetting = async (req, res) => {
     try {
        res.status(200).json({message: "Deleted"});
@@ -72,3 +76,17 @@ export const deleteSetting = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const getNotis = async (req, res) => {
+    try {
+        const notis = await prisma.noti.findMany({
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+        res.status(200).json(notis);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });    
+    }
+};

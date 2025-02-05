@@ -1,14 +1,11 @@
 import prisma from "../lib/prisma.js";
-import axios from "axios";
-import { generateSign } from "../helper/tiktok.api.js";
 import path from "path";
 import fs from "fs";
 import FormData from "form-data";
-import { getDefaultShop } from "../helper/helper.js";
+import { getDefaultShop, readJSONFile } from "../helper/helper.js";
 import { downloadImage, callTiktokApi } from "./tiktok.service.js";
 
-const app_key = process.env.TIKTOK_SHOP_APP_KEY;
-const secret = process.env.TIKTOK_SHOP_APP_SECRET;
+const PRODUCT_FOLDER = "./dummy/tiktok/products/shop/";
 
 export const uploadImageToTiktok = async (req, shop, imageUri, useCase) => {
     if (!imageUri) {
@@ -27,7 +24,7 @@ export const uploadImageToTiktok = async (req, shop, imageUri, useCase) => {
         const response = await callTiktokApi(req, shop, false, formData, "POST", "/product/202309/images/upload", "multipart/form-data");
 
         console.log(response);
-        if (response.data.code == 0) {
+        if (response.data) {
             if (fs.existsSync(localFilePath)) {
                 fs.unlinkSync(localFilePath);
             }
@@ -93,7 +90,21 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
             }]
         }));
 
+        // warehouse
+        // const warehouseRes = await getWarehouseDelivery(req, shop);
+        // let warehouse = null;
+        // if (warehouseRes) {
+        //     const warehouses = warehouseRes.data.warehouses.find(w => w.type == 'SALES_WAREHOUSE');
+        //     warehouse = warehouses[0];
+        // }
+
+        // Calculate price (start price & quantity)
+        let price = listing.price.replace('$', '');
+        let startPrice = price * (1 + (shop.priceDiff / 100));
+        let startQty = shop.shopItems;
+
         // skus
+        let skus = [];
         // sales_attribute
         const parsedSku = JSON.parse(template.skus);
         // loop through parsedSku and add to salesAttributes
@@ -101,6 +112,7 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
         for (const sku of parsedSku) {
             // if has image, upload            
             if (sku.image) {
+                req.imageUri = sku.image;
                 console.log(sku.image);
                 const uploadResponse = await uploadImageToTiktok(req, shop, sku.image, 'ATTRIBUTE_IMAGE');
                 console.log(uploadResponse);
@@ -126,11 +138,13 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
                 value_id: sku.parentId,
                 value_name: sku.code
             });
-        }
 
-        const skus =
-        [
-            {
+            // Calculate sku's price + qty
+            let listingPrice = listing.price.replace('$', '');
+            let skuPrice = sku.price ? listingPrice * (1 + (sku.price / 100)) : startPrice;
+            let skuQty = sku.qty ? sku.qty : startQty;
+
+            skus.push({
                 // combined_skus: [
                 //     {
                 //         product_id: '1729582718312380123',
@@ -150,8 +164,8 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
                 },
                 inventory: [
                     {
-                        quantity: 999,
-                        warehouse_id: '7386037015142123310' //This is the warehouse id
+                        quantity: parseInt(sku.qty ? sku.qty : startQty),
+                        warehouse_id: '7386105412573562667' //This is the warehouse id
                     }
                 ],
                 // pre_sale: {
@@ -161,14 +175,14 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
                 //     type: 'PRE_ORDER'
                 // },
                 price: {
-                    amount: template.skuPrice,
+                    amount: skuPrice.toString(),
                     currency: 'USD'
                 },
                 sales_attributes: salesAttributes,
                 seller_sku: listing.sku,
-                sku_unit_count: template.skuQty
-            }
-        ];
+                sku_unit_count: skuQty
+            });
+        }
 
         const payload = {
             // brand_id: '7082427311584347905',
@@ -234,7 +248,7 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
         // Build query params
         const extraParams = {
             'shop_cipher': defaultShop.tiktokShopCipher,
-            'access_token': setting.shopAccessToken,
+            'access_token': defaultShop.shopAccessToken,
             'version': '202309',
             'shop_id': defaultShop.tiktokShopId
         };
@@ -244,20 +258,277 @@ export const createTiktokProduct = async (req, listing, template, shop, draftMod
 
         const response = await callTiktokApi(req, shop, payload, false, "POST", "/product/202309/products", "application/json", extraParams);
 
-        console.log(response.data);
+        console.log(response);
 
         if (response.data) {
             return response.data;
         }
-        return false;        
+        return false;
     } catch (error) {
         console.log(error);
     }
 }
 
-async function getWarehouseDelivery(req) {
+export const requestUpdateTiktokProduct = async (req, existingProduct, product, shop) => {
+    try {
+        console.log(existingProduct);
+        // title, description, images        
+        // Compare images with existing images        
+
+        // images 
+        let tiktokImages = [];
+        // loop images in images and call uploadImageToTiktok . then push to images
+        for (let i = 0; i < product.images.length; i++) {
+            req.imageUri = product.images[i];
+            const uploadResponse = await uploadImageToTiktok(req, shop, product.images[i], 'MAIN_IMAGE');
+            // console.log(uploadResponse);
+            if (uploadResponse.message == 'Success') {
+                // create Tiktok Image
+                let image = await prisma.tiktokImage.create({
+                    data: {
+                        uri: uploadResponse.data.uri,
+                        url: uploadResponse.data.url,
+                        useCase: uploadResponse.data.use_case
+                    }
+                });
+
+                tiktokImages.push({
+                    uri: image.uri
+                });
+            }
+        }
+
+        // get all json products
+        const jsonProducts = await fetchOriginJsonProducts();
+        console.log(jsonProducts);
+        // loop jsonProducts and find product by id
+        let findProduct = false;
+        for (const jsonProduct of jsonProducts) {
+            if (jsonProduct.id == existingProduct.id) {
+                findProduct = jsonProduct;
+            }
+        }
+
+        // get warehouses
+
+
+        // replace title, description, main_images with payload 
+        let payload = {};
+        if (findProduct) {
+            payload.title = product.title;
+            payload.description = product.description;
+            payload.main_images = tiktokImages;
+            payload.skus = existingProduct.skus;
+            payload.category_id = existingProduct.category_id;
+            payload.package_weight = existingProduct.package_weight;
+            payload.category_version = 'v2';
+        }
+
+        if (payload.skus) {
+            for (let i = 0; i < payload.skus.length; i++) {
+                payload.skus[i].price.amount = payload.skus[i].price.sale_price + payload.skus[i].price.tax_exclusive_price;
+            }
+        }
+        console.log(findProduct);
+        console.log(payload);
+
+        // Build query params
+        const extraParams = {
+            'shop_cipher': shop.tiktokShopCipher,
+            'access_token': shop.shopAccessToken,
+            'version': '202309',
+            'shop_id': shop.tiktokShopId
+        };
+
+        const response = await callTiktokApi(req, shop, payload, false, "PUT", `/product/202309/products/${existingProduct.id}`, "application/json", extraParams);
+        console.log(response.data);
+        if (response.data) {
+            return response.data;
+        }
+        return false;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const reqUpdateTiktokPrice = async (req, data, percent) => {
     try {
 
+        let results = [];
+
+        // loop data               
+        for (let i = 0; i < data.length; i++) {
+            let payload = [];
+            // find shop
+            const shop = await prisma.shop.findFirst({
+                where: {
+                    id: data[i].shopId
+                }
+            });
+
+            let skusPayload = [];
+            for (let j = 0; j < data[i].skus.length; j++) {
+                let s = data[i].skus[j];
+                let price = s.price.tax_exclusive_price * (1 + (percent / 100));
+                skusPayload.push({
+                    "id": s.id,
+                    "price": {
+                        "amount": price,
+                        "currency": s.price.currency
+                    }
+                })
+            }
+            payload.push({
+                "skus": skusPayload
+            });
+
+            const extraParams = {
+                'shop_cipher': shop.tiktokShopCipher,
+                'access_token': shop.shopAccessToken,
+                'version': '202309',
+                'shop_id': shop.tiktokShopId
+            }
+
+            const resp = await callTiktokApi(
+                req,
+                shop,
+                payload,
+                false,
+                "POST",
+                `/product/202309/products/${data[i].pId}/prices/update`,
+                "application/json",
+                extraParams
+            );
+
+            console.log(resp.data);
+            if (resp.data) {
+                results.push(resp.data);
+            }
+        }
+
+        return results;
+    } catch (error) {
+        console.log(error);
+        return {};
+    }
+}
+
+export const getLocalTiktokProducts = async (shop) => {
+    try {
+        let page = 1;
+        let hasJsonFile = true;
+        let products = [];
+        while (hasJsonFile) {
+            // get local json file
+            const jsonFilePath = PRODUCT_FOLDER + shop.id + "/" + page + ".json";
+            console.log(jsonFilePath);
+            if (!fs.existsSync(jsonFilePath)) {
+                hasJsonFile = false;
+                break;
+            }
+            const jsonFileData = await readJSONFile(jsonFilePath);
+            if (!jsonFileData) {
+                hasJsonFile = false;
+                break;
+            }
+            console.log(jsonFileData);
+
+            products = products.concat(jsonFileData.products);
+            page++;
+        }
+
+        console.log(products);
+        return products;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const fetchOriginJsonProducts = async () => {
+    try {
+        // get all shops
+        const shops = await prisma.shop.findMany();
+        let products = [];
+
+        for (const shop of shops) {
+            const data = await getLocalTiktokProducts(shop);
+            products = products.concat(data);
+        }
+
+        console.log(products);
+        return products;
+    } catch (error) {
+        return [];
+    }
+}
+
+export const fetchAllJsonProducts = async () => {
+    try {
+        // get all shops
+        const shops = await prisma.shop.findMany();
+        let products = [];
+
+        for (const shop of shops) {
+            let filteredProducts = [];
+            const data = await getLocalTiktokProducts(shop);
+            // sort data by create_time desc
+            data.sort((a, b) => {
+                return b.create_time - a.create_time;
+            })
+            // loop products 
+            // filter name, price, create_time, update_time, [shop/template], [status], [audit.status], [listing_quality_tier]
+            for (const product of data) {
+                const filteredProduct = {
+                    id: product.id,
+                    title: product.title,
+                    create_time: product.create_time,
+                    update_time: product.update_time,
+                    shop: shop,
+                    status: product.status,
+                    audit_status: product.audit.status,
+                    quality: product.listing_quality_tier,
+                };
+                filteredProducts.push(filteredProduct);
+            }
+            products = products.concat(filteredProducts);
+        }
+
+        console.log(products);
+        return products;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+}
+
+export const reqApiTiktokProduct = async () => {
+    try {
+
+    } catch (error) {
+
+    }
+}
+
+export const getWarehouseDelivery = async (req, shop) => {
+    try {
+        const resp = await callTiktokApi(
+            req,
+            shop,
+            false,
+            false,
+            "GET",
+            `/logistics/202309/warehouses`,
+            "application/json",
+            {
+                'shop_cipher': shop.tiktokShopCipher,
+                'access_token': shop.shopAccessToken,
+            }
+        );
+
+        if (!resp.data) {
+            return [];
+        }
+        return resp.data;
     } catch (error) {
         console.log(error);
     }

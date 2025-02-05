@@ -1,8 +1,16 @@
 import prisma from "../lib/prisma.js";
 import {
     uploadImageToTiktok,
-    createTiktokProduct
+    createTiktokProduct,
+    getLocalTiktokProducts,
+    requestUpdateTiktokProduct,
+    fetchAllJsonProducts,
+    fetchOriginJsonProducts,
+    reqUpdateTiktokPrice
 } from "../services/product.service.js";
+import { readJSONFile } from "../helper/helper.js";
+import { callTiktokApi } from "../services/tiktok.service.js";
+import { processSyncProducts } from "../services/shop.service.js";
 
 export const getProducts = async (req, res) => {
     try {
@@ -83,7 +91,135 @@ export const getProducts = async (req, res) => {
     }
 }
 
-export const getProduct = async (req, res) => { }
+export const getJSONProducts = async (req, res) => {
+    try {
+        const requestUser = await prisma.user.findUnique({
+            where: {
+                id: req.userId
+            }
+        });
+
+        if (!requestUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const listingsOnShops = await prisma.listingOnShop.findMany();
+        let listings = [];
+        if (listingsOnShops) {
+            for (const listingOnShop of listingsOnShops) {
+                const dbListing = await prisma.listing.findUnique({
+                    where: {
+                        id: listingOnShop.listingId
+                    }
+                });
+                listings.push({
+                    id: listingOnShop.listingId,
+                    shopId: listingOnShop.shopId,
+                    tiktokProductId: listingOnShop.productTiktokId,
+                    listing: dbListing
+                });
+            }
+        }
+
+
+        if (requestUser.isAdmin == 1) {
+            const products = await fetchAllJsonProducts();
+
+            res.status(200).json({ 
+                total: products.length,
+                products: products 
+            });
+        } else {
+            // get default shop
+            const defaultShop = await prisma.shop.findFirst({
+                where: {
+                    id: requestUser.defaultShop,
+                }
+            });
+
+            if (!defaultShop) {
+                return res.status(404).json({ message: "Default shop not found" });
+            }
+
+            const data = await getLocalTiktokProducts(defaultShop);
+            res.status(200).json({ products: data });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getProduct = async (req, res) => { 
+    try {
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const getTiktokProduct = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const { shopId } = req.body;
+
+        if (!shopId) {
+            return res.status(404).json({ message: "Shop ID not found" });            
+        }
+
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: shopId
+            }
+        });
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });            
+        }
+
+        const extraParams = {
+            "shop_cipher": shop.tiktokShopCipher,
+            "return_under_review_version": false
+        };
+        const response = await callTiktokApi(req, shop, false, false, "GET", `/product/202309/products/${id}`, "application/json", extraParams);
+
+        console.log(response.data.data);
+        
+        let product = {};
+        if (response.data.data) {
+            const data = response.data.data;
+            console.log(data);
+            let price = null;
+            if (data.skus && data.skus.length > 0 && data.skus[0].price) {
+                price = data.skus[0].price.sale_price;
+            } else {
+                price = '';
+            }
+            // get last item in category_chains array
+            const category = data.category_chains[data.category_chains.length - 1];
+            product = {
+                id: data.id,
+                shopId: shop.id,
+                create_time: data.create_time,
+                title: data.title,
+                price: price,
+                description: data.description,
+                images: data.main_images,
+                status: data.status,
+                quality: data.listing_quality_tier,
+                category_id: category && category.id,
+                package_weight: data.package_weight,
+                skus: data.skus
+            }
+
+            res.status(200).json(product);
+        } else {
+            res.status(404).json({ message: "Product not found" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
 
 export const createProduct = async (req, res) => { }
 
@@ -186,10 +322,11 @@ export const uploadTiktokProducts = async (req, res) => {
                 try {
                     const response = await createTiktokProduct(req, listing, existingTemplate, shop, draftMode);
 
+                    console.log(response);
                     // status
-                    const exportStatus = 'PENDING';
+                    let exportStatus = 'PENDING';
                     let tiktokProductId = null;
-                    if (response.code == 0) {
+                    if (response.data) {
                         tiktokProductId = response.data.product_id;
                         exportStatus = draftMode ? 'DRAFT' : 'SUCCESS';
                     } else {
@@ -199,6 +336,7 @@ export const uploadTiktokProducts = async (req, res) => {
                     // Tạo ListingOnShop
                     const listingOnShop = await prisma.listingOnShop.create({
                         data: {
+                            productTiktokId: tiktokProductId,
                             listingId: listing.id,
                             shopId: shop.id,
                             status: exportStatus,
@@ -207,24 +345,24 @@ export const uploadTiktokProducts = async (req, res) => {
                     console.log(listingOnShop);
 
                     // Tạo product
-                    const product = await prisma.product.create({
-                        data: {
-                            name: listing.name,
-                            description: listing.description,
-                            price: listing.price,
-                            listingId: listing.id,
-                            shopId: shop.id
-                        }
-                    });
-                    console.log(product);
+                    // không tạo product vì sync từ tiktok về
+                    // const product = await prisma.product.create({
+                    //     data: {
+                    //         name: listing.name,
+                    //         description: listing.description,
+                    //         price: listing.price,
+                    //         listingId: listing.id,
+                    //         shopId: shop.id
+                    //     }
+                    // });
+                    // console.log(product);
 
                     // Tạo log
                     const logg = await prisma.log.create({
                         data: {
                             shopId: shop.id,
                             listingId: listing.id,
-                            productTiktokId: tiktokProductId,
-                            code: response.code,
+                            code: response.code ? response.code.toString() : null,
                             status: exportStatus,
                             payload: JSON.stringify(response)
                         }
@@ -266,6 +404,9 @@ export const uploadTiktokProducts = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
     try {
+        //TODO: DISABLE THIS FUNC
+        res.status(200).json({ message: "Success" });
+
         const { productId, shopId } = req.body;
         const product = await prisma.product.findUnique({
             where: {
@@ -274,7 +415,7 @@ export const deleteProduct = async (req, res) => {
         });
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
-        }        
+        }
 
         const shop = await prisma.shop.findUnique({
             where: {
@@ -312,5 +453,69 @@ export const deleteProduct = async (req, res) => {
     }
 }
 
+export const updateTiktokProduct = async (req, res) => {
+    try {
+        const {shopId, originProduct, title, description, images} = req.body;
 
+        const shop = await prisma.shop.findUnique({
+            where: {
+                id: shopId
+            }
+        });
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }        
+
+        const newProduct = {
+            title: title,
+            description: description,
+            images: images
+        }
+
+        const response = await requestUpdateTiktokProduct(req, originProduct, newProduct, shop);
+        
+        console.log(response);
+        if (response) {            
+            res.status(200).json({ message: "Success" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateTiktokPrice = async (req, res) => {
+    try {
+        const {products, percentage} = req.body;
+
+        console.log(products, percentage);
+
+        // Fetch json products
+        const jsonProducts = await fetchOriginJsonProducts();
+
+        // Find SKUs
+        let findSkus = [];
+        jsonProducts.forEach(jPr => {
+            products.forEach(p => {
+                if (jPr.id == p.pId) {                    
+                    findSkus.push({
+                        shopId: p.shopId,
+                        pId: p.pId,
+                        skus: jPr.skus
+                    });
+                }
+            })
+        });
+
+        console.log(findSkus);        
+        
+        // Update prices
+        const resp = await reqUpdateTiktokPrice(req, findSkus, percentage);
+
+        res.status(200).json({ result: resp, message: "Success" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
 

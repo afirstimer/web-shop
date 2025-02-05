@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -27,13 +27,29 @@ import {
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import apiRequest from '../lib/apiRequest'
 
 const AppHeader = () => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const navigate = useNavigate()
 
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const [notis, setNotis] = useState([])
+
+  useEffect(() => {
+    const fetchNotis = async () => {
+      try {
+        await apiRequest.get('/settings/notis')
+          .then(res => setNotis(res.data));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchNotis();
+  }, [])
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -57,29 +73,27 @@ const AppHeader = () => {
               Dashboard
             </CNavLink>
           </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
-          </CNavItem>
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
-          <CNavItem>
-            <CNavLink href="#">
+          <CDropdown>
+            <CDropdownToggle>
               <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem>
+            </CDropdownToggle>
+            <CDropdownMenu>
+              <CDropdownItem header tag="div" className="text-center">
+                <strong>You have {notis.length} notifications</strong>
+              </CDropdownItem>
+              <CDropdownItem divider />
+              {notis.map((noti) => (
+                <CDropdownItem key={noti.id}>
+                  <CNavLink as={NavLink}>
+                    <CIcon icon={cilList} className="me-2" />
+                    {noti.message}
+                  </CNavLink>
+                </CDropdownItem>
+              ))}              
+            </CDropdownMenu>
+          </CDropdown>
         </CHeaderNav>
         <CHeaderNav>
           <li className="nav-item py-1">

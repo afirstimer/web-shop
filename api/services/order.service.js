@@ -54,9 +54,39 @@ export const getLocalTiktokOrders = async (shop) => {
             page++;
         }
 
+        // append shop.id to each order
+        orders.forEach(order => {
+            order.shopId = shop.id;
+        });
+
         console.log(orders);
         return orders;
     } catch (error) {
         console.log(error);
+    }
+}
+
+export const getTiktokProducts = async (req, shop, payload) => {
+    try {
+        const extraParams = {
+            "shop_cipher": shop.tiktokShopCipher,
+            "page_size": 100,
+            "page_token": ""
+        }
+        
+        if (payload.nextPageToken) {
+            extraParams.page_token = payload.nextPageToken;
+        }
+        console.log(extraParams);
+        const response = await callTiktokApi(req, shop, payload, false, "POST", "/product/202312/products/search", "application/json", extraParams);
+
+        console.log(response.data);
+        if (response.data.data) {
+            return response.data.data;
+        }
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
     }
 }

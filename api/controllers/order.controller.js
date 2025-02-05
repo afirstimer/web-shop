@@ -81,7 +81,7 @@ export const getOrderStats = async (req, res) => {
             if (!paymentByMonth[monthName]) {
                 paymentByMonth[monthName] = 0;
             }
-            paymentByMonth[monthName] += parseFloat(order.payment.total_amount);
+            paymentByMonth[monthName] += Math.ceil(parseFloat(order.payment.total_amount));
         }
 
         // fill paymentByMonth with 0 if month not found        
@@ -110,6 +110,41 @@ export const getOrders = async (req, res) => {
     try {
         const orders = await prisma.order.findMany();
         res.status(200).json(orders);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Failed to get orders" });
+    }
+}
+
+export const getAllShopOrders = async (req, res) => {
+    try {
+        const reqUser = await prisma.user.findUnique({
+            where: {
+                id: req.userId
+            }
+        });
+        if (!reqUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+    
+        if (reqUser.isAdmin == 1) {
+            const shops = await prisma.shop.findMany();
+            let orders = [];
+            for (const shop of shops) {
+                const localOrders = await getLocalTiktokOrders(shop);
+                orders = orders.concat(localOrders);
+            }
+            res.status(200).json(orders);
+        } else {
+            // get default shop
+            const shop = await getDefaultShop(req);
+            if (!shop) {
+                return res.status(404).json({ message: "Default shop not found" });
+            }
+            const orders = await getLocalTiktokOrders(shop);
+            res.status(200).json(orders);
+        }
+        
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Failed to get orders" });

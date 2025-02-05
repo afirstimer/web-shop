@@ -1,13 +1,10 @@
 import prisma from "../lib/prisma.js";
-import axios from "axios";
-import { generateSign } from "../helper/tiktok.api.js";
 import path from "path";
-import fs from "fs";
-import FormData from "form-data";
-import { createFolder, getDefaultShop, readJSONFile, writeJSONFile } from "../helper/helper.js";
-import { downloadImage, callTiktokApi } from "./tiktok.service.js";
+import { createFolder, writeJSONFile } from "../helper/helper.js";
+import { getTiktokProducts, getTiktokOrders } from "./order.service.js";
 
 const ORDER_FOLDER = "./dummy/tiktok/orders/shop/";
+const PRODUCT_FOLDER = "./dummy/tiktok/products/shop/";
 
 export const setDefaultShopForUser = async( user, shopId ) => {
     try {
@@ -129,5 +126,76 @@ export const createOrders = async (data, fileName = null) => {
     } catch (error) {
         console.log(error);
         return false
+    }
+}
+
+export const createProducts = async (data, fileName = null) => {
+    try {
+        if (fileName) {            
+            const filePath = path.join(PRODUCT_FOLDER, fileName);            
+            await writeJSONFile(filePath, data);
+            return true;
+        }        
+
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+}
+
+export const processSyncProducts = async(req, shop) => {
+    try {
+        let isHasPageToken = true;
+        let nextPageToken = null;
+        let page = 1;
+        const folderPath = path.join(PRODUCT_FOLDER, shop.id);
+        const result = await createFolder(folderPath);        
+        while (isHasPageToken) {
+            const data = await getTiktokProducts(req, shop, { nextPageToken: nextPageToken });
+            
+            if (data) {
+                if (data.next_page_token) {
+                    nextPageToken = data.next_page_token;
+                    isHasPageToken = true;
+                    createProducts(data, shop.id + "/" + page + ".json");
+                } else {
+                    isHasPageToken = false;
+                }
+            }
+            page++;
+        }
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+export const reqSyncOrders = async (req, shop) => {
+    try {
+        let isHasPageToken = true;
+        let nextPageToken = null;
+        let page = 1;
+        const folderPath = path.join(ORDER_FOLDER, shop.id);
+        await createFolder(folderPath);
+        while (isHasPageToken) {
+            const data = await getTiktokOrders(req, shop, { nextPageToken: nextPageToken });
+            if (data) {
+                if (data.next_page_token) {
+                    nextPageToken = data.next_page_token;
+                    isHasPageToken = true;
+                    createOrders(data, shop.id + "/" + page + ".json");
+                } else {
+                    isHasPageToken = false;
+                }
+            }
+            page++;
+        }
+
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
     }
 }

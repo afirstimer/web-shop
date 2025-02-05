@@ -19,7 +19,7 @@ const Sku = ({ parentId, skuFields, handleSKUDataChange }) => {
     const [skuImage, setSkuImage] = useState('');
     const [skuPrice, setSkuPrice] = useState(0);
     const [skuQty, setSkuQty] = useState(0);
-    const [skuCode, setSkuCode] = useState('');
+    const [skuCode, setSkuCode] = useState('{{code}}');
 
     useEffect(() => {
         // loop skuFields and create array rows with id match parentId

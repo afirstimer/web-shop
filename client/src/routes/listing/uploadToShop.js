@@ -1,9 +1,43 @@
 import React, { useEffect, useState } from "react";
-import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CForm, CRow, CFormInput, CFormLabel, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CAvatar, CCol, CBadge, CFooter, CFormSelect, CToast, CToastHeader, CToastBody, CFormTextarea, CLink, CImage, CProgress } from "@coreui/react";
+import { 
+    CModal, 
+    CModalHeader, 
+    CModalTitle, 
+    CModalBody, 
+    CModalFooter, 
+    CButton, 
+    CForm,
+    CRow, 
+    CFormLabel, 
+    CTable, 
+    CTableHead, 
+    CTableRow, 
+    CTableHeaderCell, 
+    CTableBody, 
+    CTableDataCell, 
+    CAvatar, 
+    CCol, 
+    CBadge, 
+    CFooter, 
+    CFormSelect, 
+    CToast, 
+    CToastHeader, 
+    CToastBody, 
+    CFormTextarea, 
+    CImage, 
+    CProgress 
+} from "@coreui/react";
 import apiRequest from "../../lib/apiRequest";
 import MultiSelect from 'multiselect-react-dropdown'
 import { ToastNoti } from "../../components/notification/ToastNoti";
-import { cil3d, cilArrowLeft, cilBell, cilCaretRight, cilCheckCircle, cilCloudUpload, cilDiamond, cilLockLocked, cilPencil, cilPlus, cilTrash, cilX } from "@coreui/icons";
+import { 
+    cilBell, 
+    cilCheckCircle, 
+    cilCloudUpload, 
+    cilLockLocked, 
+    cilPencil, 
+    cilX 
+} from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
 import "./uploadToShop.css";
 import Toggle from 'react-toggle'

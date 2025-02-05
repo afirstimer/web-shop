@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import classNames from 'classnames'
 
 import {
     CAvatar,
@@ -79,17 +78,6 @@ import {
     cilBell
 } from '@coreui/icons'
 
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
-
-import WidgetsBrand from '../../views/widgets/WidgetsBrand'
-import WidgetsDropdown from '../../views/widgets/WidgetsDropdown'
-import MainChart from '../../views/dashboard/MainChart'
-
 import apiRequest from '../../lib/apiRequest'
 import DeleteListing from './deleteListing'
 import CrawlListing from './crawlListing'
@@ -102,7 +90,6 @@ import { format } from 'timeago.js'
 import { ToastNoti } from "../../components/notification/ToastNoti";
 
 const Listings = () => {
-    const navigate = useNavigate();
 
     // enum
     const StatusEnum = {
@@ -132,6 +119,10 @@ const Listings = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [limit, setLimit] = useState(10);
     const [sort, setSort] = useState('newest');
+
+    // filter risk
+    const [filter, setFilter] = useState({});
+
     // listings on shops
     const [listingOnShops, setListingOnShops] = useState([]);
 
@@ -203,6 +194,17 @@ const Listings = () => {
                 console.log(error);
             }
         }
+
+        const fetchFilter = async () => {
+            try {
+                const res = await apiRequest.get('/filters');
+                setFilter(res.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchFilter();
 
         fetchListingsOnShops();
     }, []);
@@ -371,19 +373,14 @@ const Listings = () => {
             <CRow>
                 <CCol sm={5}>
                     <h4 id="traffic" className="card-title mb-0">
-                        Sản phẩm cào
-                        <CButton color="warning" className="ms-2 mb-2" onClick={() => setVisibleCrawl(!visibleCrawl)}>
+                        Sản phẩm cào ({total})
+                        {/* <CButton color="warning" className="ms-2 mb-2" onClick={() => setVisibleCrawl(!visibleCrawl)}>
                             <CIcon icon={cilReload} className="me-1" />
-                        </CButton>
+                        </CButton> */}
                     </h4>
                 </CCol>
-                <CCol sm={7} className="d-none d-md-block">
-                    <CButton color="primary" className="float-end" disabled={!uploadStatusBtn} onClick={() => callUpload()}>
-                        <CIcon icon={cilPlus} /> Đăng sản phẩm
-                    </CButton>
-                </CCol>
             </CRow>
-            <CRow>
+            <CRow className="mt-3">
                 <CCol>
                     <CInputGroup className="mb-3">
                         <CFormInput
@@ -394,7 +391,7 @@ const Listings = () => {
                         />
                     </CInputGroup>
                 </CCol>
-                <CCol>
+                {/* <CCol>
                     <MultiSelect
                         displayValue='name'
                         options={StatusEnum.PRODUCT_STATUS}
@@ -408,7 +405,7 @@ const Listings = () => {
                         options={StatusEnum.PUBLISH_STATUS}
                         placeholder='Trạng thái đăng sản phẩm'
                     />
-                </CCol>
+                </CCol> */}
                 <CCol>
                     <CDropdown>
                         <CDropdownToggle color='white'>
@@ -433,6 +430,11 @@ const Listings = () => {
                             <CDropdownItem onClick={() => handleSortChange("updated_oldest")} className={sort === "updated_oldest" ? 'active' : ''}>Cập nhật cũ nhất</CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
+                </CCol>
+                <CCol className="d-none d-md-block">
+                    <CButton color="primary" className="float-end" disabled={!uploadStatusBtn} onClick={() => callUpload()}>
+                        <CIcon icon={cilPlus} /> Đăng sản phẩm
+                    </CButton>
                 </CCol>
             </CRow>
             <CRow>
@@ -472,7 +474,7 @@ const Listings = () => {
                                 </CTableHead>
                                 <CTableBody>
                                     {listings.map((item, index) => (
-                                        <CTableRow v-for="item in tableItems" key={index}>
+                                        <CTableRow v-for="item in tableItems" key={index} color={filter && filter.asin.includes(item.sku) ? 'danger' : ''}>
                                             <CTableDataCell>
                                                 <CFormCheck
                                                     className="form-check-input"
@@ -504,14 +506,14 @@ const Listings = () => {
                                                                 <div class="p-2">{los.shop.name}</div>
                                                                 <div class="p-2">{format(los.createdAt)}</div>
                                                                 <div class="p-2">
-                                                                    {los.status === 'SUCCESS' ?
-                                                                        <CBadge color='success'>ACTIVE</CBadge> :
+                                                                    {los.status === 'FAILURE' ?
                                                                         <>
-                                                                            <CBadge color='danger'>ERROR</CBadge>
+                                                                            <CBadge color='danger'>{los.status}</CBadge>
                                                                             <CLink color='info' href='#' target="_blank">
                                                                                 <CIcon icon={cilReload} className="me-2" />
                                                                             </CLink>
-                                                                        </>
+                                                                        </> :
+                                                                        <CBadge color='warning'>{los.status}</CBadge>
                                                                     }
                                                                 </div>
                                                             </div>

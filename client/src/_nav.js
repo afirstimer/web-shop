@@ -1,30 +1,22 @@
 import React from 'react'
-import CIcon from '@coreui/icons-react'
-import {
-  cilExternalLink,
-  cilPuzzle,
-  cilSpeedometer,
-  cilLineWeight,
-  cilCart,
-  cilCloud,
-  cilBook,
-  cilGroup,
-  cilHouse,
-  cilLink,
-  cilInbox,
-  cilSettings,
-  cilKeyboard,
-  cilLockLocked,
-  cilDoor,
-  cibGlassdoor,
-  cilFactory,
-  cilLibraryBuilding,
-  cilMediaRecord,
-  cilColumns,
-  cilSitemap,
-  cilGlobeAlt,
-  cilUser
-} from '@coreui/icons'
+import { 
+  Boxes, 
+  DatabaseZap, 
+  Filter,
+  Gauge, 
+  Hand, 
+  KeySquare, 
+  LaptopMinimal, 
+  LayoutTemplate, 
+  Package, 
+  Send, 
+  ShoppingBag, 
+  SquareUserRound, 
+  Store, 
+  Users, 
+  Waypoints, 
+  Wrench 
+} from 'lucide-react'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
@@ -32,7 +24,7 @@ const _nav = [
     component: CNavItem,
     name: 'Dashboard',
     to: '/dashboard',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    icon: <Gauge className="w-4 h-4 me-2" />,
   },
   {
     component: CNavTitle,
@@ -42,14 +34,13 @@ const _nav = [
     component: CNavGroup,
     name: 'Sản phẩm',
     to: '/products',
-    icon: <CIcon icon={cilSitemap} customClassName="nav-icon" />,
+    icon: <LaptopMinimal className="w-4 h-4 me-2" />,
     items: [
       {
         component: CNavItem,
         name: (
           <React.Fragment>
-            {'Listing'}
-            <CIcon icon={cilCart} size="sm" className="ms-2" />
+            {'Listing'} <Package className="w-4 h-4 ms-2" />
           </React.Fragment>
         ),        
         to: '/listings',
@@ -58,8 +49,7 @@ const _nav = [
         component: CNavItem,
         name: (
           <React.Fragment>
-            {'Template'}
-            <CIcon icon={cilPuzzle} size="sm" className="ms-2" />
+            {'Template'} <LayoutTemplate className='w-4 h-4 ms-2' />
           </React.Fragment>
         ),        
         to: '/templates',
@@ -68,8 +58,7 @@ const _nav = [
         component: CNavItem,
         name: (
           <React.Fragment>
-            {'Sản phẩm'}
-            <CIcon icon={cilCart} size="sm" className="ms-2" />
+            {'Sản phẩm'} <Boxes className='w-4 h-4 ms-2' />
           </React.Fragment>
         ),        
         to: '/products',
@@ -77,17 +66,23 @@ const _nav = [
     ],
   },
   {
+    component: CNavItem,
+    name: 'Orders',
+    to: '/orders',
+    icon: <ShoppingBag className="w-4 h-4 me-2" />
+  },
+  {
     component: CNavGroup,
     name: 'Systems',
     to: '/systems',
-    icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
+    icon: <DatabaseZap className="w-4 h-4 me-2" />,
     items: [
       {
         component: CNavItem,
         name: (
           <React.Fragment>
             {'Cửa hàng'}
-            <CIcon icon={cilLibraryBuilding} size="sm" className="ms-2" />
+            <Store className="w-4 h-4 ms-2" />
           </React.Fragment>
         ),        
         to: '/shops',
@@ -97,7 +92,7 @@ const _nav = [
         name: (
           <React.Fragment>
             {'Nhóm'}
-            <CIcon icon={cilGroup} size="sm" className="ms-2" />
+            <Users className="w-4 h-4 ms-2" />
           </React.Fragment>
         ),        
         to: '/teams',
@@ -107,7 +102,7 @@ const _nav = [
         name: (
           <React.Fragment>
             {'User'}
-            <CIcon icon={cilUser} size="sm" className="ms-2" />
+            <SquareUserRound className="w-4 h-4 ms-2" />
           </React.Fragment>
         ),        
         to: '/users',
@@ -117,14 +112,14 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Tools',    
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+    icon: <Wrench className="w-4 h-4 me-2" />,
     items: [
       {
         component: CNavItem,
         name: (
           <React.Fragment>
             {'Proxy'}
-            <CIcon icon={cilDoor} size="sm" className="ms-2" />
+            <Waypoints className="w-4 h-4 ms-2" />
           </React.Fragment>
         ),
         to: '/proxies'        
@@ -134,11 +129,31 @@ const _nav = [
         name: (
           <React.Fragment>
             {'Token'}
-            <CIcon icon={cilLockLocked} size="sm" className="ms-2" />
+            <KeySquare className="w-4 h-4 ms-2" />
           </React.Fragment>
         ),        
         to: '/tools'
       },
+      {
+        component: CNavItem,
+        name: (
+          <React.Fragment>
+            {'Filter'}
+            <Filter className="w-4 h-4 ms-2" />
+          </React.Fragment>
+        ),        
+        to: '/filters'
+      },
+      {
+        component: CNavItem,
+        name: (
+          <React.Fragment>
+            {'Notify'}
+            <Send className="w-4 h-4 ms-2" />
+          </React.Fragment>
+        ),        
+        to: '/notify'
+      }
     ]
   }
 ]
