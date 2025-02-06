@@ -46,11 +46,11 @@ app.use("/api/filters", filterRoute);
 
 app.use("/api/test", testRoute);
 
-app.listen(8800, () => {
-    console.log("Listening on port 8800");
-}).on("error", (err) => {
-    console.log(err);
-}).catch((err) => {
-    console.log(err);
-});
+try {
+    app.listen(8800, () => {
+        console.log("Listening on port 8800");
+    });
+} catch (error) {
+    console.log(error);
+}
 
